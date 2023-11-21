@@ -1,6 +1,6 @@
 import express from "express";
 import citizenController from "../controllers/citizen.js";
-import citizen from "../controllers/citizen.js";
+
 const router = express.Router();
 
 router.get("/get-sipulated", citizenController.getSipulated);
