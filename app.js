@@ -23,7 +23,8 @@ import {
 } from "./models/index.js";
 
 //Import routes
-import citizenRoute from "./routes/citizen.js";
+import citizenRoutes from "./routes/citizen.js";
+import authRoutes from "./routes/auth.js";
 
 //Variable definition
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,7 +38,7 @@ const app = express();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "images");
+    cb(null, "reports");
   },
   filename: (req, file, cb) => {
     cb(
@@ -113,17 +114,20 @@ Board.hasOne(PermitRequest);
 Company.hasMany(PermitRequest);
 PermitRequest.belongsTo(Company);
 
-
 //Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).array("files", 2)
 );
 app.use(express.json());
-app.use('/images',express.static(path.join(__dirname, "images")));
+app.use("/report", express.static(path.join(__dirname, "report")));
+app.use(express.static(path.join(__dirname, "public")));
+
+console.log(__dirname)
 
 //Routing
-app.use("/citizen", citizenRoute);
+app.use("/citizen", citizenRoutes);
+app.use("/auth",authRoutes);
 app.use("/", (req, res) => {
   res.render("404");
 });
