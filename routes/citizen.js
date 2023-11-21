@@ -1,5 +1,5 @@
-import express from "express";
-import citizenController from "../controllers/citizen.js";
+const express = require("express");
+const citizenController = require("../controllers/citizen.js");
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.post("/post-report", citizenController.postReport);
 router.get("/get-report-data", citizenController.getReportData);
 router.post("/post-self-report", citizenController.postSelfReport);
 
-export default router;
+module.exports = router;

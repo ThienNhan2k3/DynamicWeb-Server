@@ -1,14 +1,15 @@
-import express from "express";
-import bodyParser from "body-parser";
-import multer from "multer";
-import sequelize from "./util/database.js";
-import fs from "fs";
-import path from "path";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+const express = require("express");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+//const sequelize = require("./util/database.js");
+const fs = require("fs");
+const path = require("path");
+const { dirname } = require("path");
+const { fileURLToPath } = require("url");
 
 //Import model
-import {
+const {
+  sequelize,
   Account,
   AdsPlacement,
   AdsType,
@@ -20,14 +21,15 @@ import {
   PermitRequest,
   Report,
   ReportType,
-} from "./models/index.js";
+} = require("./models");
 
 //Import routes
-import citizenRoutes from "./routes/citizen.js";
-import authRoutes from "./routes/auth.js";
+const citizenRoutes = require("./routes/citizen.js");
+const authRoutes = require("./routes/auth.js");
 
 //Variable definition
-const __dirname = dirname(fileURLToPath(import.meta.url));
+//const __dirname = dirname(fileURLToPath(import.meta.url));
+const PORT = 5000 || process.env.PORT;
 
 const uploadFolder = "images";
 if (!fs.existsSync(uploadFolder)) {
@@ -81,7 +83,7 @@ app.use((req, res, next) => {
 });
 
 //Association
-Area.hasMany(AdsPlacement);
+/* Area.hasMany(AdsPlacement);
 AdsPlacement.belongsTo(Area);
 
 LocationType.hasMany(AdsPlacement);
@@ -112,7 +114,7 @@ PermitRequest.belongsTo(Board);
 Board.hasOne(PermitRequest);
 
 Company.hasMany(PermitRequest);
-PermitRequest.belongsTo(Company);
+PermitRequest.belongsTo(Company); */
 
 //Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -132,14 +134,13 @@ app.use("/", (req, res) => {
   res.render("404");
 });
 
-sequelize
-  // Uncomment when change database schema
-  // .sync({ alter: true })
-  .sync()
-  .then((result) => {
-    app.listen(3000);
-    console.log("Database connected");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+app.listen(PORT, async () => {
+  console.log("Server is running on PORT ", PORT);
+  try {
+    await sequelize.authenticate();
+    console.log("Database connected!!");
+  } catch(err) {
+    console.error(err);
+  }
+
+})

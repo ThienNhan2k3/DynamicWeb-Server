@@ -1,25 +1,42 @@
-import Account from "./account.js";
-import AdsPlacement from "./adsPlacement.js";
-import AdsType from "./adsType.js";
-import Area from "./area.js";
-import Board from "./board.js";
-import BoardType from "./boardType.js";
-import Company from "./company.js";
-import LocationType from "./locationType.js";
-import PermitRequest from "./permitRequest.js";
-import Report from "./report.js";
-import ReportType from "./reportType.js";
+'use strict';
 
-export {
-  Account,
-  AdsPlacement,
-  AdsType,
-  Area,
-  Board,
-  BoardType,
-  Company,
-  LocationType,
-  PermitRequest,
-  Report,
-  ReportType,
-};
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const process = require('process');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/config.json')[env];
+const db = {};
+
+let sequelize;
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
+
+fs
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (
+      file.indexOf('.') !== 0 &&
+      file !== basename &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
+  })
+  .forEach(file => {
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
+  });
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+
+db.sequelize = sequelize;
+
+module.exports = db;

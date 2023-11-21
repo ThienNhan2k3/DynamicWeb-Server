@@ -1,18 +1,47 @@
-import Sequelize from "sequelize";
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Company extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate({PermitRequest}) {
+      // define association here
+      this.hasMany(PermitRequest, {foreignKey: "companyId"});
 
-import sequelize from "../util/database.js";
-
-const Company = sequelize.define("Company", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  name: Sequelize.STRING,
-  phone: Sequelize.STRING,
-  address: Sequelize.STRING,
-  email: Sequelize.STRING,
-});
-
-export default Company;
+    }
+  }
+  Company.init({
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false 
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false 
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false 
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false 
+    },
+  }, {
+    sequelize,
+    tableName: "companies",
+    modelName: 'Company',
+  });
+  return Company;
+};

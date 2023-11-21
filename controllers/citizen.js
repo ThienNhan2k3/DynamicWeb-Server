@@ -1,4 +1,5 @@
-import {
+const {
+  sequelize,
   AdsPlacement,
   Area,
   LocationType,
@@ -6,17 +7,15 @@ import {
   Report,
   ReportType,
   PermitRequest,
-} from "../models/index.js";
-
-import BoardType from "../models/boardType.js";
-import Sequelize from "sequelize";
+  BoardType
+} = require("../models");
 
 const getSipulated = async (req, res, next) => {
   const sipulated = await AdsPlacement.findAll({
     where: {
       status: "Đã quy hoạch",
       id: {
-        [Sequelize.Op.notIn]: Sequelize.literal(
+        [sequelize.Op.notIn]: sequelize.literal(
           "(SELECT AdsPlacementId FROM reports)"
         ),
       },
@@ -67,7 +66,7 @@ const getNonSipulated = async (req, res, next) => {
     where: {
       status: "Chưa quy hoạch",
       id: {
-        [Sequelize.Op.notIn]: Sequelize.literal(
+        [sequelize.Op.notIn]: sequelize.literal(
           "(SELECT AdsPlacementId FROM reports)"
         ),
       },
@@ -117,7 +116,7 @@ const getReport = async (req, res, next) => {
   const reported = await Report.findAll({
     where: {
       AdsPlacementId: {
-        [Sequelize.Op.not]: null,
+        [sequelize.Op.not]: null,
       },
     },
     include: [
@@ -292,7 +291,7 @@ const getReportData = async (req, res, next) => {
 const postSelfReport = async (req, res) => {
   const reportIds = req.body.reportIds;
   const reports = await Report.findAll({
-    where: { id: { [Sequelize.Op.in]: reportIds } },
+    where: { id: { [sequelize.Op.in]: reportIds } },
     include: [
       { model: ReportType, required: true },
       { model: AdsPlacement, required: true },
@@ -301,7 +300,7 @@ const postSelfReport = async (req, res) => {
   res.json(JSON.stringify(reports));
 };
 
-export default {
+module.exports = {
   getSipulated,
   getNonSipulated,
   getReport,

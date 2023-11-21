@@ -1,15 +1,34 @@
-import Sequelize from "sequelize";
-
-import sequelize from "../util/database.js";
-
-const BoardType = sequelize.define("BoardType", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  type: Sequelize.STRING,
-});
-
-export default BoardType;
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class BoardType extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate({Board}) {
+      // define association here
+      this.hasMany(Board, {foreignKey: "boardTypeId"});
+    }
+  }
+  BoardType.init({
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false 
+    }
+  }, {
+    sequelize,
+    tableName: "boardTypes",
+    modelName: 'BoardType',
+  });
+  return BoardType;
+};

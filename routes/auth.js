@@ -1,9 +1,9 @@
-import express from "express";
-import authController from "../controllers/auth.js";
-import auth from "../controllers/auth.js";
+const express = require("express");
+const authController = require("../controllers/auth.js");
+const auth = require("../controllers/auth.js");
 
 const router = express.Router();
 
 router.get("/forget-password", authController.getForgetPassword);
 
-export default router
+module.exports = router;
