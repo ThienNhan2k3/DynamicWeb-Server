@@ -7,15 +7,16 @@ const {
   Report,
   ReportType,
   PermitRequest,
-  BoardType
+  BoardType,
 } = require("../models");
+const Sequelize = require("sequelize");
 
 const getSipulated = async (req, res, next) => {
   const sipulated = await AdsPlacement.findAll({
     where: {
       status: "Đã quy hoạch",
       id: {
-        [sequelize.Op.notIn]: sequelize.literal(
+        [Sequelize.Op.notIn]: Sequelize.literal(
           "(SELECT AdsPlacementId FROM reports)"
         ),
       },
@@ -66,7 +67,7 @@ const getNonSipulated = async (req, res, next) => {
     where: {
       status: "Chưa quy hoạch",
       id: {
-        [sequelize.Op.notIn]: sequelize.literal(
+        [Sequelize.Op.notIn]: Sequelize.literal(
           "(SELECT AdsPlacementId FROM reports)"
         ),
       },
@@ -116,7 +117,7 @@ const getReport = async (req, res, next) => {
   const reported = await Report.findAll({
     where: {
       AdsPlacementId: {
-        [sequelize.Op.not]: null,
+        [Sequelize.Op.not]: null,
       },
     },
     include: [
@@ -232,6 +233,7 @@ const postReport = async (req, res, next) => {
     imageUrl = path.join(",");
     imageUrl = imageUrl.replace(/\\/g, "/");
   }
+  console.log(type)
   if (type == "TGSP") {
     type = "Tố giác sai phạm";
   } else if (type == "DKND") {
@@ -246,6 +248,7 @@ const postReport = async (req, res, next) => {
     return;
   }
   const typeId = dbquery.id;
+  console.log(typeId)
 
   const newReport = await Report.create({
     submission_time: new Date(),
@@ -261,28 +264,35 @@ const postReport = async (req, res, next) => {
   });
   newReport.save();
   if (board != undefined) {
-    let permitRequest= await PermitRequest.findOne({ where: { BoardId: board } });
-    permitRequest.status="Bị báo cáo"
-    permitRequest.save()
+    let permitRequest = await PermitRequest.findOne({
+      where: { BoardId: board },
+    });
+    permitRequest.status = "Bị báo cáo";
+    permitRequest.save();
   }
   res.status(200).json({ id: newReport.id });
 };
 
 const getReportData = async (req, res, next) => {
-  const adsPlacementId = req.query.placement;
-  const boardId = req.query.board;
+  let adsPlacementId = req.query.placement;
+  let boardId = req.query.board;
+
   let reports;
+  console.log(adsPlacementId);
   if (boardId != "undefined") {
-    console.log("HEHE");
+    boardId = parseInt(boardId);
+
     reports = await Report.findAll({
       where: { BoardId: boardId },
       include: [{ model: ReportType, required: true }],
     });
   } else {
+    // adsPlacementId = parseInt(adsPlacementId);
     reports = await Report.findAll({
       where: { AdsPlacementId: adsPlacementId },
       include: [{ model: ReportType, required: true }],
     });
+    console.log(reports);
   }
 
   res.json(JSON.stringify(reports));
@@ -291,7 +301,7 @@ const getReportData = async (req, res, next) => {
 const postSelfReport = async (req, res) => {
   const reportIds = req.body.reportIds;
   const reports = await Report.findAll({
-    where: { id: { [sequelize.Op.in]: reportIds } },
+    where: { id: { [Sequelize.Op.in]: reportIds } },
     include: [
       { model: ReportType, required: true },
       { model: AdsPlacement, required: true },

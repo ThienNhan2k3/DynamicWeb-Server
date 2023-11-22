@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({AdsPlacement}) {
       // define association here
-      this.hasMany(AdsPlacement, { foreignKey: "areaId"})
+      this.hasMany(AdsPlacement)
     }
   }
   Area.init({
@@ -20,10 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
       primaryKey: true,
-    },
-    uuid: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
     },
     ward: {
       type: DataTypes.STRING,

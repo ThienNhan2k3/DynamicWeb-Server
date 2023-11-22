@@ -11,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({Board, AdsPlacement, Company}) {
       // define association here
-      this.belongsTo(Board, {foreignKey: 'boardId'});
-      this.belongsTo(AdsPlacement, {foreignKey: 'adsPlacementId'});
-      this.belongsTo(Company, {foreignKey: 'companyId'});
+      this.belongsTo(Board);
+      this.belongsTo(AdsPlacement);
+      this.belongsTo(Company);
     }
   }
   PermitRequest.init({
@@ -47,7 +47,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     size: {
       type: DataTypes.STRING,
-      allowNull: false
     },
   }, {
     sequelize,

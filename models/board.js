@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({BoardType, AdsPlacement, Report, PermitRequest}) {
       // define association here
-      this.belongsTo(BoardType, {foreignKey: "boardTypeId"});
-      this.belongsTo(AdsPlacement, {foreignKey: "adsPlacementId"});
-      this.hasMany(Report, {foreignKey: "boardId"});
-      this.hasOne(PermitRequest, {foreignKey: 'boardId'});
+      this.belongsTo(BoardType);
+      this.belongsTo(AdsPlacement);
+      this.hasMany(Report);
+      this.hasOne(PermitRequest);
     }
   }
   Board.init({

@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({PermitRequest}) {
       // define association here
-      this.hasMany(PermitRequest, {foreignKey: "companyId"});
+      this.hasMany(PermitRequest);
 
     }
   }
