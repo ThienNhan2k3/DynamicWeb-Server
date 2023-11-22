@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const multer = require("multer");
 //const sequelize = require("./util/database.js");
 const fs = require("fs");
 const path = require("path");
@@ -44,31 +43,6 @@ if (!fs.existsSync(uploadFolder)) {
 
 const app = express();
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "reports");
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      new Date().toISOString().replace(/:/g, "-") +
-        "-" +
-        file.originalname.replace(" ", "-")
-    );
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
 
 //View engine (ejs)
 app.set("view engine", "ejs");
@@ -90,11 +64,8 @@ app.use((req, res, next) => {
 
 //Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).array("files", 2)
-);
 app.use(express.json());
-app.use("/report", express.static(path.join(__dirname, "report")));
+app.use('/images',express.static(path.join(__dirname, "images")));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
