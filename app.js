@@ -8,10 +8,6 @@ const { fileURLToPath } = require("url");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 
-// initalize sequelize with session store
-const SequelizeStore = require("connect-session-sequelize")(session.Store);
-
-
 //Import model
 const {
   sequelize,
@@ -32,6 +28,12 @@ const {
 const citizenRoutes = require("./routes/citizen.js");
 const authRoutes = require("./routes/auth.js");
 const departmentRoutes = require("./routes/department.js");
+
+// initalize sequelize with session store
+const SessionStore = require("connect-session-sequelize")(session.Store);
+const sessionStore = new SessionStore({
+  db: sequelize,
+})
 
 //Variable definition
 const PORT = 5000 || process.env.PORT;
@@ -71,9 +73,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     secret: "keyboard cat",
-    store: new SequelizeStore({
-      db: sequelize,
-    }),
+    store: sessionStore,
     resave: false, // we support the touch method so per the express-session docs this should be set to false
     saveUninitialized: false
   })
@@ -81,6 +81,14 @@ app.use(
 
 //Routing
 app.use("/",authRoutes);
+
+app.use((req, res, next) => {
+  if (req.session.accountId == null || req.session.accountId == undefined) {
+    return res.redirect("/");
+  }
+  next();
+})
+
 app.use("/citizen", citizenRoutes);
 app.use("/department", departmentRoutes);
 
@@ -93,6 +101,7 @@ app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     console.log("Database connected!!");
+    sessionStore.sync();
   } catch(err) {
     console.error(err);
   }
