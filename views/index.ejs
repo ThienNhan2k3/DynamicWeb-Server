@@ -63,7 +63,7 @@
     </div> 
 
 
-    <script type="module">
+    <script >
       const users = [
             {
                 username: "nhan",
@@ -96,25 +96,6 @@
           `;
           document.getElementById("listOfAccounts").appendChild(divElement);
         });
-
-        document.getElementById("login-button").addEventListener("click", (e) => {
-          e.preventDefault();
-          const usernameOrEmail = document.getElementById("usernameOrEmail").value;
-          const password = document.getElementById("password").value;
-
-          let currentUser = users.filter((user) => (user.username === usernameOrEmail || user.email === usernameOrEmail) && user.password === password);
-          if (currentUser.length > 0) {
-            currentUser = currentUser[0];
-            if (currentUser.role === "SO") {
-              console.log(currentUser);
-              window.location.href = './So/quan-ly-tai-khoan.html'
-            } else if (currentUser.role === "PHUONG") {
-              window.location.href = './CanBoPhuong/index.html'
-            } else if (currentUser.role === "QUAN") {
-              window.location.href = './CanBoQuan/index.html'
-            }
-          }
-        })
     </script>
     
 

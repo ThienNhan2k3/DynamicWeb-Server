@@ -4,7 +4,11 @@
     "password": "tuilaemga",
     "database": "ptudw",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false,
+    "define": {
+        "timestamps": false
+    }
   },
   "test": {
     "username": "root",
