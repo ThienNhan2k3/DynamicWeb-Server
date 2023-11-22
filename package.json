@@ -18,6 +18,7 @@
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.3",
+    "node-mailjet": "^4.0.1",
     "sequelize": "^6.34.0"
   },
   "devDependencies": {
