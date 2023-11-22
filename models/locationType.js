@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({AdsPlacement}) {
       // define association here
-      this.hasMany(AdsPlacement, {foreignKey: 'locationTypeId'});
+      this.hasMany(AdsPlacement);
     }
   }
   LocationType.init({
