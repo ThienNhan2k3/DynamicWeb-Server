@@ -31,6 +31,11 @@
 </style>
 
 <body class="bg-light-subtle">
+  <% if (errorMessage.length>0) {%>
+    <div class="alert alert-danger d-flex justify-content-center" role="alert">
+      <span><%=errorMessage[0] %></span>
+    </div>
+  <% } %>
   <div class="container d-flex flex-column align-items-center mt-5">
     <div class="row justify-content-center mb-3">
       <img src="/images/logo.png" alt="Logo" style="width: 48px" class="p-0" />
@@ -88,9 +93,13 @@
         },
         body: JSON.stringify(data)
       })
-      if (response.redirected) {
-        window.location.href = response.url
+      const res=await response.json()
+      if (res.redirect) {
+        window.location.href = res.redirect;
       }
+      // if (response.redirected) {
+      //   window.location.href = response.url
+      // }
     } else {
       alert('Bạn chưa điền OTP hoặc điền chưa đủ');
     }
