@@ -7,6 +7,7 @@ const { dirname } = require("path");
 const { fileURLToPath } = require("url");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const flash = require("connect-flash");
 
 //Import model
 const {
@@ -34,7 +35,7 @@ const account = require("./models/account.js");
 const SessionStore = require("connect-session-sequelize")(session.Store);
 const sessionStore = new SessionStore({
   db: sequelize,
-})
+});
 
 //Variable definition
 const PORT = 5000 || process.env.PORT;
@@ -45,7 +46,6 @@ if (!fs.existsSync(uploadFolder)) {
 }
 
 const app = express();
-
 
 //View engine (ejs)
 app.set("view engine", "ejs");
@@ -68,7 +68,7 @@ app.use((req, res, next) => {
 //Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
-app.use('/images',express.static(path.join(__dirname, "images")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
@@ -76,23 +76,23 @@ app.use(
     secret: "keyboard cat",
     store: sessionStore,
     resave: false, // we support the touch method so per the express-session docs this should be set to false
-    saveUninitialized: false
+    saveUninitialized: false,
   })
 );
-
+app.use(flash());
 //Routing
-app.use("/",authRoutes);
+app.use("/", authRoutes);
 
 app.use(async (req, res, next) => {
   if (req.session.accountId == null || req.session.accountId == undefined) {
     return res.redirect("/");
   }
-  const account = Account.findOne({where: {id: req.session.accountId}});
+  const account = Account.findOne({ where: { id: req.session.accountId } });
   if (!account) {
     return res.redirect("/");
   }
   next();
-})
+});
 
 app.use("/citizen", citizenRoutes);
 app.use("/department", departmentRoutes);
@@ -107,8 +107,7 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log("Database connected!!");
     sessionStore.sync();
-  } catch(err) {
+  } catch (err) {
     console.error(err);
   }
-
-})
+});
