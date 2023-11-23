@@ -35,6 +35,14 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false
       },
+      otp: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      expiredOtp: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     });
   },
   async down(queryInterface, DataTypes) {

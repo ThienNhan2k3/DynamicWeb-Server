@@ -28,6 +28,7 @@ const {
 const citizenRoutes = require("./routes/citizen.js");
 const authRoutes = require("./routes/auth.js");
 const departmentRoutes = require("./routes/department.js");
+const account = require("./models/account.js");
 
 // initalize sequelize with session store
 const SessionStore = require("connect-session-sequelize")(session.Store);
@@ -82,8 +83,12 @@ app.use(
 //Routing
 app.use("/",authRoutes);
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.session.accountId == null || req.session.accountId == undefined) {
+    return res.redirect("/");
+  }
+  const account = Account.findOne({where: {id: req.session.accountId}});
+  if (!account) {
     return res.redirect("/");
   }
   next();

@@ -127,7 +127,7 @@ const postLogin = async (req, res) => {
 
   try {
     const account = await Account.findOne({where: {
-      [Op.or]: {
+      [Sequelize.Op.or]: {
         username: usernameOrEmail,
         email: usernameOrEmail
       }
@@ -172,6 +172,7 @@ module.exports = {
   getForgetPassword,
   getLogin,
   postLogin,
+  getLogout,
   getOtpWaiting,
   postForgetPassword,
   getResetPassword,
