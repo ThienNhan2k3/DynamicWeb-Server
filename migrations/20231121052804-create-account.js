@@ -43,6 +43,14 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      }
     });
   },
   async down(queryInterface, DataTypes) {

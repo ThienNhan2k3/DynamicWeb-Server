@@ -129,18 +129,35 @@ const postResetPassword = async (req, res, next) => {
   res.redirect("/");
 };
 
-const getLogin = (req, res) => {
-  const users = [];
-  const types = ["So", "Quan", "Phuong"];
-  for (let i = 0; i < types.length; i++) {
-    users.push(Account.findOne({ where: { type: types[i] } }));
+const getLogin = async (req, res) => {
+  if (req.session.accountId) {
+    const account = await Account.findOne({ where: { id: req.session.accountId } });
+    if (account) {
+      console.log(account);
+      if (account.type.toUpperCase() === "SO") {
+        return res.redirect("/department/accountManagement");
+      }
+    }
   }
-  res.render("index", users);
+
+  const error = {
+    usernameOrEmail: req.flash("usernameOrEmail"),
+    password: req.flash("password"),
+  };
+
+  res.render("index", {
+    err: error
+  });
 };
 
 const postLogin = async (req, res) => {
-  const { usernameOrEmail, password } = req.body;
-
+  const usernameOrEmail = req.body.usernameOrEmail ? req.body.usernameOrEmail.trim() : ""; 
+  const password  = req.body.password;
+  if (!usernameOrEmail) {
+    req.flash("usernameOrEmail", "Username or email is empty");
+    return res.redirect("/");
+  }
+  
   try {
     const account = await Account.findOne({
       where: {
@@ -150,23 +167,20 @@ const postLogin = async (req, res) => {
         },
       },
     });
-
+    console.log(account);
     if (!account) {
-      return res.redirect("/", {
-        error: "Username or email doesn't exist",
-      });
+      req.flash("usernameOrEmail", "Username or email doesn't exist");
+      return res.redirect("/");
     }
-    console.log(password, account.password);
     const isMatch = await bcrypt.compare(password, account.password);
     if (!isMatch) {
-      return res.redirect("/", {
-        error: "Your password is not valid",
-      });
+      req.flash("password", "Your password is not valid");
+      return res.redirect("/");
     }
 
     req.session.accountId = account.id;
-    console.log(account.type);
     res.redirect("/department/accountManagement");
+
     // if (account.type === 'So') {
     //   res.redirect("/department/accountManagement");
     // }

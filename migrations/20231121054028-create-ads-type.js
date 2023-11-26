@@ -12,6 +12,14 @@ module.exports = {
       type: {
         type: DataTypes.STRING
       },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      }
     });
   },
   async down(queryInterface, DataTypes) {

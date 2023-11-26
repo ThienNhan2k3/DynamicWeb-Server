@@ -22,7 +22,9 @@ module.exports = {
       type: "So",
       district: "",
       ward: "",
-      email: "thnhan032@gmail.com",    
+      email: "nhan@gmail.com",
+      updatedAt:"2023-11-21T04:14:54",
+      createdAt:"2023-11-21T04:14:54"       
     }, 
     {
       id: 2,
@@ -33,7 +35,9 @@ module.exports = {
       type: "Quan",
       district: "1",
       ward: "",
-      email: "hoang@gmail.com",    
+      email: "hoang@gmail.com",  
+      updatedAt:"2023-11-21T04:14:54",
+      createdAt:"2023-11-21T04:14:54"     
     }, 
     {
       id: 3,
@@ -44,7 +48,9 @@ module.exports = {
       type: "Phuong",
       district: "5",
       ward: "4",
-      email: "khiem@gmail.com",    
+      email: "khiem@gmail.com", 
+      updatedAt:"2023-11-21T04:14:54",
+      createdAt:"2023-11-21T04:14:54"   
     }], {});
   },
 

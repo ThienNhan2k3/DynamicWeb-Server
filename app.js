@@ -8,6 +8,7 @@ const { fileURLToPath } = require("url");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("connect-flash");
+const { authUser, authRole } = require("./middlewares/authentication.js");
 
 //Import model
 const {
@@ -80,22 +81,15 @@ app.use(
   })
 );
 app.use(flash());
+
+
 //Routing
 app.use("/", authRoutes);
 
-app.use(async (req, res, next) => {
-  if (req.session.accountId == null || req.session.accountId == undefined) {
-    return res.redirect("/");
-  }
-  const account = Account.findOne({ where: { id: req.session.accountId } });
-  if (!account) {
-    return res.redirect("/");
-  }
-  next();
-});
+app.use(authUser);
 
 app.use("/citizen", citizenRoutes);
-app.use("/department", departmentRoutes);
+app.use("/department", authRole("So"), departmentRoutes);
 
 app.use((req, res) => {
   res.render("404");

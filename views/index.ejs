@@ -17,7 +17,7 @@
         width: 360px;
       }
 
-      #form-container div {
+      #passwordInputContainer {
         position: relative;
       }
 
@@ -29,6 +29,14 @@
         font-size: 0.8rem;
         opacity: 0.9;
       }
+
+      #passwordInputContainer .invalid-feedback {
+        position: relative;
+        width: 100%;
+
+      } 
+
+
     </style>
 
   </head>
@@ -43,13 +51,24 @@
       <div id="form-container" class=" row rounded bg-body-secondary p-3">
           <form action="/login" method="POST">
             <fieldset>
-              <div class="mb-3">
-                <label for="usernameOrEmail" class="form-lable mb-2">Username hoặc email</label>
-                <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" required autocomplete="true">
+              <div class="mb-3 input-group has-validation">
+                <div class="is-invalid w-100">
+                  <label for="usernameOrEmail" class="form-lable mb-2">Username hoặc email</label>
+                  <input type="text" class="form-control <% if (err.usernameOrEmail.length > 0){ %> is-invalid <% } %>" id="usernameOrEmail" name="usernameOrEmail" placeholder="" required autocomplete="true">  
+                </div>
+                <% if(err.usernameOrEmail.length > 0) { %>
+                  <div class="invalid-feedback"> <%= err.usernameOrEmail %></div>
+                <% } %>
               </div>
-              <div class="mb-3">
-                <label for="password" class="form-label mb-2">Mật khẩu</label>
-                <input type="password" id="password" class="form-control" name="password" required autocomplete="true">
+              
+              <div class="mb-3 input-group has-validation" id="passwordInputContainer">
+                <div class="is-invalid w-100">
+                  <label for="password" class="form-label mb-2">Mật khẩu</label>
+                  <input type="password" id="password" class="form-control <% if (err.password.length > 0){ %> is-invalid <% } %>" name="password" placeholder="" required autocomplete="true">
+                </div>
+                <% if(err.password.length > 0) { %>
+                  <div class="invalid-feedback"> <%= err.password %> </div>
+                <% } %>
                 <a href="/forget-password" id="forgotPasswordLink">Quên mật khẩu?</a>
               </div>
             </fieldset>

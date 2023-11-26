@@ -1,10 +1,16 @@
+const {Area} = require("../models");
 const controller = {};
 
-controller.accountManagement = (req, res) => {
-    return res.render("So/accountManagement.ejs");
+controller.accountManagement = async (req, res) => {
+    const areas = await Area.findAll({
+        attributes: ['id', 'district', "ward"]
+    });
+    return res.render("So/accountManagement.ejs", {
+        areas
+    });
 }
 
-controller.registerAccount = (req, res) => {
+controller.createAccount =  (req, res) => {
     return res.render("So/accountManagement.ejs");
 }
 
