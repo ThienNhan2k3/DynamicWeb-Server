@@ -81,6 +81,8 @@ app.use(
 );
 app.use(flash());
 //Routing
+app.use("/citizen", citizenRoutes);
+app.use("/department", departmentRoutes);
 app.use("/", authRoutes);
 
 app.use(async (req, res, next) => {
@@ -94,9 +96,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use("/citizen", citizenRoutes);
-app.use("/department", departmentRoutes);
-
 app.use((req, res) => {
   res.render("404");
 });
@@ -104,7 +103,7 @@ app.use((req, res) => {
 app.listen(PORT, async () => {
   console.log("Server is running on PORT ", PORT);
   try {
-    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
     console.log("Database connected!!");
     sessionStore.sync();
   } catch (err) {

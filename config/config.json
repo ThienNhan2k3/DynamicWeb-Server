@@ -7,7 +7,7 @@
     "dialect": "mysql",
     "logging": false,
     "define": {
-        "timestamps": false
+        "timestamps": true
     }
   },
   "test": {

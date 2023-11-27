@@ -60,6 +60,7 @@ const getSipulated = async (req, res, next) => {
     sipulatedGeoJSON.features.push(feature);
   });
 
+  console.log(sipulatedGeoJSON)
   res.json(JSON.stringify(sipulatedGeoJSON));
 };
 const getNonSipulated = async (req, res, next) => {
