@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "tuilaemga",
-    "database": "ptudw",
+    "database": "ptudw-test",
     "host": "localhost",
     "dialect": "mysql",
     "logging": false,

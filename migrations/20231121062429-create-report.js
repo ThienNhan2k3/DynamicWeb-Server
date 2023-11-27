@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('reports', {
+    await queryInterface.createTable("reports", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -12,55 +12,59 @@ module.exports = {
       submission_time: DataTypes.DATE,
       name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       phone: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       reportContent: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       image: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       status: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       method: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true,
       },
       boardId: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
+      },
+      adsPlacementId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       reportTypeId: {
         type: DataTypes.INTEGER,
-        allowNull: true
-      }, 
+        allowNull: true,
+      },
       accountId: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE
-      }
+        type: DataTypes.DATE,
+      },
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('reports');
-  }
+    await queryInterface.dropTable("reports");
+  },
 };
