@@ -23,8 +23,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
-    // size: DataTypes.STRING,
-    // quantity: DataTypes.STRING,
+    size: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    quantity: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     content: {
       type: DataTypes.STRING,
       allowNull: false

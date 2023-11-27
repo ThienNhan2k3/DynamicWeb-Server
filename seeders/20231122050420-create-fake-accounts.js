@@ -20,8 +20,8 @@ module.exports = {
       username: "nhan",
       password: "$2b$12$rV7gjsFTaM/vY.jAzSjEFOXYkyMf5L/tvlz6Zadz10Pc7/tLrAspK",
       type: "So",
-      district: "",
-      ward: "",
+      district: "5",
+      ward: "10",
       email: "nhan@gmail.com",
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"       
@@ -33,8 +33,8 @@ module.exports = {
       username: "hoang",
       password: "$2b$12$V37z8QM5g2J0Rp2XxVf2QutIMcnaRcuW9QcFvMR.lthNisApSDGPG",
       type: "Quan",
-      district: "1",
-      ward: "",
+      district: "11",
+      ward: "5",
       email: "hoang@gmail.com",  
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"     
@@ -46,8 +46,8 @@ module.exports = {
       username: "khiem",
       password: "$2b$12$.BVc.Mw9MvW2zuD9tBFXKuC1kw4P8Ez4pG6DNX53XxvYuqehQ76tS",
       type: "Phuong",
-      district: "5",
-      ward: "4",
+      district: "11",
+      ward: "7",
       email: "khiem@gmail.com", 
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"   

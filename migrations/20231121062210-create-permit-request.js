@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('permitRequests', {
+    await queryInterface.createTable("permitRequests", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -13,52 +13,55 @@ module.exports = {
       // quantity: DataTypes.STRING,
       content: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       image: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       start: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
       },
       end: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
       },
       status: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       size: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true,
+      },
+      quantity: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       boardId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       adsPlacementId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       companyId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE
-      }
-      
+        type: DataTypes.DATE,
+      },
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('permitRequests');
-  }
+    await queryInterface.dropTable("permitRequests");
+  },
 };
