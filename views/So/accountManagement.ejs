@@ -253,8 +253,8 @@
                   <div class="col-6 col-md-4">
                     <select name="district" class="form-select" required>
                       <option value="">Quận</option>
-                      <% for (let i = 0; i < areas.length; i++){ %>
-                        <option value="<%= areas[i].id %>"><%= areas[i].district %></option>
+                      <% for (let i = 0; i < districts.length; i++){ %>
+                        <option value="<%= districts[i] %>"><%= districts[i] %></option>
                       <% } %>
                       <option value="1">1</option>
                       <option value="2">2</option>

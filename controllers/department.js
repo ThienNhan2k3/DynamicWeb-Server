@@ -1,12 +1,17 @@
-const {Area} = require("../models");
+const {Area, sequelize} = require("../models");
+const sql = sequelize.sql;
 const controller = {};
 
 controller.accountManagement = async (req, res) => {
-    const areas = await Area.findAll({
-        attributes: ['id', 'district', "ward"]
+    const wards = await Area.findAll({
+        attributes: ['district', "ward"]
     });
+    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
+    console.log(districts);
+
     return res.render("So/accountManagement.ejs", {
-        areas
+        districts, 
+        wards
     });
 }
 

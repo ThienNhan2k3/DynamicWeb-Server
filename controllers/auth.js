@@ -133,7 +133,6 @@ const getLogin = async (req, res) => {
   if (req.session.accountId) {
     const account = await Account.findOne({ where: { id: req.session.accountId } });
     if (account) {
-      console.log(account);
       if (account.type.toUpperCase() === "SO") {
         return res.redirect("/department/accountManagement");
       }
@@ -167,7 +166,6 @@ const postLogin = async (req, res) => {
         },
       },
     });
-    console.log(account);
     if (!account) {
       req.flash("usernameOrEmail", "Username or email doesn't exist");
       return res.redirect("/");
