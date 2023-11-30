@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "tuilaemga",
-    "database": "ptudw-test",
+    "password": "mysql@0406",
+    "database": "database_development",
     "host": "localhost",
     "dialect": "mysql",
     "logging": false,

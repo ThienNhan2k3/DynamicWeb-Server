@@ -1,0 +1,80 @@
+.alert-container {
+    margin: 1rem auto;
+    width: 96%;
+    animation-name: fade;
+    animation-duration: 4s;
+    animation-fill-mode: forwards;
+}
+
+.alert {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.alert-container .progress, .alert {
+    width: 100%;
+}
+
+.alert-container .progress {
+    height: 8px;
+    position: relative;
+    top: -8px;
+    border-radius: 0px 0px 8px 8px;
+}
+
+.progress::before {
+    content: "";
+    height: 100%;
+    animation-name: progressHorizontailAnimation;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+}
+
+.progress-success {
+    background-color: #D1E7DD;
+}
+
+.progress-success::before {
+    background-color: #7FB59D;
+}
+
+.progress-danger {
+    background-color: #F8D7DA;
+}
+
+.progress-danger::before {
+    background-color: #C48F94;
+}
+
+
+@keyframes progressHorizontailAnimation {
+    0% { width: 100%;}
+    100% { width: 0%;}
+}
+
+
+@keyframes fade {
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@media only screen and (min-width:576px) {
+    .alert-container {
+        margin-right: 20px;
+        width: 45%;
+    }
+}
+
+@media only screen and (min-width:768px) {
+    .alert-container {
+        width: 32%;
+    }
+}
+
+@media only screen and (min-width:992px) {
+    .alert-container {
+        width: 25%;
+    }
+}

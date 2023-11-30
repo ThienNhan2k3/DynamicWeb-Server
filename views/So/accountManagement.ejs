@@ -16,6 +16,8 @@
     <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/So/style.css">
     <link rel="stylesheet" href="/css/So/table.css">
+    <link rel="stylesheet" href="/css/So/alert.css">
+    <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
   </head>
 
   <body>
@@ -48,117 +50,76 @@
             <th scope="col">Email</th>
             <th scope="col">Phường</th>
             <th scope="col">Quận</th>
-            <th scope="col">Thành Phố</th>
             <th scope="col">Loại</th>
             <th scope="col" style="text-align: center;">Chức năng</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
-          <tr>
-            <td scope="col">
-              <input type="checkbox" name="allAccounts" class="checkbox-items">
-            </td>
-            <td>Nguyễn Thiện Nhân</td>
-            <td>ntnhan21@fitus.edu.vn</td>
-            <td>15</td>
-            <td>Tân Bình</td>
-            <td>Hồ Chí Minh</td>
-            <td>Quận</td>
-            <td class="function-icons text-center">
-              <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-              <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
-            </td>
-          </tr>
+          <% if (pagination.accounts) { %>
+            <% for (let i = 0; i < pagination.accounts.length; i++) { %>
+              <tr>
+                <td scope="col">
+                  <input type="checkbox" name="accountId" class="checkbox-items" value="<%= pagination.accounts[i].id %>">
+                </td>
+                <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
+                <td><%= pagination.accounts[i].email %></td>
+                <% if (pagination.accounts[i].ward != null) { %> 
+                <td> <%= pagination.accounts[i].ward %></td>
+                <% } else {%>
+                  <td>NULL</td>
+                <% } %>
+                <% if (pagination.accounts[i].district != null) { %> 
+                  <td> <%= pagination.accounts[i].district %></td>
+                  <% } else {%>
+                    <td>NULL</td>
+                  <% } %>
+                <td><%= pagination.accounts[i].type %></td>
+                <td class="function-icons text-center">
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
+                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
+              </tr>
+          <% } %>
+
         </tbody>
       </table>
     </div>
 
     <div class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
-      <p class="pagination-text mb-0">Showing <b>5</b> Out of <b>25</b></p>
+      <p class="pagination-text mb-0">Showing <b><%= pagination.currentPage %></b> Out of <b><%= pagination.maxPage %></b></p>
       <nav aria-label="Page navigation example">
         <ul class="pagination mb-0">
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">Previous</a></li>
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">1</a></li>
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">2</a></li>
-          <li class="page-item active" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="#">3</a></li>
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">4</a></li>
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">5</a></li>
-          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="#">Next</a></li>
+          <% if (pagination.currentPage === pagination.minPage) { %>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>">Previous</a></li>
+          <% }else{%>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
+          <% } %>
+
+          <% for (let i = pagination.currentPage - pagination.sizePage; i < pagination.currentPage; i++) { %>
+            <% if (i >= pagination.minPage){ %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>"><%=i%></a></li>
+            <% } %>
+          <% } %>
+
+          <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
+
+          <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.sizePage; i++) { %>
+            <% if (i <= pagination.maxPage) { %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= i%>"><%= i%></a></li>
+            <% } %>
+          <% } %>
+
+          <% if (pagination.currentPage === pagination.maxPage) { %>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage%>">Next</a></li>
+          <% }else{%>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
+          <% } %>
+
         </ul>
       </nav>
     </div>
@@ -190,83 +151,135 @@
       </div>
     </div>
 
+    
     <!-- The Create Modal -->
     <div class="modal" id="createModal">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
+      <% if (createMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= createMsg.status[0] %>"></div>
+      </div>
+      <% } %>
+      <div class="modal-dialog modal-dialog-centered modal-lg align-items-start">
         <div class="modal-content">
-
           <!-- Modal Header -->
           <div class="modal-header">
             <h4 class="modal-title">Tạo tài khoản</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
           </div>
 
           <!-- Modal body -->
           <div class="modal-body">
             <form action="/department/register" method="POST">
               <fieldset class="container">
-                <div class="row">
-                  <div class="col col-6 ps-0">
-                    <div class="mb-3 form-floating">
-                      <input type="text" class="form-control" id="name" name="name" required autocomplete="true" placeholder="">
-                      <label for="name" class="mb-2">Họ và tên</label>
+                <div class="row mb-3">
+                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input type="text" class="form-control <% if(err.firstNameCreateModal.length > 0){ %> is-invalid <% } %>" id="firstNameCreateModal" name="firstNameCreateModal" autocomplete="true" placeholder="">
+                      <label for="firstNameCreateModal" class="mb-2">Tên</label>
                     </div>
+                    <% if(err.firstNameCreateModal.length > 0) { %>
+                      <div class="invalid-feedback"> <%= err.firstNameCreateModal[0] %></div>
+                    <% } %>
                   </div>
-                  <div class="col col-6 pe-0">
-                    <div class="mb-3 form-floating">
-                      <input type="text" class="form-control" id="username" name="username" required autocomplete="true" placeholder="">
-                      <label for="username" class="mb-2">Tên tài khoản</label>
+                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input type="text" class="form-control <% if(err.lastNameCreateModal.length > 0){ %> is-invalid <% } %>" id="lastNameCreateModal" name="lastNameCreateModal" autocomplete="true" placeholder="">
+                      <label for="lastNameCreateModal" class="mb-2">Tên đệm và họ</label>
                     </div>
+                    <% if(err.lastNameCreateModal.length > 0) { %>
+                      <div class="invalid-feedback"> <%= err.lastNameCreateModal[0] %></div>
+                    <% } %>
                   </div>
                 </div>
-                
-                <div class="row mb-3 form-floating">
-                  <input type="email" id="email" class="form-control" name="email" required autocomplete="true" placeholder="example@gmail.com">
-                  <label for="email" class="mb-2">Email</label>
+
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input type="text" class="form-control <% if(err.usernameCreateModal.length > 0){ %> is-invalid <% } %>" id="usernameCreateModal" name="usernameCreateModal" autocomplete="true" placeholder="">
+                      <label for="usernameCreateModal" class="mb-2">Tên tài khoản</label>
+                    </div>
+                    <% if(err.usernameCreateModal.length > 0) { %>
+                      <div class="invalid-feedback"> <%= err.usernameCreateModal[0] %></div>
+                    <% } %>
+                  </div>
                 </div>
-                <div class="row mb-3 form-floating">
-                  <input type="password" id="password" class="form-control" name="password" required autocomplete="true" placeholder="">
-                  <label for="password" class="mb-2">Mật khẩu</label>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input type="email" id="emailCreateModal" class="form-control <% if(err.emailCreateModal.length > 0){ %> is-invalid <% } %>" name="emailCreateModal" autocomplete="true" placeholder="example@gmail.com" pattern="^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\.[a-z]{2,}$">
+                      <label for="emailCreateModal" class="mb-2">Email</label>
+                    </div>
+                    <% if(err.emailCreateModal.length > 0) { %>
+                    <div class="invalid-feedback"> <%= err.emailCreateModal[0] %></div>
+                    <% } %>
+                  </div>
                 </div>
-                <div class="row mb-3 form-floating">
-                  <input type="password" id="confirmPassword" class="form-control" name="confirmPassword" required autocomplete="true" placeholder="">
-                  <label for="confirmPassword" class="mb-2">Xác nhận mật khẩu</label>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input type="password" id="passwordCreateModal" class="form-control <% if(err.passwordCreateModal.length > 0){ %> is-invalid <% } %>" name="passwordCreateModal" autocomplete="true" placeholder="">
+                      <label for="passwordCreateModal" class="mb-2">Mật khẩu</label>
+                    </div>
+                    <div id="passwordStrengthIndicator">
+                      <div>
+                        <span class="week"></span>
+                        <span class="medium"></span>
+                        <span class="strong"></span>
+                      </div>
+                      <div id="textPasswordStrength"></div>
+                    </div>
+                    <% if(err.passwordCreateModal.length > 0) { %>
+                      <div class="invalid-feedback"> <%= err.passwordCreateModal[0] %></div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input type="password" id="confirmPasswordCreateModal" class="form-control <% if(err.confirmPasswordCreateModal.length > 0){ %> is-invalid <% } %>" name="confirmPasswordCreateModal" autocomplete="true" placeholder="">
+                    <label for="confirmPasswordCreateModal" class="mb-2">Xác nhận mật khẩu</label>
+                    </div>
+                    <% if(err.confirmPasswordCreateModal.length > 0) { %>
+                    <div class="invalid-feedback"> <%= err.confirmPasswordCreateModal[0] %></div>
+                    <% } %>
+                  </div>
+                  
                 </div>
                 <div class="row fw-semibold fs-4 mb-2">Phân công khu vực quản lý</div>
                 <div class="row g-md-3 g-2">
                   <div class="col-6 col-md-4">
-                    <select name="ward" class="form-select" required>
+                    <select name="accountTypeSelectCreateModal" class="form-select" id="accountTypeSelectCreateModal" required onchange="selectAccountType(event)">
                       <option value="">Loại tài khoản</option>
-                      <option value="1">Phường</option>
-                      <option value="2">Quận</option>
-                      <option value="3">Sở</option>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="ward" class="form-select" required>
-                      <option value="">Phường</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="district" class="form-select" required>
-                      <option value="">Quận</option>
-                      <% for (let i = 0; i < districts.length; i++){ %>
-                        <option value="<%= districts[i] %>"><%= districts[i] %></option>
+                      <% for (let i = 0; i < accountTypes.length; i++){ %>
+                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
                       <% } %>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
                     </select>
                   </div>
+                  <div class="col-6 col-md-4">
+                    <select name="districtSelectCreateModal" class="form-select" required  id="districtSelectCreateModal" selected="selected" onchange="districtSelectChange(event)" disabled="true">
+                      <option value="">Quận/Huyện</option>
+                      <% for (let i = 0; i < districts.length; i++){ %>
+                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
+                      <% } %>
+                    </select>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required disabled="false">
+                      <option value="">Phường</option>
+                    </select>
+                  </div>
+                  
                 </div>
               </fieldset>
 
-              <button type="submit" class="mt-4 btn btn-success w-100">Tạo tài khoản</button>
+              <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo tài khoản</button>
             </form>
           </div>
+          
         </div>
       </div>
     </div>
@@ -330,7 +343,50 @@
   <!-- Footer -->
   <%- include("../partials/footer.ejs") %>
 
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "@popperjs/core": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js",
+        "bootstrap": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.esm.min.js"
+      }
+    }
+  </script>
+  <% if (createMsg.status.length > 0){ %>
+    <script type="module">
+      import * as bootstrap from 'bootstrap'
+      
+      const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
+      myModal.show();
+
+    </script>
+  <% } %>
+
+  <script type="module">
+    import * as bootstrap from 'bootstrap'
+    
+
+    const myModalEl = document.getElementById('createModal')
+    myModalEl.addEventListener('hidden.bs.modal', function (event) {
+        const invalidFeedbacks = document.querySelectorAll(".invalid-feedback");
+        invalidFeedbacks.forEach((feedback) => feedback.remove());
+
+        const createAlertMessage = document.querySelector("#create-alert-container");
+        if (createAlertMessage) {
+          createAlertMessage.remove();
+        }
+
+        const inputElements = document.querySelectorAll(".form-control");
+        inputElements.forEach((inputElement) => {
+          if (inputElement.classList.contains("is-valid")) {
+            inputElement.classList.remove(is-valid);
+          }
+        })
+    })
+  </script>
+
   <script>
+    let accountType = "";
 
     function selectAllCheckboxItems(status) {
       document.querySelectorAll(".checkbox-items").forEach((item) => item.checked = status)
@@ -367,7 +423,59 @@
       document.querySelector("#allAccounts").checked = false;
     })
 
+    const districtSelectCreateModal = document.getElementById("districtSelectCreateModal");
+    const wardSelectCreateModal = document.getElementById("wardSelectCreateModal");
+
+    function districtSelectChange(e) {
+      if (accountType === 'Phuong') {
+        fetch(`/department/accountManagement/api/wards?district=${districtSelectCreateModal.value}`)
+        .then((res) => res.json())
+        .then((data) => {
+          wardSelectCreateModal.innerHTML = "";
+          let option = document.createElement("option");
+          option.setAttribute("value", "");
+          option.textContent = "Phường";
+          wardSelectCreateModal.appendChild(option);
+
+          for (let i = 0; i < data.length; i++) {
+            option = document.createElement("option");
+            option.setAttribute("value", data[i].ward);
+            option.textContent = data[i].ward;
+            wardSelectCreateModal.appendChild(option);
+          }
+          wardSelectCreateModal.disabled = false;
+        })
+        .catch(err => console.error(err));
+        }
+    }
+
+    function selectAccountType(e) {
+      districtSelectCreateModal.disabled = true;
+      wardSelectCreateModal.disabled = true;
+      wardSelectCreateModal.value = "";
+      districtSelectCreateModal.value = "";
+
+      accountType = e.target.value;
+      if (accountType === 'Phuong') {
+        districtSelectCreateModal.disabled = false;
+      } else if (accountType === 'Quan') {
+        districtSelectCreateModal.disabled = false;
+      } else {
+        wardSelectCreateModal.value = "";
+        districtSelectCreateModal.value = "";
+      }
+    }
+
+    // const emailRegExp = new RegExp("^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\\.[a-z.]{2,}$")
+    // document.getElementById("emailCreateModal").addEventListener("input", (e) => {
+    //   console.log(e.target.value.match(emailRegExp));
+    // })
+
   </script>
+
+  <script src="/javascript/So/passwordStrengthIndicator.js"></script>
+  <script src="/javascript/So/navbar.js"></script>
+
 
   </body>
 
@@ -382,5 +490,4 @@
     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
     crossorigin="anonymous"
   ></script>
-  <script src="/javascript/So/navbar.js"></script>
 </html>

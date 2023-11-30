@@ -85,13 +85,13 @@ app.use(flash());
 
 
 //Routing
+// app.get("/test", (req, res) => {
+//   return res.send("Hello");
+// })
 app.use("/citizen", citizenRoutes);
-app.use(authUser);
-app.use("/department", authRole("So"), departmentRoutes);
 app.use("/", authRoutes);
 
-
-app.use("/citizen", citizenRoutes);
+app.use(authUser);
 app.use("/department", authRole("So"), departmentRoutes);
 app.use("/ward", authRole("Phuong"), wardDistrictRoutes);
 app.use("/district", authRole("Quan"), wardDistrictRoutes);
