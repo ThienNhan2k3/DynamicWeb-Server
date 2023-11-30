@@ -35,6 +35,9 @@ dependencies:
   node-mailjet:
     specifier: ^4.0.1
     version: 4.0.1
+  sequelize:
+    specifier: ^6.35.1
+    version: 6.35.1(mysql2@3.6.5)
 
 devDependencies:
   nodemon:

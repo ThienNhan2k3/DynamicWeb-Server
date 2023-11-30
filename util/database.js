@@ -1,5 +1,7 @@
 import Sequelize from "sequelize";
 
+//const Sequelize = require('sequelize');
+
 const sequelize = new Sequelize("ptudw", "root", "tuilaemga", {
   dialect: "mysql",
   host: "localhost",

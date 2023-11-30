@@ -30,6 +30,7 @@ const {
 const citizenRoutes = require("./routes/citizen.js");
 const authRoutes = require("./routes/auth.js");
 const departmentRoutes = require("./routes/department.js");
+const wardDistrictRoutes = require("./routes/ward_district.js");
 const account = require("./models/account.js");
 
 // initalize sequelize with session store
@@ -90,6 +91,8 @@ app.use(authUser);
 
 app.use("/citizen", citizenRoutes);
 app.use("/department", authRole("So"), departmentRoutes);
+app.use("/ward", authRole("Phuong"), wardDistrictRoutes);
+app.use("/district", authRole("Quan"), wardDistrictRoutes);
 
 app.use((req, res) => {
   res.render("404");

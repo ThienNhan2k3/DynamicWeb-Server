@@ -177,11 +177,20 @@ const postLogin = async (req, res) => {
     }
 
     req.session.accountId = account.id;
-    res.redirect("/department/accountManagement");
+    req.session.accountType = account.type;
 
-    // if (account.type === 'So') {
-    //   res.redirect("/department/accountManagement");
-    // }
+    if (account.type === 'So') {
+      res.redirect("/department/accountManagement");
+    }
+
+    else if (account.type === 'Quan') {
+      res.redirect("/district/home");
+    }
+
+    else if (account.type === 'Phuong') {
+      res.redirect("/ward/home");
+    }
+
   } catch (err) {
     console.log(err);
     res.redirect("/login");
