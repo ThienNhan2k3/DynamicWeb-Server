@@ -84,12 +84,12 @@ app.use(flash());
 
 
 //Routing
+app.use("/citizen", citizenRoutes);
+app.use(authUser);
+app.use("/department", authRole("So"), departmentRoutes);
 app.use("/", authRoutes);
 
-app.use(authUser);
 
-app.use("/citizen", citizenRoutes);
-app.use("/department", authRole("So"), departmentRoutes);
 
 app.use((req, res) => {
   res.render("404");

@@ -233,7 +233,7 @@ const postReport = async (req, res, next) => {
     imageUrl = path.join(",");
     imageUrl = imageUrl.replace(/\\/g, "/");
   }
-  console.log(type)
+
   if (type == "TGSP") {
     type = "Tố giác sai phạm";
   } else if (type == "DKND") {
@@ -248,7 +248,6 @@ const postReport = async (req, res, next) => {
     return;
   }
   const typeId = dbquery.id;
-  console.log(typeId)
 
   const newReport = await Report.create({
     submission_time: new Date(),
@@ -270,7 +269,7 @@ const postReport = async (req, res, next) => {
     permitRequest.status = "Bị báo cáo";
     permitRequest.save();
   }
-  res.status(200).json({ id: newReport.id });
+  res.status(200).json({ newReport });
 };
 
 const getReportData = async (req, res, next) => {
@@ -278,7 +277,7 @@ const getReportData = async (req, res, next) => {
   let boardId = req.query.board;
 
   let reports;
-  console.log(adsPlacementId);
+
   if (boardId != "undefined") {
     boardId = parseInt(boardId);
 
@@ -292,7 +291,7 @@ const getReportData = async (req, res, next) => {
       where: { AdsPlacementId: adsPlacementId },
       include: [{ model: ReportType, required: true }],
     });
-    console.log(reports);
+
   }
 
   res.json(JSON.stringify(reports));
