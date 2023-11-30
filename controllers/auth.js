@@ -122,9 +122,9 @@ const postResetPassword = async (req, res, next) => {
   const account = await Account.findOne({ where: { id: accountId } });
   if (!account) return res.status(400);
   if (account.otp == otp) {
-    console.log(newPassword);
-    account.password = newPassword;
-    account.save();
+    const hashedPassword=await bcrypt.hash(newPassword,12)
+    account.password = hashedPassword;
+    await account.save();
   }
   res.redirect("/");
 };
