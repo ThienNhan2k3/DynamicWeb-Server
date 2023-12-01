@@ -168,8 +168,12 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-success"
         : adsData[0].status == "Chưa cấp phép"
         ? "bg-warning"
-        : "bg-danger"
-    }" id="board-status">${adsData[0].status}</span></a>`;
+        : adsData[0].status == "Bị báo cáo"
+        ? "bg-danger"
+        : "bg-dark"
+    }" id="board-status">${
+      adsData[0].status != undefined ? adsData[0].status : "Chưa có quảng cáo"
+    }</span></a>`;
     HTMLaddr.innerHTML = adsData[0].AdsPlacement.address;
     HTMLsize.innerHTML = adsData[0].size;
     HTMLqty.innerHTML = adsData[0].quantity;
@@ -179,7 +183,11 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLthumbnail.src = adsData[0].image;
     HTMLboardContract.setAttribute(
       "data-bs-content",
-      `Ngày hết hạn: ${adsData[0].end.split("T")[0]}`
+      `Ngày hết hạn: ${
+        adsData[0].end != undefined
+          ? adsData[0].end.split("T")[0]
+          : "Chưa có thông tin"
+      }`
     );
     const popover = new bootstrap.Popover(HTMLboardContract);
     popover.update();
@@ -234,12 +242,18 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
       }<span class="ms-2 badge ${
-        adsData[page - 1].status == "Đã cấp phép"
+        adsData[page-1].status == "Đã cấp phép"
           ? "bg-success"
           : adsData[page - 1].status == "Chưa cấp phép"
           ? "bg-warning"
-          : "bg-danger"
-      }" id="board-status">${adsData[page - 1].status}</span></a>`;
+          : adsData[page - 1].status == "Bị báo cáo"
+          ? "bg-danger"
+          : "bg-dark"
+      }" id="board-status">${
+        adsData[page - 1].status != undefined
+          ? adsData[page - 1].status
+          : "Chưa có quảng cáo"
+      }</span></a>`;
       HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
       HTMLsize.innerHTML = adsData[page - 1].size;
       HTMLqty.innerHTML = adsData[page - 1].quantity;
@@ -247,6 +261,16 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLclassification.innerHTML =
         adsData[page - 1].AdsPlacement.LocationType.locationType;
       HTMLthumbnail.src = adsData[page - 1].image;
+      HTMLboardContract.setAttribute(
+        "data-bs-content",
+        `Ngày hết hạn: ${
+          adsData[page - 1].end != undefined
+            ? adsData[page - 1].end.split("T")[0]
+            : "Chưa có thông tin"
+        }`
+      );
+      const popover = new bootstrap.Popover(HTMLboardContract);
+      popover.update();
       //Set active
       e.target.parentNode.classList.add("active");
       //Set enable/disable for prev/next button
@@ -277,8 +301,14 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-success"
         : adsData[page - 1].status == "Chưa cấp phép"
         ? "bg-warning"
-        : "bg-danger"
-    }" id="board-status">${adsData[page - 1].status}</span></a>`;
+        : adsData[page - 1].status == "Bị báo cáo"
+        ? "bg-danger"
+        : "bg-dark"
+    }" id="board-status">${
+      adsData[page - 1].status != undefined
+        ? adsData[page - 1].status
+        : "Chưa có quảng cáo"
+    }</span></a>`;
     HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
@@ -286,6 +316,16 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
     HTMLthumbnail.src = adsData[page - 1].image;
+    HTMLboardContract.setAttribute(
+        "data-bs-content",
+        `Ngày hết hạn: ${
+          adsData[page - 1].end != undefined
+            ? adsData[page - 1].end.split("T")[0]
+            : "Chưa có thông tin"
+        }`
+      );
+      const popover = new bootstrap.Popover(HTMLboardContract);
+      popover.update();
     //Set active
     activeItem.previousSibling.classList.add("active");
     //Deactive prev button if reach the first page
@@ -313,8 +353,14 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-success"
         : adsData[page - 1].status == "Chưa cấp phép"
         ? "bg-warning"
-        : "bg-danger"
-    }" id="board-status">${adsData[page - 1].status}</span></a>`;
+        : adsData[page - 1].status == "Bị báo cáo"
+        ? "bg-danger"
+        : "bg-dark"
+    }" id="board-status">${
+      adsData[page - 1].status != undefined
+        ? adsData[page - 1].status
+        : "Chưa có quảng cáo"
+    }</span></a>`;
     HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
@@ -322,13 +368,22 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
     HTMLthumbnail.src = adsData[page - 1].image;
+    HTMLboardContract.setAttribute(
+        "data-bs-content",
+        `Ngày hết hạn: ${
+          adsData[page - 1].end != undefined
+            ? adsData[page - 1].end.split("T")[0]
+            : "Chưa có thông tin"
+        }`
+      );
+      const popover = new bootstrap.Popover(HTMLboardContract);
+      popover.update();
     //Set active
     activeItem.nextSibling.classList.add("active");
     //Deactive next button if reach the last page
     pageNext.parentNode.classList.remove("disabled");
 
     pagePrev.parentNode.classList.remove("disabled");
-
 
     if (page == adsData.length) {
       pageNext.parentNode.classList.add("disabled");
