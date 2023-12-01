@@ -1,9 +1,13 @@
 .alert-container {
-    margin: 1rem auto;
-    width: 96%;
+    /* margin: 1rem auto 0px; */
+    width: 90%;
     animation-name: fade;
     animation-duration: 4s;
     animation-fill-mode: forwards;
+    position: fixed;
+    z-index: 9999;
+    top: 1.8rem;
+    right: 20px;
 }
 
 .alert {
@@ -11,6 +15,7 @@
     justify-content: start;
     align-items: center;
     border-radius: 8px;
+    box-shadow: -2px 0px 38px -12px rgba(0,0,0,0.75);
 }
 
 .alert-container .progress, .alert {
@@ -57,13 +62,12 @@
 
 @keyframes fade {
     50% { opacity: 1; }
-    100% { opacity: 0; }
+    100% { opacity: 0; display: none; }
 }
 
 @media only screen and (min-width:576px) {
     .alert-container {
-        margin-right: 20px;
-        width: 45%;
+        width: 40%;
     }
 }
 

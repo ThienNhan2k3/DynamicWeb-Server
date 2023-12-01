@@ -26,14 +26,27 @@
   <%- include("./subPartials/navbar.ejs") %> 
   <!-- Main content -->
   <main class="dynamic-container">
+    <% if (editMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= editMsg.status[0] %>"></div>
+      </div>
+    <% } else if (createMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= createMsg.status[0] %>"></div>
+      </div>
+    <% } %>
     <div class="table-container border border-2 rounded-3">
       <div class="table-header">
         <h2>Quản lý tài khoản</h2>
         <div class="button-container">
-          <button class="red-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-minus-circle" style="color: #ffffff;"></i>
-            Xóa
-          </button>
           <button class="green-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#createModal">
             <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
             Thêm tài khoản
@@ -43,9 +56,6 @@
       <table class="table-body table table-striped table-responsive mb-0">
         <thead>
           <tr>
-            <th scope="col">
-              <input type="checkbox" name="all" id="allAccounts">
-            </th>
             <th scope="col">Họ và tên</th>
             <th scope="col">Email</th>
             <th scope="col">Phường</th>
@@ -58,25 +68,22 @@
           <% if (pagination.accounts) { %>
             <% for (let i = 0; i < pagination.accounts.length; i++) { %>
               <tr>
-                <td scope="col">
-                  <input type="checkbox" name="accountId" class="checkbox-items" value="<%= pagination.accounts[i].id %>">
-                </td>
                 <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
                 <td><%= pagination.accounts[i].email %></td>
                 <% if (pagination.accounts[i].ward != null) { %> 
                 <td> <%= pagination.accounts[i].ward %></td>
                 <% } else {%>
-                  <td>NULL</td>
+                  <td></td>
                 <% } %>
                 <% if (pagination.accounts[i].district != null) { %> 
                   <td> <%= pagination.accounts[i].district %></td>
                   <% } else {%>
-                    <td>NULL</td>
+                    <td></td>
                   <% } %>
                 <td><%= pagination.accounts[i].type %></td>
                 <td class="function-icons text-center">
-                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal"></i>
-                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal"></i>
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].district %>" data-ward="<%= pagination.accounts[i].ward %>" onclick="showEditUserModal(this)"></i>
+                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
                 </td>
               </tr>
             <% } %>
@@ -100,7 +107,7 @@
             <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
           <% } %>
 
-          <% for (let i = pagination.currentPage - pagination.sizePage; i < pagination.currentPage; i++) { %>
+          <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
             <% if (i >= pagination.minPage){ %>
               <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>"><%=i%></a></li>
             <% } %>
@@ -108,7 +115,7 @@
 
           <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
 
-          <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.sizePage; i++) { %>
+          <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
             <% if (i <= pagination.maxPage) { %>
               <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= i%>"><%= i%></a></li>
             <% } %>
@@ -123,10 +130,193 @@
         </ul>
       </nav>
     </div>
-
       
+    <!-- The Create Modal -->
+    <div class="modal fade" id="createModal" data-bs-backdrop="static">
+      <!-- <% if (createMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= createMsg.status[0] %>"></div>
+      </div>
+      <% } %> -->
+      <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Tạo tài khoản</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <form action="/department/accountManagement" method="POST">
+              <fieldset class="container">
+                <div class="row mb-3">
+                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input 
+                      type="text" 
+                      <% if(createErr.error.firstName.length > 0){ %> class="form-control  is-invalid" 
+                      <% } else { %>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.firstName %>"
+                      id="firstNameCreateModal" name="firstNameCreateModal" autocomplete="true" placeholder="">
+                      <label for="firstNameCreateModal" class="mb-2">Tên</label>
+                    </div>
+                    <% if(createErr.error.firstName.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.firstName[0] %></div>
+                    <% } %>
+                  </div>
+                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input 
+                      type="text"
+                      <% if(createErr.error.lastName.length > 0){ %>
+                        class="form-control  is-invalid"
+                      <% } else {%>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.lastName %>"
+                      id="lastNameCreateModal" name="lastNameCreateModal" autocomplete="true" placeholder="">
+                      <label for="lastNameCreateModal" class="mb-2">Tên đệm và họ</label>
+                    </div>
+                    <% if(createErr.error.lastName.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.lastName[0] %></div>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input 
+                      type="text"
+                      <% if(createErr.error.username.length > 0){ %>
+                        class="form-control is-invalid"
+                      <% } else { %>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.username %>"
+                      id="usernameCreateModal" name="usernameCreateModal" autocomplete="true" placeholder="">
+                      <label for="usernameCreateModal" class="mb-2">Tên tài khoản</label>
+                    </div>
+                    <% if(createErr.error.username.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.username[0] %></div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input 
+                      type="email" 
+                      id="emailCreateModal" 
+                      <% if(createErr.error.email.length > 0){ %>
+                        class="form-control is-invalid" 
+                      <% } else { %>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.email %>" 
+                      name="emailCreateModal" autocomplete="true" placeholder="example@gmail.com" pattern="^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\.[a-z]{2,}$">
+                      <label for="emailCreateModal" class="mb-2">Email</label>
+                    </div>
+                    <% if(createErr.error.email.length > 0) { %>
+                    <div class="invalid-feedback"> <%= createErr.error.email[0] %></div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input 
+                      type="password" 
+                      id="passwordCreateModal" 
+                      <% if(createErr.error.password.length > 0){ %>
+                        class="form-control is-invalid" 
+                      <% } else {%>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.password %>"  
+                      name="passwordCreateModal"
+                      autocomplete="true"
+                      placeholder="">
+                      <label for="passwordCreateModal" class="mb-2">Mật khẩu</label>
+                    </div>
+                    <div id="passwordStrengthIndicator">
+                      <div>
+                        <span class="week"></span>
+                        <span class="medium"></span>
+                        <span class="strong"></span>
+                      </div>
+                      <div id="textPasswordStrength"></div>
+                    </div>
+                    <% if(createErr.error.password.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.password[0] %></div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col col-12 p-0 has-validation">
+                    <div class="form-floating is-invalid">
+                      <input 
+                      type="password" 
+                      id="confirmPasswordCreateModal"
+                      <% if(createErr.error.confirmPassword.length > 0){ %> 
+                        class="form-control is-invalid" 
+                      <% }else { %>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.confirmPassword %>"
+                      name="confirmPasswordCreateModal" autocomplete="true" placeholder="">
+                    <label for="confirmPasswordCreateModal" class="mb-2">Xác nhận mật khẩu</label>
+                    </div>
+                    <% if(createErr.error.confirmPassword.length > 0) { %>
+                    <div class="invalid-feedback"> <%= createErr.error.confirmPassword[0] %></div>
+                    <% } %>
+                  </div>
+                  
+                </div>
+                <div class="row fw-semibold fs-4 mb-2">Phân công khu vực quản lý</div>
+                <div class="row g-md-3 g-2">
+                  <div class="col-6 col-md-4">
+                    <select name="accountTypeSelectCreateModal" class="form-select" id="accountTypeSelectCreateModal" required onchange="selectAccountType(event, document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))">
+                      <option value="">Loại tài khoản</option>
+                      <% for (let i = 0; i < accountTypes.length; i++){ %>
+                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
+                      <% } %>
+                    </select>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <select name="districtSelectCreateModal" class="form-select" required  id="districtSelectCreateModal" selected="selected" onchange="districtSelectChange(document.getElementById('accountTypeSelectCreateModal'), document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))" disabled="true">
+                      <option value="">Quận/Huyện</option>
+                      <% for (let i = 0; i < districts.length; i++){ %>
+                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
+                      <% } %>
+                    </select>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required disabled="false">
+                      <option value="">Phường</option>
+                    </select>
+                  </div>
+                  
+                </div>
+              </fieldset>
+
+              <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo tài khoản</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
     <!-- The Delete Modal -->
-    <div class="modal" id="deleteModal">
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -151,141 +341,8 @@
       </div>
     </div>
 
-    
-    <!-- The Create Modal -->
-    <div class="modal" id="createModal">
-      <% if (createMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
-        </div>
-        <div class="progress progress-<%= createMsg.status[0] %>"></div>
-      </div>
-      <% } %>
-      <div class="modal-dialog modal-dialog-centered modal-lg align-items-start">
-        <div class="modal-content">
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title">Tạo tài khoản</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body">
-            <form action="/department/register" method="POST">
-              <fieldset class="container">
-                <div class="row mb-3">
-                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
-                    <div class="mb-0 form-floating is-invalid">
-                      <input type="text" class="form-control <% if(err.firstNameCreateModal.length > 0){ %> is-invalid <% } %>" id="firstNameCreateModal" name="firstNameCreateModal" autocomplete="true" placeholder="">
-                      <label for="firstNameCreateModal" class="mb-2">Tên</label>
-                    </div>
-                    <% if(err.firstNameCreateModal.length > 0) { %>
-                      <div class="invalid-feedback"> <%= err.firstNameCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
-                    <div class="mb-0 form-floating is-invalid">
-                      <input type="text" class="form-control <% if(err.lastNameCreateModal.length > 0){ %> is-invalid <% } %>" id="lastNameCreateModal" name="lastNameCreateModal" autocomplete="true" placeholder="">
-                      <label for="lastNameCreateModal" class="mb-2">Tên đệm và họ</label>
-                    </div>
-                    <% if(err.lastNameCreateModal.length > 0) { %>
-                      <div class="invalid-feedback"> <%= err.lastNameCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                </div>
-
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input type="text" class="form-control <% if(err.usernameCreateModal.length > 0){ %> is-invalid <% } %>" id="usernameCreateModal" name="usernameCreateModal" autocomplete="true" placeholder="">
-                      <label for="usernameCreateModal" class="mb-2">Tên tài khoản</label>
-                    </div>
-                    <% if(err.usernameCreateModal.length > 0) { %>
-                      <div class="invalid-feedback"> <%= err.usernameCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input type="email" id="emailCreateModal" class="form-control <% if(err.emailCreateModal.length > 0){ %> is-invalid <% } %>" name="emailCreateModal" autocomplete="true" placeholder="example@gmail.com" pattern="^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\.[a-z]{2,}$">
-                      <label for="emailCreateModal" class="mb-2">Email</label>
-                    </div>
-                    <% if(err.emailCreateModal.length > 0) { %>
-                    <div class="invalid-feedback"> <%= err.emailCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input type="password" id="passwordCreateModal" class="form-control <% if(err.passwordCreateModal.length > 0){ %> is-invalid <% } %>" name="passwordCreateModal" autocomplete="true" placeholder="">
-                      <label for="passwordCreateModal" class="mb-2">Mật khẩu</label>
-                    </div>
-                    <div id="passwordStrengthIndicator">
-                      <div>
-                        <span class="week"></span>
-                        <span class="medium"></span>
-                        <span class="strong"></span>
-                      </div>
-                      <div id="textPasswordStrength"></div>
-                    </div>
-                    <% if(err.passwordCreateModal.length > 0) { %>
-                      <div class="invalid-feedback"> <%= err.passwordCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input type="password" id="confirmPasswordCreateModal" class="form-control <% if(err.confirmPasswordCreateModal.length > 0){ %> is-invalid <% } %>" name="confirmPasswordCreateModal" autocomplete="true" placeholder="">
-                    <label for="confirmPasswordCreateModal" class="mb-2">Xác nhận mật khẩu</label>
-                    </div>
-                    <% if(err.confirmPasswordCreateModal.length > 0) { %>
-                    <div class="invalid-feedback"> <%= err.confirmPasswordCreateModal[0] %></div>
-                    <% } %>
-                  </div>
-                  
-                </div>
-                <div class="row fw-semibold fs-4 mb-2">Phân công khu vực quản lý</div>
-                <div class="row g-md-3 g-2">
-                  <div class="col-6 col-md-4">
-                    <select name="accountTypeSelectCreateModal" class="form-select" id="accountTypeSelectCreateModal" required onchange="selectAccountType(event)">
-                      <option value="">Loại tài khoản</option>
-                      <% for (let i = 0; i < accountTypes.length; i++){ %>
-                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="districtSelectCreateModal" class="form-select" required  id="districtSelectCreateModal" selected="selected" onchange="districtSelectChange(event)" disabled="true">
-                      <option value="">Quận/Huyện</option>
-                      <% for (let i = 0; i < districts.length; i++){ %>
-                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required disabled="false">
-                      <option value="">Phường</option>
-                    </select>
-                  </div>
-                  
-                </div>
-              </fieldset>
-
-              <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo tài khoản</button>
-            </form>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-
     <!-- The Edit Modal -->
-    <div class="modal" id="editModal">
+    <div class="modal fade" id="editModal" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -297,31 +354,29 @@
 
           <!-- Modal body -->
           <div class="modal-body p-2">
-            <form action="#">
+            <form action="#" id="editForm">
               <fieldset class="container">
+                <input type="hidden" id="idEditModal" name="idEditModal">
                 <div class="row g-2 g-md-3">
                   <div class="col-6 col-md-4">
-                    <select name="ward" class="form-select" required>
+                    <select name="accountTypeSelectEditModal" class="form-select" id="accountTypeSelectEditModal" required onchange="selectAccountType(event, document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
                       <option value="">Loại tài khoản</option>
-                      <option value="1">Phường</option>
-                      <option value="2">Quận</option>
-                      <option value="3">Sở</option>
+                      <% for (let i = 0; i < accountTypes.length; i++){ %>
+                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
+                      <% } %>
                     </select>
                   </div>
                   <div class="col-6 col-md-4">
-                    <select name="ward" class="form-select" required>
+                    <select name="districtSelectEditModal" class="form-select" required  id="districtSelectEditModal" selected="selected" onchange="districtSelectChange(document.getElementById('accountTypeSelectEditModal'), document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))" disabled="true">
+                      <option value="">Quận/Huyện</option>
+                      <% for (let i = 0; i < districts.length; i++){ %>
+                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
+                      <% } %>
+                    </select>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <select name="wardSelectEditModal" class="form-select" id="wardSelectEditModal" required disabled="false">
                       <option value="">Phường</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="district" class="form-select" required>
-                      <option value="">Quận</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
                     </select>
                   </div>
               </fieldset>
@@ -331,7 +386,7 @@
           <!-- Modal footer -->
           <div class="modal-footer" style="background-color: #C4D4D6;">
             <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
-            <button class="btn btn-success" data-bs-dismiss="modal" id="confirm-edit-button">Cập nhật</button>
+            <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="confirm-edit-button">Cập nhật</button>
           </div>
 
         </div>
@@ -343,6 +398,7 @@
   <!-- Footer -->
   <%- include("../partials/footer.ejs") %>
 
+  <!-- Javascript -->
   <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
   <script type="importmap">
     {
@@ -355,131 +411,15 @@
   <% if (createMsg.status.length > 0){ %>
     <script type="module">
       import * as bootstrap from 'bootstrap'
-      
       const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
       myModal.show();
-
     </script>
   <% } %>
-
-  <script type="module">
-    import * as bootstrap from 'bootstrap'
-    
-
-    const myModalEl = document.getElementById('createModal')
-    myModalEl.addEventListener('hidden.bs.modal', function (event) {
-        const invalidFeedbacks = document.querySelectorAll(".invalid-feedback");
-        invalidFeedbacks.forEach((feedback) => feedback.remove());
-
-        const createAlertMessage = document.querySelector("#create-alert-container");
-        if (createAlertMessage) {
-          createAlertMessage.remove();
-        }
-
-        const inputElements = document.querySelectorAll(".form-control");
-        inputElements.forEach((inputElement) => {
-          if (inputElement.classList.contains("is-valid")) {
-            inputElement.classList.remove(is-valid);
-          }
-        })
-    })
-  </script>
-
-  <script>
-    let accountType = "";
-
-    function selectAllCheckboxItems(status) {
-      document.querySelectorAll(".checkbox-items").forEach((item) => item.checked = status)
-
-    }
-    
-    document.querySelector("#allAccounts").addEventListener("click", (e) => {
-      selectAllCheckboxItems(document.querySelector("#allAccounts").checked)
-    });
-
-    document.querySelectorAll(".fa-trash").forEach(item => {
-      item.addEventListener("click", (e) => {
-        const inputElement = e.target.parentElement.parentElement.firstElementChild.firstElementChild; 
-        inputElement.checked = true;
-      })
-    })
-
-    document.querySelectorAll(".fa-pen").forEach(item => {
-      item.addEventListener("click", (e) => {
-        selectAllCheckboxItems(false);
-        document.querySelector("#allAccounts").checked = false;
-        const inputElement = e.target.parentElement.parentElement.firstElementChild.firstElementChild; 
-        inputElement.checked = true;
-      })
-    })
-
-    document.getElementById("confirm-delete-button").addEventListener("click", () => {
-      selectAllCheckboxItems(false);
-      document.querySelector("#allAccounts").checked = false;
-    })
-
-    document.getElementById("confirm-edit-button").addEventListener("click", () => {
-      selectAllCheckboxItems(false);
-      document.querySelector("#allAccounts").checked = false;
-    })
-
-    const districtSelectCreateModal = document.getElementById("districtSelectCreateModal");
-    const wardSelectCreateModal = document.getElementById("wardSelectCreateModal");
-
-    function districtSelectChange(e) {
-      if (accountType === 'Phuong') {
-        fetch(`/department/accountManagement/api/wards?district=${districtSelectCreateModal.value}`)
-        .then((res) => res.json())
-        .then((data) => {
-          wardSelectCreateModal.innerHTML = "";
-          let option = document.createElement("option");
-          option.setAttribute("value", "");
-          option.textContent = "Phường";
-          wardSelectCreateModal.appendChild(option);
-
-          for (let i = 0; i < data.length; i++) {
-            option = document.createElement("option");
-            option.setAttribute("value", data[i].ward);
-            option.textContent = data[i].ward;
-            wardSelectCreateModal.appendChild(option);
-          }
-          wardSelectCreateModal.disabled = false;
-        })
-        .catch(err => console.error(err));
-        }
-    }
-
-    function selectAccountType(e) {
-      districtSelectCreateModal.disabled = true;
-      wardSelectCreateModal.disabled = true;
-      wardSelectCreateModal.value = "";
-      districtSelectCreateModal.value = "";
-
-      accountType = e.target.value;
-      if (accountType === 'Phuong') {
-        districtSelectCreateModal.disabled = false;
-      } else if (accountType === 'Quan') {
-        districtSelectCreateModal.disabled = false;
-      } else {
-        wardSelectCreateModal.value = "";
-        districtSelectCreateModal.value = "";
-      }
-    }
-
-    // const emailRegExp = new RegExp("^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\\.[a-z.]{2,}$")
-    // document.getElementById("emailCreateModal").addEventListener("input", (e) => {
-    //   console.log(e.target.value.match(emailRegExp));
-    // })
-
-  </script>
-
+  <script src="/javascript/So/accountManagement.js"></script>
   <script src="/javascript/So/passwordStrengthIndicator.js"></script>
   <script src="/javascript/So/navbar.js"></script>
-
-
-  </body>
-
-
+  
+</body>
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
