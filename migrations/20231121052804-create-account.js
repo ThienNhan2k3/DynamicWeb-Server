@@ -29,8 +29,10 @@ module.exports = {
         type:DataTypes.STRING,
         allowNull: false
       },
-      district: DataTypes.STRING,
-      ward: DataTypes.STRING,
+      areaId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false

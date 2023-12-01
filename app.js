@@ -104,6 +104,7 @@ app.listen(PORT, async () => {
   console.log("Server is running on PORT ", PORT);
   try {
     await sequelize.authenticate();
+    //await sequelize.sync({alter:true});
     console.log("Database connected!!");
     sessionStore.sync();
   } catch (err) {
