@@ -32,11 +32,14 @@
           <div class="col-2 ">
             <div class="input-group input-group-sm ">
               <span class="input-group-text" id="inputGroup-sizing-sm">Phường xử lý</span>
-              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+              <!--<input type="text" class="form-control" name="search" id="search" aria-describedby="inputGroup-sizing-sm">-->
+              <select class="form-select" id="selectedArea" name="selectedArea" onchange="this.form.submit()">
+                <option value="all">Tất cả</option>
+                <% myArea.forEach(area => { %>
+                  <option value="<%= area.id %>"><%= area.ward %></option>
+                <% }); %>
+              </select>
             </div>            
-          </div>
-          <div class="col-2">
-            <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
           </div>
         </div>
       </form>

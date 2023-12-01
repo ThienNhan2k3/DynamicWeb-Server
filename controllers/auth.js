@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { Account } = require("../models");
+const { Account, Area } = require("../models");
 const Mailjet = require("node-mailjet");
 const Sequelize = require("sequelize");
 
@@ -159,6 +159,9 @@ const postLogin = async (req, res) => {
   
   try {
     const account = await Account.findOne({
+      include: [
+        {model: Area}
+      ],
       where: {
         [Sequelize.Op.or]: {
           username: usernameOrEmail,
@@ -184,10 +187,13 @@ const postLogin = async (req, res) => {
     }
 
     else if (account.type === 'Quan') {
+      req.session.accountDistrict = account.Area.district;
       res.redirect("/district/home");
     }
 
     else if (account.type === 'Phuong') {
+      req.session.accountWard = account.Area.ward;
+      req.session.accountDistrict = account.Area.district;
       res.redirect("/ward/home");
     }
 
