@@ -204,16 +204,22 @@ const getAds = async (req, res, next) => {
     ],
   });
   for (const board of boards) {
-    const permitRequest = await board.getPermitRequest();
-    const data = {
-      ...board.dataValues,
-      image: permitRequest.image,
-      start: permitRequest.start,
-      end: permitRequest.end,
-      content: permitRequest.content,
-      status: permitRequest.status,
-    };
-    respondData.push(data);
+    try {
+      const permitRequest = await board.getPermitRequest();
+      if (permitRequest) {
+        const data = {
+          ...board.dataValues,
+          image: permitRequest.image,
+          start: permitRequest.start,
+          end: permitRequest.end,
+          content: permitRequest.content,
+          status: permitRequest.status,
+        };
+        respondData.push(data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
   res.json(JSON.stringify(respondData));
 };
@@ -291,7 +297,6 @@ const getReportData = async (req, res, next) => {
       where: { AdsPlacementId: adsPlacementId },
       include: [{ model: ReportType, required: true }],
     });
-
   }
 
   res.json(JSON.stringify(reports));
