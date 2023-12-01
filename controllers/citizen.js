@@ -219,11 +219,11 @@ const getAds = async (req, res, next) => {
       }else{
         const data={
           ...board.dataValues,
-          image: undefined,
-          start: undefined,
-          end: undefined,
-          content: undefined,
-          status: undefined,
+          image: "",
+          start: "",
+          end: "",
+          content: "",
+          status: "",
         }
         respondData.push(data);
       }

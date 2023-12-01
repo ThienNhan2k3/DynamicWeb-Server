@@ -196,8 +196,8 @@ const getInfoOnclickUnclustered = async (e) => {
   //Update pagination
   let paginationData = "";
   paginationData += `<li class="page-item disabled">
-      <a class="page-link" href="#" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span></a></li>`;
+    <a class="page-link" href="#" aria-label="Previous">
+      <span aria-hidden="true">&laquo;</span></a></li>`;
   for (let i = 0; i < adsData.length; i++) {
     if (i == 3) {
       break;
@@ -212,17 +212,15 @@ const getInfoOnclickUnclustered = async (e) => {
       }</a></li>`;
     }
   }
-  if (adsData.length == 1) {
+  if (adsData.length <= 1) {
     paginationData += `<li class="page-item disabled">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span></a></li>`;
+      <a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span></a></li>`;
   } else {
-    paginationData += `<li class="page-item ">
-        <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span></a></li>`;
+    paginationData += `<a class="page-link" href="#" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span></a>`;
   }
   HTMLpagination.innerHTML = paginationData;
-
   //Pagination feature
   const pagePrev = document.querySelector('.page-link[aria-label="Previous"]');
   const pageNext = document.querySelector('.page-link[aria-label="Next"]');
@@ -242,7 +240,7 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
       }<span class="ms-2 badge ${
-        adsData[page-1].status == "Đã cấp phép"
+        adsData[page - 1].status == "Đã cấp phép"
           ? "bg-success"
           : adsData[page - 1].status == "Chưa cấp phép"
           ? "bg-warning"
@@ -250,7 +248,7 @@ const getInfoOnclickUnclustered = async (e) => {
           ? "bg-danger"
           : "bg-dark"
       }" id="board-status">${
-        adsData[page - 1].status != undefined
+        adsData[page - 1].status != ""
           ? adsData[page - 1].status
           : "Chưa có quảng cáo"
       }</span></a>`;
@@ -264,7 +262,7 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLboardContract.setAttribute(
         "data-bs-content",
         `Ngày hết hạn: ${
-          adsData[page - 1].end != undefined
+          adsData[page - 1].end != ""
             ? adsData[page - 1].end.split("T")[0]
             : "Chưa có thông tin"
         }`
@@ -283,7 +281,6 @@ const getInfoOnclickUnclustered = async (e) => {
       }
     });
   });
-
   pagePrev.addEventListener("click", (e) => {
     if (pagePrev.parentNode.classList.contains("disabled")) {
       return;
@@ -305,7 +302,7 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-danger"
         : "bg-dark"
     }" id="board-status">${
-      adsData[page - 1].status != undefined
+      adsData[page - 1].status != ""
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
@@ -317,15 +314,15 @@ const getInfoOnclickUnclustered = async (e) => {
       adsData[page - 1].AdsPlacement.LocationType.locationType;
     HTMLthumbnail.src = adsData[page - 1].image;
     HTMLboardContract.setAttribute(
-        "data-bs-content",
-        `Ngày hết hạn: ${
-          adsData[page - 1].end != undefined
-            ? adsData[page - 1].end.split("T")[0]
-            : "Chưa có thông tin"
-        }`
-      );
-      const popover = new bootstrap.Popover(HTMLboardContract);
-      popover.update();
+      "data-bs-content",
+      `Ngày hết hạn: ${
+        adsData[page - 1].end != ""
+          ? adsData[page - 1].end.split("T")[0]
+          : "Chưa có thông tin"
+      }`
+    );
+    const popover = new bootstrap.Popover(HTMLboardContract);
+    popover.update();
     //Set active
     activeItem.previousSibling.classList.add("active");
     //Deactive prev button if reach the first page
@@ -335,7 +332,6 @@ const getInfoOnclickUnclustered = async (e) => {
       pagePrev.parentNode.classList.add("disabled");
     }
   });
-
   pageNext.addEventListener("click", (e) => {
     if (pageNext.parentNode.classList.contains("disabled")) {
       return;
@@ -357,7 +353,7 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-danger"
         : "bg-dark"
     }" id="board-status">${
-      adsData[page - 1].status != undefined
+      adsData[page - 1].status != ""
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
@@ -369,15 +365,15 @@ const getInfoOnclickUnclustered = async (e) => {
       adsData[page - 1].AdsPlacement.LocationType.locationType;
     HTMLthumbnail.src = adsData[page - 1].image;
     HTMLboardContract.setAttribute(
-        "data-bs-content",
-        `Ngày hết hạn: ${
-          adsData[page - 1].end != undefined
-            ? adsData[page - 1].end.split("T")[0]
-            : "Chưa có thông tin"
-        }`
-      );
-      const popover = new bootstrap.Popover(HTMLboardContract);
-      popover.update();
+      "data-bs-content",
+      `Ngày hết hạn: ${
+        adsData[page - 1].end != ""
+          ? adsData[page - 1].end.split("T")[0]
+          : "Chưa có thông tin"
+      }`
+    );
+    const popover = new bootstrap.Popover(HTMLboardContract);
+    popover.update();
     //Set active
     activeItem.nextSibling.classList.add("active");
     //Deactive next button if reach the last page
