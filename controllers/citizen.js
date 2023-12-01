@@ -216,6 +216,16 @@ const getAds = async (req, res, next) => {
           status: permitRequest.status,
         };
         respondData.push(data);
+      }else{
+        const data={
+          ...board.dataValues,
+          image: undefined,
+          start: undefined,
+          end: undefined,
+          content: undefined,
+          status: undefined,
+        }
+        respondData.push(data);
       }
     } catch (err) {
       console.log(err);
