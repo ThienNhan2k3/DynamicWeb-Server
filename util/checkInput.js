@@ -10,9 +10,9 @@ function isEmpty(input) {
 function isEmail(email) {
     const emailRegExp = new RegExp("^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\\.[a-z]{2,}$")
     if (email.match(emailRegExp) != null) {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 async function emailExists(email) {

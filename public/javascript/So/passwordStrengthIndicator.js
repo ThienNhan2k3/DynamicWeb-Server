@@ -4,9 +4,9 @@ document.getElementById("passwordCreateModal").addEventListener("input", (e) => 
     const strongSpan = document.querySelector("#passwordStrengthIndicator span.strong");
     const textSpan = document.querySelector("#passwordStrengthIndicator #textPasswordStrength");
     
-    weekSpan.style.backgroundColor = rgb(163, 170, 170);
-    mediumSpan.style.backgroundColor = rgb(163, 170, 170);
-    strongSpan.style.backgroundColor = rgb(163, 170, 170);
+    weekSpan.style.backgroundColor = "#bac2c2";
+    mediumSpan.style.backgroundColor = "#bac2c2";
+    strongSpan.style.backgroundColor = "#bac2c2";
 
     grandParentElement = e.target.parentElement.parentElement;
     let count = 0;

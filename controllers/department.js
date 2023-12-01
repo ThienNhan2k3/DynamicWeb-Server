@@ -26,33 +26,46 @@ controller.accountManagement = async (req, res) => {
             currentPage: page,
             maxPage,
             sizePage,
+            limitPage: 2,
             accounts: accounts.slice((page - 1) * sizePage, page * sizePage)
         }
     }
 
-    const err = {
-        firstNameCreateModal: req.flash("firstNameCreateModal"),
-        lastNameCreateModal: req.flash("lastNameCreateModal"),
-        usernameCreateModal: req.flash("usernameCreateModal"),
-        emailCreateModal: req.flash("emailCreateModal"),
-        passwordCreateModal: req.flash("passwordCreateModal"),
-        confirmPasswordCreateModal: req.flash("confirmPasswordCreateModal"),
+    const createErr = {
+        error: {
+            firstName: req.flash("firstNameCreateModalError"),
+            lastName: req.flash("lastNameCreateModalError"),
+            username: req.flash("usernameCreateModalError"),
+            email: req.flash("emailCreateModalError"),
+            password: req.flash("passwordCreateModalError"),
+            confirmPassword: req.flash("confirmPasswordCreateModalError"),
+        },
+        value: {
+            firstName: req.flash("firstNameCreateModal")[0],
+            lastName: req.flash("lastNameCreateModal")[0],
+            username: req.flash("usernameCreateModal")[0],
+            email: req.flash("emailCreateModal")[0],
+            password: req.flash("passwordCreateModal")[0],
+            confirmPassword: req.flash("confirmPasswordCreateModal")[0],
+        }
     }
-
-    console.log(err);
 
     const createMsg = {
         status: req.flash("createMsgStatus"), 
-        content: req.flash("createMsgContent")
+        content: req.flash("createMsgContent"),
     }
-    console.log(createMsg);
+    const editMsg = {
+        status: req.flash("editMsgStatus"), 
+        content: req.flash("editMsgContent")
+    }
      
     return res.render("So/accountManagement.ejs", {
         accountTypes,
         districts, 
         pagination,
-        err,
-        createMsg
+        createErr,
+        createMsg,
+        editMsg
     });
 }
 
@@ -89,51 +102,58 @@ controller.createAccount = async (req, res) => {
     let loginFailed = false;
     //First name
     if (checkInput.isEmpty(firstNameCreateModal)) {
-        req.flash("firstNameCreateModal", "Tên cán bộ không thể để trống!");
+        req.flash("firstNameCreateModalError", "Tên cán bộ không thể để trống!");
         loginFailed = true;
     } 
     //Last name
     if (checkInput.isEmpty(lastNameCreateModal)) {
-        req.flash("lastNameCreateModal", "Tên đệm và họ của cán bộ chưa được nhập!");
+        req.flash("lastNameCreateModalError", "Tên đệm và họ của cán bộ chưa được nhập!");
         loginFailed = true;
     } 
     //Username 
     if (checkInput.isEmpty(usernameCreateModal)) {
         loginFailed = true;
-        req.flash("usernameCreateModal", "Tên đăng nhập không thể để trống!");
+        req.flash("usernameCreateModalError", "Tên đăng nhập không thể để trống!");
     } else if (await checkInput.usernameExists(usernameCreateModal)) {
         loginFailed = true;
-        req.flash("usernameCreateModal", "Tên đăng nhập đã tồn tại!");
+        req.flash("usernameCreateModalError", "Tên đăng nhập đã tồn tại!");
     }
     //Email
     if (checkInput.isEmpty(emailCreateModal)) {
         loginFailed = true;
-        req.flash("emailCreateModal", "Email chưa được nhập!");
+        req.flash("emailCreateModalError", "Email chưa được nhập!");
     } else if (!checkInput.isEmail(emailCreateModal)) {
         loginFailed = true;
-        req.flash("emailCreateModal", "Email không hợp lệ!");
+        req.flash("emailCreateModalError", "Email không hợp lệ!");
     } else if (await checkInput.emailExists(emailCreateModal)) {
         loginFailed = true;
-        req.flash("emailCreateModal", "Email này đã được sử dụng!");
+        req.flash("emailCreateModalError", "Email này đã được sử dụng!");
     }
     //Password
     if (checkInput.isEmpty(passwordCreateModal)) {
         loginFailed = true;
-        req.flash("passwordCreateModal", "Mật khẩu không thể bỏ trống!");
-    } else if (checkInput.isValidPassword(passwordCreateModal)) {
+        req.flash("passwordCreateModalError", "Mật khẩu không thể bỏ trống!");
+    } else if (!checkInput.isValidPassword(passwordCreateModal)) {
         loginFailed = true;
-        req.flash("passwordCreateModal", "Mật khẩu này quá yếu!");
+        req.flash("passwordCreateModalError", "Mật khẩu này quá yếu!");
     }
     //Confirm password 
     if (checkInput.isEmpty(confirmPasswordCreateModal)) {
         loginFailed = true;
-        req.flash("confirmPasswordCreateModal", "Mật khẩu xác nhận chưa được nhập!");
-    } else if (checkInput.isValidConfirmPassword(confirmPasswordCreateModal)) {
+        req.flash("confirmPasswordCreateModalError", "Mật khẩu xác nhận chưa được nhập!");
+    } else if (!checkInput.isValidConfirmPassword(passwordCreateModal, confirmPasswordCreateModal)) {
         loginFailed = true;
-        req.flash("confirmPasswordCreateModal", "Mật khẩu xác nhận không trùng với mật khẩu!");
+        req.flash("confirmPasswordCreateModalError", "Mật khẩu xác nhận không trùng với mật khẩu!");
     }
 
     if (loginFailed) {
+        req.flash("firstNameCreateModal", firstNameCreateModal);
+        req.flash("lastNameCreateModal", lastNameCreateModal);
+        req.flash("usernameCreateModal", usernameCreateModal);
+        req.flash("emailCreateModal", emailCreateModal);
+        req.flash("passwordCreateModal", passwordCreateModal);
+        req.flash("confirmPasswordCreateModal", confirmPasswordCreateModal);
+
         req.flash("createMsgStatus", "danger");
         req.flash("createMsgContent", "Đăng ký thất bại");
         return res.redirect("/department/accountManagement");    
@@ -159,6 +179,46 @@ controller.createAccount = async (req, res) => {
         req.flash("createMsgContent", "Đăng ký thất bại");
     }
     return res.redirect("/department/accountManagement");    
+}
+
+controller.editAccount = async (req, res) => {
+    const {
+        idEditModal,
+        accountTypeSelectEditModal, 
+        districtSelectEditModal,
+        wardSelectEditModal
+    } = req.body;
+    try {
+        await Account.update(
+            {type: accountTypeSelectEditModal, district: districtSelectEditModal ? districtSelectEditModal : '', ward: wardSelectEditModal ? wardSelectEditModal : ''},
+            {where: {id: idEditModal}}
+        )
+        req.flash("editMsgStatus", "success");
+        req.flash("editMsgContent", "Phân công khu vực thành công");
+        return res.send("Account updated!");
+    } catch(err) {
+        console.error(err);
+        req.flash("editMsgStatus", "danger");
+        req.flash("editMsgContent", "Phân công khu vực thất bại");
+        return res.send("Can not update account!");
+    }
+}
+
+controller.deleteAccount = async (req, res) => {
+    const { idEditModal } = req.body;
+    try {
+        await Account.destroy(
+            {where: {id: idEditModal}}
+        )
+        req.flash("deleteMsgStatus", "success");
+        req.flash("deleteMsgContent", "Xóa tài khoản thành công");
+        return res.send("Account deleted!");
+    } catch(err) {
+        console.error(err);
+        req.flash("editMsgStatus", "danger");
+        req.flash("editMsgContent", "Xóa tài khoản thất bại");
+        return res.send("Can not delete account!");
+    }
 }
 
 module.exports = controller;
