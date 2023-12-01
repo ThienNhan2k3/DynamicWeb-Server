@@ -242,7 +242,7 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
       }<span class="ms-2 badge ${
-        adsData[0].status == "Đã cấp phép"
+        adsData[page-1].status == "Đã cấp phép"
           ? "bg-success"
           : adsData[page - 1].status == "Chưa cấp phép"
           ? "bg-warning"
