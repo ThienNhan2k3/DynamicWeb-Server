@@ -6,7 +6,7 @@ const controller = {};
 controller.accountManagement = async (req, res) => {
     let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
     const options = {
-        attributes: ["id", "firstName", "lastName", "email", "type", "district", "ward"],
+        attributes: ["id", "firstName", "lastName", "email", "type", "areaId"],
     }
 
     const accountTypes = ["Phuong", "Quan", "So"]
