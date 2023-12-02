@@ -7,6 +7,7 @@ controller.home = async (req, res) => {
     
     return res.render("PhuongQuan/home.ejs", {
         tab: "Trang chủ",
+        selectedId: req.session.selectedAdsplacementId
     });
 }
 
@@ -32,8 +33,6 @@ controller.showListAdsplacements = async (req, res) => {
 
     else {
         let selectedArea = req.query.selectedArea ? req.query.selectedArea : '';
-        console.log('Select 1', selectedArea);
-        console.log('Account', req.session.accountWard);
         if (selectedArea.trim() != '' && selectedArea != 'all') {
             options.where.areaId = selectedArea;
         }
@@ -63,11 +62,80 @@ controller.showListAdsplacements = async (req, res) => {
     return res.render("PhuongQuan/list-adsplacements.ejs", {
         tab: "Danh sách điểm đặt quảng cáo",
         adsPlacements: rows,
+        selectedId: req.session.selectedAdsplacementId
     });
 }
 
 controller.editAdsplacement = async (req, res) => {
     let {id, address, areaId, adsTypeId, locationTypeId, status} = req.body;
+}
+
+controller.showListBoards = async (req, res) => {
+
+    let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+
+    req.session.selectedAdsplacementId = id;
+
+    res.locals.adsplacement = await models.AdsPlacement.findOne({
+        include: [{model: models.Area}],
+        where: {id: id}
+    });
+
+    let {rows, count} = await models.Board.findAndCountAll({
+        include: [
+            {
+                model: models.PermitRequest,
+                required: true
+            },
+            {model: models.BoardType}
+        ],
+        where: {adsPlacementId: id},
+    });
+
+    let permitedRows = rows;
+
+    let emptyBoards = await models.Board.findAll({
+        include: [
+            {
+                model: models.PermitRequest,
+                required: false,
+                where: {boardId: null}
+            },
+            {model: models.BoardType}
+        ],
+        where: {
+            [Op.and]: [
+                {adsPlacementId: id},
+                {id: {
+                    [Op.notIn]: Sequelize.literal(
+                      '(SELECT boardId FROM permitRequests WHERE boardId IS NOT NULL)'
+                    )
+                  }}
+            ]
+        }
+    });
+
+    res.locals.waitingBoards = await models.Board.findAll({
+        include: [
+            {
+                model: models.PermitRequest,
+                where: {
+                    status: 'Chưa cấp phép',
+                    accountId: req.session.accountId
+                }
+            },
+            {model: models.BoardType}
+        ],
+        where: {adsPlacementId: id},
+    });
+
+    return res.render("PhuongQuan/list-boards", {
+        selectedId: id,
+        tab: "Danh sách bảng quảng cáo",
+        selectedId: req.session.selectedAdsplacementId,
+        permitedBoards: permitedRows,
+        emptyBoards: emptyBoards
+    });
 }
 
 module.exports = controller;

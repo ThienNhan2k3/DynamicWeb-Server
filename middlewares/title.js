@@ -2,9 +2,11 @@ const controller = {};
 
 controller.role = async (req, res, next) => {
     let type = req.session.accountType;
-    if (type == 'Phuong') res.locals.role = 'Phường'
-    else if (type == 'Quan') res.locals.role = 'Quận'
-    else if (type == 'So') res.locals.role = 'Sở'
+    if (type == 'ward') res.locals.role = 'Phường'
+    else if (type == 'district') res.locals.role = 'Quận'
+    else if (type == 'department') res.locals.role = 'Sở'
+
+    res.locals.accountType = req.session.accountType;
 
     next();
 }

@@ -76,7 +76,7 @@
                       <td>Link</td>
                       <td><%= place.status %></td>
                       <td>
-                          <a href="./ds-qc-1-diem.html"><img src="/images/view.png" alt="" width="35"></a>
+                          <a href="./list-boards/<%= place.id %>"><img src="/images/view.png" alt="" width="35"></a>
                           <a href="" data-bs-toggle="modal" data-bs-target="#locationChange" onclick="showEditAdsplacementModal(this)" data-id="<%= place.id %>" data-address="<%= place.address %>" data-area="<%= place.Area.id %>" data-ads-type="<%= place.AdsType.id %>" data-location-type="<%= place.LocationType.id %>" data-status="<%= place.status %>">
                             <img src="/images/edit.png" alt="" width="35">
                           </a>

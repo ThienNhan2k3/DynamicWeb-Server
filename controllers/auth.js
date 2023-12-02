@@ -180,20 +180,24 @@ const postLogin = async (req, res) => {
     }
 
     req.session.accountId = account.id;
-    req.session.accountType = account.type;
 
     if (account.type === 'So') {
+      req.session.accountType = 'department';
       res.redirect("/department/accountManagement");
     }
 
     else if (account.type === 'Quan') {
+      req.session.accountType = 'district';
       req.session.accountDistrict = account.Area.district;
+      req.session.selectedAdsplacementId = -1;
       res.redirect("/district/home");
     }
 
     else if (account.type === 'Phuong') {
+      req.session.accountType = 'ward';
       req.session.accountWard = account.Area.ward;
       req.session.accountDistrict = account.Area.district;
+      req.session.selectedAdsplacementId = -1;
       res.redirect("/ward/home");
     }
 
