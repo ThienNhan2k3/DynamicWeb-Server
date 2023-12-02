@@ -14,8 +14,8 @@ module.exports = {
      */
     await queryInterface.sequelize.query('SELECT * FROM companies')
     await queryInterface.sequelize.query('SELECT * FROM boards');
-    await queryInterface.sequelize.query('SELECT * FROM adsplacements');
     await queryInterface.sequelize.query('SELECT * FROM reporttypes');
+    await queryInterface.sequelize.query('SELECT * FROM accounts');
 
     await queryInterface.bulkInsert(
       "permitRequests",
