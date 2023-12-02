@@ -85,9 +85,9 @@ app.use(flash());
 
 
 //Routing
-// app.get("/test", (req, res) => {
-//   return res.send("Hello");
-// })
+app.get("/test", (req, res) => {
+  return res.render("template");
+})
 app.use("/citizen", citizenRoutes);
 app.use("/", authRoutes);
 
@@ -95,6 +95,8 @@ app.use(authUser);
 app.use("/department", authRole("So"), departmentRoutes);
 app.use("/ward", authRole("Phuong"), wardDistrictRoutes);
 app.use("/district", authRole("Quan"), wardDistrictRoutes);
+
+
 
 app.use((req, res) => {
   res.render("404");

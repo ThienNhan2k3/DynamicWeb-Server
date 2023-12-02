@@ -6,7 +6,8 @@ const controller = {};
 controller.accountManagement = async (req, res) => {
     let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
     const options = {
-        attributes: ["id", "firstName", "lastName", "email", "type", "areaId"],
+        attributes: ["id", "firstName", "lastName", "email", "type"],
+        include: [Area]
     }
 
     const accountTypes = ["Phuong", "Quan", "So"]
@@ -161,6 +162,18 @@ controller.createAccount = async (req, res) => {
 
     try {
         const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
+        let areaId = 1;
+        if (accountTypeSelectCreateModal !== 'So') {
+            const options = {
+                where: {
+                    district: districtSelectCreateModal,
+                }
+            }
+            if (accountTypeSelectCreateModal === 'Phuong') {
+                options.where.ward = wardSelectCreateModal;
+            }
+            areaId = (await Area.findOne(options)).id;
+        }
         const newAccount = await Account.create({ 
             firstName: firstNameCreateModal, 
             lastName: lastNameCreateModal,
@@ -168,8 +181,7 @@ controller.createAccount = async (req, res) => {
             email: emailCreateModal,
             password: hashPassword,
             type: accountTypeSelectCreateModal,
-            district: districtSelectCreateModal,
-            ward: wardSelectCreateModal
+            AreaId: areaId,
         });
         req.flash("createMsgStatus", "success");
         req.flash("createMsgContent", "Đăng ký thành công");
@@ -189,8 +201,20 @@ controller.editAccount = async (req, res) => {
         wardSelectEditModal
     } = req.body;
     try {
+        let areaId = 1;
+        if (accountTypeSelectEditModal !== 'So') {
+            const options = {
+                where: {
+                    district: districtSelectEditModal,
+                }
+            }
+            if (accountTypeSelectEditModal === 'Phuong') {
+                options.where.ward = wardSelectEditModal;
+            }
+            areaId = (await Area.findOne(options)).id;
+        }
         await Account.update(
-            {type: accountTypeSelectEditModal, district: districtSelectEditModal ? districtSelectEditModal : '', ward: wardSelectEditModal ? wardSelectEditModal : ''},
+            {type: accountTypeSelectEditModal, AreaId: areaId},
             {where: {id: idEditModal}}
         )
         req.flash("editMsgStatus", "success");

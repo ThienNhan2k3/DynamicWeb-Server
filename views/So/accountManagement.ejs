@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="/css/So/table.css">
     <link rel="stylesheet" href="/css/So/alert.css">
     <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
+    <link rel="stylesheet" href="/css/toggleNavigation.css">
   </head>
 
   <body>
@@ -70,19 +71,24 @@
               <tr>
                 <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
                 <td><%= pagination.accounts[i].email %></td>
-                <% if (pagination.accounts[i].ward != null) { %> 
-                <td> <%= pagination.accounts[i].ward %></td>
-                <% } else {%>
+                <% if (pagination.accounts[i].type === 'So') {%>
                   <td></td>
-                <% } %>
-                <% if (pagination.accounts[i].district != null) { %> 
-                  <td> <%= pagination.accounts[i].district %></td>
-                  <% } else {%>
-                    <td></td>
-                  <% } %>
+                  <td></td>
+                <% } else { %>
+                  <% if (pagination.accounts[i].type === 'Phuong' && pagination.accounts[i].Area.ward != null) { %> 
+                    <td> <%= pagination.accounts[i].Area.ward %></td>
+                    <% } else {%>
+                      <td></td>
+                    <% } %>
+                    <% if (pagination.accounts[i].Area.district != null) { %> 
+                      <td> <%= pagination.accounts[i].Area.district %></td>
+                    <% } else {%>
+                      <td></td>
+                    <% } %>
+                <% } %> 
                 <td><%= pagination.accounts[i].type %></td>
                 <td class="function-icons text-center">
-                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].district %>" data-ward="<%= pagination.accounts[i].ward %>" onclick="showEditUserModal(this)"></i>
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].Area.district %>" data-ward="<%= pagination.accounts[i].Area.ward %>" onclick="showEditUserModal(this)"></i>
                   <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
                 </td>
               </tr>
@@ -417,7 +423,7 @@
   <% } %>
   <script src="/javascript/So/accountManagement.js"></script>
   <script src="/javascript/So/passwordStrengthIndicator.js"></script>
-  <script src="/javascript/So/navbar.js"></script>
+  <script src="/javascript/toggleNavigation.js"></script>
   
 </body>
   <script
