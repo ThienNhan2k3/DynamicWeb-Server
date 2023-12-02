@@ -9,11 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({Board, AdsPlacement, Company}) {
+    static associate({Board, AdsPlacement, Company, Account}) {
       // define association here
       this.belongsTo(Board);
       this.belongsTo(AdsPlacement);
       this.belongsTo(Company);
+      this.belongsTo(Account);
     }
   }
   PermitRequest.init({
