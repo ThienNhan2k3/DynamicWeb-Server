@@ -11,13 +11,15 @@ module.exports = (sequelize, DataTypes) => {
       Area,
       Report,
       PermitRequest,
-      AdsPlacementRequest
+      AdsPlacementRequest,
+      BoardRequest
     }) {
       // define association here
       this.belongsTo(Area);
       this.hasMany(Report);
       this.hasMany(PermitRequest);
       this.hasMany(AdsPlacementRequest);
+      this.hasMany(BoardRequest);
     }
   }
   Account.init(

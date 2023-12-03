@@ -25,40 +25,98 @@
   <%- include("./subPartials/navbar.ejs") %> 
   <!-- Main content -->
   <main class="dynamic-container">
-    <!-- Danh sách chờ duyệt -->
+    <!-- Danh sách thay đổi thông tin điểm đặt QC chờ duyệt -->
     <div class="container-fluid pt-4 pe-4 text-center">
       <div class="row justify-content-center table-responsive">
         <div class="container row bg-secondary text-white">
           <div class="col text-center">
-            <p class="fs-2 text-center py-2 m-0">Danh sách bảng quảng cáo chờ cấp phép của bạn</p>
+            <p class="fs-2 text-center py-2 m-0">Yêu cầu thay đổi thông tin điểm đặt</p>
           </div>
         </div>
         <table class="table table-striped">
           <thead>
             <tr>
               <th scope="col">ID</th>
-              <th scope="col">Kích thước</th>
-              <th scope="col">Số lượng</th>
-              <th scope="col">Loại bảng</th>
+              <th scope="col">ID Điểm đặt</th>
+              <th scope="col">Địa chỉ mới</th>
+              <th scope="col">Hình thức quảng cáo mới</th>
+              <th scope="col">Loại vị trí mới</th>
+              <th scope="col">Thông tin quy hoạch mới</th>
+              <th scope="col">Lý do chỉnh sửa</th>
+              <th scope="col">Ngày tạo</th>
               <th scope="col">Tình trạng</th>
               <th>Chức năng</th>
             </tr>
           </thead>
           <tbody>
-            <% myPermitRequests.forEach(request => { %>
+            <% adsplacementRequests.forEach(request => { %>
               <tr>
                 <td><%= request.id %></td>
-                <td><%= request.size %></td>
-                <td><%= request.quantity %></td>
-                <td><%= request.BoardType.type %></td>
-                <td><%= request.PermitRequest.status %></td>
+                <td><%= request.AdsPlacementId %></td>
+                <td><%= request.address %></td>
+                <td><%= request.AdsType.type %></td>
+                <td><%= request.LocationType.locationType %></td>
+                <td><%= request.status %></td>
+                <td><%= request.reason %></td>
+                <td><%= request.createdAt.toLocaleString() %></td>
+                <td><%= request.requestStatus %></td>
                 <td>
-                  <a
-                    href="http://google.com"
-                    data-bs-toggle="modal"
-                    data-bs-target="#adsChange"
-                    ><img src="/images/edit.png" alt="" width="35"
-                  /></a>
+                  <% if (request.requestStatus == "Chờ phê duyệt") { %>
+                    <a href=""><i class="fa fa-trash-can"></i></a>
+                  <% }; %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <!-- Table pagination -->
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+          <li class="page-item">
+            <a class="page-link" href="#">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Danh sách cấp phép bảng QC chờ duyệt -->
+    <div class="container-fluid pt-4 pe-4 text-center">
+      <div class="row justify-content-center table-responsive">
+        <div class="container row bg-secondary text-white">
+          <div class="col text-center">
+            <p class="fs-2 text-center py-2 m-0">Yêu cầu cấp phép quảng cáo</p>
+          </div>
+        </div>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">ID Bảng</th>
+              <th scope="col">Nội dung</th>
+              <th scope="col">Công ty</th>
+              <th scope="col">Tình trạng</th>
+              <th scope="col">Ngày bắt đầu</th>
+              <th scope="col">Ngày hết hạn</th>
+              <th>Chức năng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% permitRequests.forEach(request => { %>
+              <tr>
+                <td><%= request.id %></td>
+                <td><%= request.BoardId %></td>
+                <td><%= request.content %></td>
+                <td><%= request.Company.name %></td>
+                <td><%= request.status %></td>
+                <td><%= request.start.toLocaleString() %></td>
+                <td><%= request.end.toLocaleString() %></td>
+                <td>
+                  <a href=""><i class="fa fa-trash-can"></i></a>
                 </td>
               </tr>
             <% }); %>

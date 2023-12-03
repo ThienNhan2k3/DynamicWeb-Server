@@ -3,22 +3,20 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Board extends Model {
+  class BoardRequest extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({BoardType, AdsPlacement, Report, PermitRequest, BoardRequest}) {
+    static associate({BoardType, Board, Account}) {
       // define association here
       this.belongsTo(BoardType);
-      this.belongsTo(AdsPlacement);
-      this.hasMany(Report);
-      this.hasOne(PermitRequest);
-      this.hasMany(BoardRequest);
+      this.belongsTo(Board);
+      this.belongsTo(Account);
     }
   }
-  Board.init({
+  BoardRequest.init({
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -33,11 +31,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    reason: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     // image: DataTypes.STRING,
   }, {
     sequelize,
-    tableName: "boards",
-    modelName: 'Board',
+    tableName: "boardRequests",
+    modelName: 'BoardRequest',
   });
-  return Board;
+  return BoardRequest;
 };

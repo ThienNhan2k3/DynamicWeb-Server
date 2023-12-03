@@ -53,12 +53,10 @@
                 <td><%= board.BoardType.type %></td>
                 <td><%= board.PermitRequest.status %></td>
                 <td>
-                  <a
-                    href="http://google.com"
-                    data-bs-toggle="modal"
-                    data-bs-target="#adsChange"
-                    ><img src="/images/edit.png" alt="" width="35"
-                  /></a>
+                  <a href=""><i class="fa-solid fa-file"></i></a>
+                  <a href="" data-bs-toggle="modal" data-bs-target="#boardChange" onclick="showEditBoardModal(this)" data-id="<%= board.id %>" data-size="<%= board.size %>" data-quantity="<%= board.quantity %>" data-type="<%= board.BoardTypeId %>">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
                 </td>
               </tr>
             <% }); %>
@@ -104,12 +102,9 @@
                 <td><%= board.quantity %></td>
                 <td><%= board.BoardType.type %></td>
                 <td>
-                  <a
-                    href="http://google.com"
-                    data-bs-toggle="modal"
-                    data-bs-target="#adsChange"
-                    ><img src="/images/edit.png" alt="" width="35"
-                  /></a>
+                  <a href="http://google.com" data-bs-toggle="modal" data-bs-target="#adsChange">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                  </a>
                 </td>
               </tr>
             <% }); %>
@@ -134,6 +129,7 @@
   <%- include("../partials/footer.ejs") %>
 
   <!-- Modals -->
+  <%- include("./subPartials/form-change-board-details.ejs") %>
   </body>
 
 
@@ -148,5 +144,5 @@
     crossorigin="anonymous"
   ></script>
   <script src="/javascript/toggleNavigation.js"></script>
-  <script src="/javascript/list-boards.js"></script>
+  <script src="/javascript/PhuongQuan/list-boards.js"></script>
 </html>

@@ -131,6 +131,9 @@ controller.showListBoards = async (req, res) => {
         }
     });
 
+    //Adding options for select forms
+    res.locals.boardTypes = await models.BoardType.findAll();
+
     return res.render("PhuongQuan/list-boards", {
         selectedId: id,
         tab: "Danh sách bảng quảng cáo",
@@ -141,23 +144,31 @@ controller.showListBoards = async (req, res) => {
 }
 
 controller.showMyRequests = async (req, res) => {
-    res.locals.myPermitRequests = await models.Board.findAll({
+
+    res.locals.adsplacementRequests = await models.AdsPlacementRequest.findAll({
         include: [
-            {
-                model: models.PermitRequest,
-                where: {
-                    status: 'Chưa cấp phép',
-                    accountId: req.session.accountId
-                }
-            },
-            {model: models.BoardType}
+            {model: models.LocationType},
+            {model: models.AdsType}  
         ],
+        where: {
+            accountId: req.session.accountId,
+        },
+        order: [['id', 'ASC']]
+    });
+
+    res.locals.permitRequests = await models.PermitRequest.findAll({
+        include: [{model: models.Company}],
+        where: {
+            status: 'Chưa cấp phép',
+            accountId: req.session.accountId
+        },
+        order: [['id', 'ASC']]
     });
 
     return res.render("PhuongQuan/my-requests.ejs", {
         tab: "Yêu cầu của tôi",
         selectedId: req.session.selectedAdsplacementId
-    })
+    });
 }
 
 module.exports = controller;
