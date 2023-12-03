@@ -59,7 +59,7 @@ function selectAccountType(e, districtSelect, wardSelect) {
     }
 }
 
-function showEditUserModal(btn) {
+function showEditAccountModal(btn) {
     const id = btn.dataset.id;
     const accountType = btn.dataset.type;
     const district = btn.dataset.district;
@@ -84,10 +84,16 @@ function showEditUserModal(btn) {
     document.getElementById("idEditModal").value = id;
 }
 
-const confirmEditButton = document.getElementById("confirm-edit-button");
-confirmEditButton.addEventListener("click", async (e) => {
+
+function showDeleteAccountModal(btn) {
+  const id = btn.dataset.id;
+  document.getElementById("idDeleteModal").value = id;
+}
+
+const confirmDeleteButton = document.getElementById("confirm-delete-button");
+confirmDeleteButton.addEventListener("click", async (e) => {
     e.preventDefault();
-    const formData = new FormData(document.getElementById("editForm"));
+    const formData = new FormData(document.getElementById("deleteForm"));
     const data = Object.fromEntries(formData.entries());
     const res = await fetch("/department/accountManagement", {
         method: "PUT",
@@ -98,3 +104,4 @@ confirmEditButton.addEventListener("click", async (e) => {
     });
     location.reload();
 })
+

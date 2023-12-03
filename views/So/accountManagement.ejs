@@ -88,8 +88,8 @@
                 <% } %> 
                 <td><%= pagination.accounts[i].type %></td>
                 <td class="function-icons text-center">
-                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].Area.district %>" data-ward="<%= pagination.accounts[i].Area.ward %>" onclick="showEditUserModal(this)"></i>
-                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].Area.district %>" data-ward="<%= pagination.accounts[i].Area.ward %>" onclick="showEditAccountModal(this)"></i>
+                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>" onclick="showDeleteAccountModal(this)"></i>
                 </td>
               </tr>
             <% } %>
@@ -335,11 +335,13 @@
           <!-- Modal body -->
           <div class="modal-body">
             Bạn có chắc chắn rằng bạn muốn xóa tài khoản này không ?
+            <input type="hidden" value="" name="accountId" id="idDeleteModal">
+
           </div>
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
+            <button type="button" class="btn gray-button" data-bs-dismiss="modal" id="confirm-delete-button">Hủy bỏ</button>
             <button class="btn red-button" id="confirm-delete-button" data-bs-dismiss="modal">Xóa</button>
           </div>
 

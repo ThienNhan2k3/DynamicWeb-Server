@@ -4,34 +4,7 @@ const bcrypt = require("bcrypt");
 const controller = {};
 
 controller.accountManagement = async (req, res) => {
-    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-    const options = {
-        attributes: ["id", "firstName", "lastName", "email", "type"],
-        include: [Area]
-    }
-
-    const accountTypes = ["Phuong", "Quan", "So"]
-    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
-    let accounts = await Account.findAll(options);
-
-    const sizePage = 1;
-    const minPage = 1;
-    const accountsPerPage = 1;
-    const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
-    let pagination = {};
-    if (page < minPage || page > maxPage) {
-        res.send("<h1>Page not found!!!</h1>")
-    } else {
-        pagination = {
-            minPage,
-            currentPage: page,
-            maxPage,
-            sizePage,
-            limitPage: 2,
-            accounts: accounts.slice((page - 1) * sizePage, page * sizePage)
-        }
-    }
-
+    
     const createErr = {
         error: {
             firstName: req.flash("firstNameCreateModalError"),
@@ -59,6 +32,45 @@ controller.accountManagement = async (req, res) => {
         status: req.flash("editMsgStatus"), 
         content: req.flash("editMsgContent")
     }
+
+    const deleteMsg = {
+        status: req.flash("deleteMsgStatus"), 
+        content: req.flash("deleteMsgContent")
+    }
+
+    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+    const options = {
+        attributes: ["id", "firstName", "lastName", "email", "type"],
+        include: [Area]
+    }
+
+    const accountTypes = ["Phuong", "Quan", "So"]
+    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
+    let accounts = await Account.findAll(options);
+
+    const sizePage = 1;
+    const minPage = 1;
+    const accountsPerPage = 1;
+    const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
+    let pagination = {};
+    if (page < minPage || page > maxPage) {
+        if (deleteMsg.status.length > 0) {
+            page = maxPage;
+            res.redirect(`?page=${page}`)
+        } else {
+            res.send("<h1>Page not found!!!</h1>")
+        }
+    } else {
+        pagination = {
+            minPage,
+            currentPage: page,
+            maxPage,
+            sizePage,
+            limitPage: 2,
+            accounts: accounts.slice((page - 1) * sizePage, page * sizePage)
+        }
+    }
+
      
     return res.render("So/accountManagement.ejs", {
         accountTypes,
@@ -239,8 +251,8 @@ controller.deleteAccount = async (req, res) => {
         return res.send("Account deleted!");
     } catch(err) {
         console.error(err);
-        req.flash("editMsgStatus", "danger");
-        req.flash("editMsgContent", "Xóa tài khoản thất bại");
+        req.flash("deleteMsgStatus", "danger");
+        req.flash("deleteMsgContent", "Xóa tài khoản thất bại");
         return res.send("Can not delete account!");
     }
 }
