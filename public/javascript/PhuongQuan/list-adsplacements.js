@@ -1,5 +1,5 @@
 function showEditAdsplacementModal(btn) {
-    document.querySelector('#idEdit').value = btn.dataset.id;
+    document.querySelector('#adsplacementIdEdit').value = btn.dataset.id;
     document.querySelector('#addressEdit').value = btn.dataset.address;
     document.querySelector('#areaEdit').value = btn.dataset.area;
     document.querySelector('#adsTypeEdit').value = btn.dataset.adsType;
@@ -21,7 +21,7 @@ async function editAdsplacement(e) {
         body: JSON.stringify(data)
     });
     
-    location.reload();
+    //location.reload();
 }
 
 var urlParams = new URLSearchParams(window.location.search);

@@ -67,7 +67,23 @@ controller.showListAdsplacements = async (req, res) => {
 }
 
 controller.editAdsplacement = async (req, res) => {
-    let {id, address, areaId, adsTypeId, locationTypeId, status} = req.body;
+    let {adsplacementId, address, adsTypeId, locationTypeId, status, reason} = req.body;
+    try {
+        await models.AdsPlacementRequest.create({
+            AdsPlacementId: adsplacementId,
+            address: address,
+            AdsTypeId: adsTypeId,
+            LocationTypeId: locationTypeId,
+            status: status,
+            reason: reason,
+            AccountId: req.session.accountId,
+            requestStatus: "Chờ phê duyệt"
+        });
+        res.redirect("./list-adsplacements");
+    } catch (error) {
+        res.send("Gửi yêu cầu thất bại!");
+        console.error(error);
+    }
 }
 
 controller.showListBoards = async (req, res) => {
@@ -115,7 +131,17 @@ controller.showListBoards = async (req, res) => {
         }
     });
 
-    res.locals.waitingBoards = await models.Board.findAll({
+    return res.render("PhuongQuan/list-boards", {
+        selectedId: id,
+        tab: "Danh sách bảng quảng cáo",
+        selectedId: req.session.selectedAdsplacementId,
+        permitedBoards: permitedRows,
+        emptyBoards: emptyBoards
+    });
+}
+
+controller.showMyRequests = async (req, res) => {
+    res.locals.myPermitRequests = await models.Board.findAll({
         include: [
             {
                 model: models.PermitRequest,
@@ -126,16 +152,12 @@ controller.showListBoards = async (req, res) => {
             },
             {model: models.BoardType}
         ],
-        where: {adsPlacementId: id},
     });
 
-    return res.render("PhuongQuan/list-boards", {
-        selectedId: id,
-        tab: "Danh sách bảng quảng cáo",
-        selectedId: req.session.selectedAdsplacementId,
-        permitedBoards: permitedRows,
-        emptyBoards: emptyBoards
-    });
+    return res.render("PhuongQuan/my-requests.ejs", {
+        tab: "Yêu cầu của tôi",
+        selectedId: req.session.selectedAdsplacementId
+    })
 }
 
 module.exports = controller;

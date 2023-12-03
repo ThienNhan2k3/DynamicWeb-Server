@@ -5,7 +5,8 @@ const router = express.Router();
 
 router.get("/home", title.role, controller.home);
 router.get("/list-adsplacements", title.role, controller.showListAdsplacements);
-router.put("/list-adsplacements", controller.editAdsplacement);
+router.post("/list-adsplacements", title.role, controller.editAdsplacement);
 router.get("/list-boards/:id", title.role, controller.showListBoards);
+router.get("/my-requests", title.role, controller.showMyRequests);
 
 module.exports = router;

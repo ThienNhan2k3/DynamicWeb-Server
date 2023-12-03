@@ -1,30 +1,26 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class AdsPlacement extends Model {
+  class AdsPlacementRequest extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate({
-      Area,
+      AdsPlacement,
       LocationType,
       AdsType,
-      Board,
-      Report,
-      AdsPlacementRequest,
+      Account,
     }) {
       // define association here
-      this.belongsTo(Area);
+      this.belongsTo(AdsPlacement);
       this.belongsTo(LocationType);
       this.belongsTo(AdsType);
-      this.hasMany(Board);
-      this.hasMany(Report);
-      this.hasMany(AdsPlacementRequest);
+      this.belongsTo(Account);
     }
   }
-  AdsPlacement.init(
+  AdsPlacementRequest.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -37,20 +33,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: DataTypes.STRING,
-      long: {
-        type: DataTypes.DOUBLE,
+      reason: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
-      lat: {
-        type: DataTypes.DOUBLE,
+      requestStatus: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {
       sequelize,
-      tableName: "adsPlacements",
-      modelName: "AdsPlacement",
+      tableName: "adsPlacementRequests",
+      modelName: "AdsPlacementRequest",
     }
   );
-  return AdsPlacement;
+  return AdsPlacementRequest;
 };
