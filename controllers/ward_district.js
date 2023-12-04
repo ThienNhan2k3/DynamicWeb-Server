@@ -143,6 +143,25 @@ controller.showListBoards = async (req, res) => {
     });
 }
 
+controller.editBoard = async (req, res) => {
+    let {boardId, quantity, size, boardTypeId, reason} = req.body;
+    try {
+        await models.BoardRequest.create({
+            BoardId: boardId,
+            size: size,
+            quantity: quantity,
+            BoardTypeId: boardTypeId,
+            reason: reason,
+            AccountId: req.session.accountId,
+            requestStatus: "Chờ phê duyệt"
+        });
+        res.redirect("./list-boards/" + req.session.selectedAdsplacementId);
+    } catch (error) {
+        res.send("Gửi yêu cầu thất bại!");
+        console.error(error);
+    }
+}
+
 controller.showMyRequests = async (req, res) => {
 
     res.locals.adsplacementRequests = await models.AdsPlacementRequest.findAll({
@@ -155,6 +174,12 @@ controller.showMyRequests = async (req, res) => {
         },
         order: [['id', 'ASC']]
     });
+
+    res.locals.boardRequests = await models.BoardRequest.findAll({
+        include: [{model: models.BoardType}],
+        where: {accountId: req.session.accountId},
+        order: [['id', 'ASC']]
+    })
 
     res.locals.permitRequests = await models.PermitRequest.findAll({
         include: [{model: models.Company}],

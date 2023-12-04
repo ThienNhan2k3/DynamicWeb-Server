@@ -13,12 +13,12 @@
       </div>
     </div>
     <div class="modal-body justify-content-center">
-      <form action="">
+      <form action="/<%= accountType %>/list-boards" id="editBoardForm" method="POST">
         <input type="hidden" name="boardId" id="boardIdEdit"/>
         <div class="row">
           <div class="col">
             <div class="form-floating">
-              <select class="form-select" id="typeEdit" name="type">
+              <select class="form-select" id="typeEdit" name="boardTypeId">
                 <% boardTypes.forEach(type => { %>
                     <option value="<%= type.id %>"><%= type.type %></option>
                   <% }); %>
