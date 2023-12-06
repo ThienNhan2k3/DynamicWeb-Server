@@ -21,6 +21,7 @@ const authRole = (type) => {
             return res.send("Not allowed !!!");
         }
         res.locals.accountType = type;
+        res.locals.createWardDistrictPageQueryString = require("../util/queryString").createWardDistrictPageQueryString;
         next();
     }
 }

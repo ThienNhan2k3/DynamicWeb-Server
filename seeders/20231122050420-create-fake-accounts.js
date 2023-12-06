@@ -71,7 +71,7 @@ module.exports = {
       password: "$2b$12$rV7gjsFTaM/vY.jAzSjEFOXYkyMf5L/tvlz6Zadz10Pc7/tLrAspK", //nhan123
       type: "Phuong",
       email: "nhan123@gmail.com",
-      AreaId: 4,
+      AreaId: 186,
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"       
     },

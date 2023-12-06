@@ -79,6 +79,9 @@ app.use(
     store: sessionStore,
     resave: false, // we support the touch method so per the express-session docs this should be set to false
     saveUninitialized: false,
+    cookie: {
+      maxAge: 60000 * 60 * 24 * 30
+    }
   })
 );
 app.use(flash());

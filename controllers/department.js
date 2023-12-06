@@ -1,10 +1,13 @@
-const {Area, Account, sequelize} = require("../models");
+const {Area, Account, PermitRequest, Board, sequelize} = require("../models");
 const checkInput = require("../util/checkInput");
+const {createWardDistrictPageQueryString} = require("../util/queryString");
 const bcrypt = require("bcrypt");
 const controller = {};
+const { Op } = require('sequelize');
+
+
 
 controller.accountManagement = async (req, res) => {
-    
     const createErr = {
         error: {
             firstName: req.flash("firstNameCreateModalError"),
@@ -23,11 +26,11 @@ controller.accountManagement = async (req, res) => {
             confirmPassword: req.flash("confirmPasswordCreateModal")[0],
         }
     }
-
     const createMsg = {
         status: req.flash("createMsgStatus"), 
         content: req.flash("createMsgContent"),
     }
+
     const editMsg = {
         status: req.flash("editMsgStatus"), 
         content: req.flash("editMsgContent")
@@ -39,26 +42,67 @@ controller.accountManagement = async (req, res) => {
     }
 
     let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+    let district = req.query.district || '';
+    let ward = req.query.ward || '';
     const options = {
         attributes: ["id", "firstName", "lastName", "email", "type"],
-        include: [Area]
+        where: {
+            id: { [Op.ne]: req.session.accountId }
+        },
+        include: [{
+            model: Area,
+            attributes: ['id', 'district', 'ward'],
+            where: {}
+        }]
+    }
+    let wards = [], currentDistrict = '', currentWard = ''; 
+    if (district.trim() !== '') {
+        options.include[0].where.district = district;
+        options.where = {
+            [Op.or]: [
+                { type: 'Quan' },
+                { type: 'Phuong' }
+            ]
+        }
+        wards = await Area.findAll({
+            where: {
+                district
+            }
+        })
+        currentDistrict = district;
+        if (ward.trim() !== '') {
+            options.include[0].where.ward = ward;
+            options.where = {
+                type: "Phuong",
+            }
+            currentWard = ward;
+        }
     }
 
     const accountTypes = ["Phuong", "Quan", "So"]
     const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
     let accounts = await Account.findAll(options);
-
-    const sizePage = 1;
+    const sizePage = 5;
     const minPage = 1;
     const accountsPerPage = 1;
     const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
     let pagination = {};
     if (page < minPage || page > maxPage) {
         if (deleteMsg.status.length > 0) {
-            page = maxPage;
-            res.redirect(`?page=${page}`)
+            page = (maxPage <= 0) ? 1 : maxPage;
+            return res.redirect("/department" + createWardDistrictPageQueryString(req.url, 'page=', page));
         } else {
-            res.send("<h1>Page not found!!!</h1>")
+            if (page !== 1) {
+                return res.send("<h1>Page not found</h1>")
+            }
+            pagination = {
+                minPage: 1,
+                currentPage: page,
+                maxPage: 1,
+                sizePage,
+                limitPage: 2,
+                accounts: [],
+            }
         }
     } else {
         pagination = {
@@ -67,18 +111,23 @@ controller.accountManagement = async (req, res) => {
             maxPage,
             sizePage,
             limitPage: 2,
-            accounts: accounts.slice((page - 1) * sizePage, page * sizePage)
+            accounts: accounts.slice((page - 1) * sizePage, page * sizePage),
         }
     }
-
-     
+    const currentUrl = req.url.slice(1);
+    
     return res.render("So/accountManagement.ejs", {
         accountTypes,
         districts, 
+        wards,
         pagination,
         createErr,
         createMsg,
-        editMsg
+        editMsg,
+        deleteMsg,
+        currentUrl,
+        currentDistrict,
+        currentWard
     });
 }
 
@@ -241,10 +290,10 @@ controller.editAccount = async (req, res) => {
 }
 
 controller.deleteAccount = async (req, res) => {
-    const { idEditModal } = req.body;
+    const { accountId } = req.body;
     try {
         await Account.destroy(
-            {where: {id: idEditModal}}
+            {where: {id: accountId}}
         )
         req.flash("deleteMsgStatus", "success");
         req.flash("deleteMsgContent", "Xóa tài khoản thành công");
@@ -255,6 +304,89 @@ controller.deleteAccount = async (req, res) => {
         req.flash("deleteMsgContent", "Xóa tài khoản thất bại");
         return res.send("Can not delete account!");
     }
+}
+
+
+controller.viewAdsRequest = async (req, res) => {
+    // let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+    // let district = req.query.district || '';
+    // let ward = req.query.ward || '';
+
+    // let wards = [], currentDistrict = '', currentWard = ''; 
+    // if (district.trim() !== '') {
+    //     wards = await Area.findAll({
+    //         where: {
+    //             district
+    //         }
+    //     })
+
+    //     currentDistrict = district;
+    //     if (ward.trim() !== '') {
+    //         currentWard = ward;
+    //     }
+    // }
+
+    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
+    let permitRequests = await sequelize.query(`
+        SELECT BTs.type AS boardType, PRs.id, PRs.content, PRs.start, PRs.end, PRs.status, Cs.id AS companyId, Cs.name AS companyName, Cs.phone AS companyPhone, Cs.address AS companyAddress, Cs.email AS companyEmail, 
+        A.id AS areaId, A.district AS district, A.ward AS ward, APs.address AS address
+        FROM permitRequests PRs
+        LEFT JOIN companies Cs ON PRs.companyId = Cs.id
+        LEFT JOIN boards Bs ON PRs.boardId = Bs.id
+        LEFT JOIN boardTypes BTs ON Bs.boardTypeId = BTs.id
+        LEFT JOIN adsPlacements APs ON Bs.adsPlacementId = APs.id
+        LEFT JOIN areas A ON APs.areaId = A.id
+    `, { type: sequelize.QueryTypes.SELECT });
+
+    console.log(permitRequests);
+    // const sizePage = 5;
+    // const minPage = 1;
+    // const accountsPerPage = 1;
+    // const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
+    // let pagination = {};
+    // if (page < minPage || page > maxPage) {
+    //     if (deleteMsg.status.length > 0) {
+    //         page = (maxPage <= 0) ? 1 : maxPage;
+    //         return res.redirect("/department" + createWardDistrictPageQueryString(req.url, 'page=', page));
+    //     } else {
+    //         if (page !== 1) {
+    //             return res.send("<h1>Page not found</h1>")
+    //         }
+    //         pagination = {
+    //             minPage: 1,
+    //             currentPage: page,
+    //             maxPage: 1,
+    //             sizePage,
+    //             limitPage: 2,
+    //             accounts: [],
+    //         }
+    //     }
+    // } else {
+    //     pagination = {
+    //         minPage,
+    //         currentPage: page,
+    //         maxPage,
+    //         sizePage,
+    //         limitPage: 2,
+    //         accounts: accounts.slice((page - 1) * sizePage, page * sizePage),
+    //     }
+    // }
+    // const currentUrl = req.url.slice(1);
+    
+    return res.render("So/viewAdsRequest.ejs", {
+        permitRequests,
+        formatDate: (date) => {
+            return date.toLocaleDateString({
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            })
+        }
+    });
+}
+
+controller.acceptOrDenyAdsRequest = (req, res) => {
+    return res.send("Hello world");
 }
 
 module.exports = controller;

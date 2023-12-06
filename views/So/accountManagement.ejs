@@ -14,36 +14,100 @@
 
     <!-- Font awesome -->
     <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
+    
+    <!--Css link -->
     <link rel="stylesheet" href="/css/So/style.css">
     <link rel="stylesheet" href="/css/So/table.css">
-    <link rel="stylesheet" href="/css/So/alert.css">
-    <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
     <link rel="stylesheet" href="/css/toggleNavigation.css">
+    <link rel="stylesheet" href="/css/So/alert.css">
+    <link rel="stylesheet" href="/css/So/customDropbox.css">
+    <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
   </head>
 
   <body>
   <%- include("../partials/header.ejs") %>
   <!-- Navbar content -->
   <%- include("./subPartials/navbar.ejs") %> 
+
+  <% if (editMsg.status.length > 0){ %>
+    <div class="alert-container" id="create-alert-container">
+      <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+        <i class="fa-regular fa-circle-check fa-2xl"></i>
+        <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
+      </div>
+      <div class="progress progress-<%= editMsg.status[0] %>"></div>
+    </div>
+  <% } else if (createMsg.status.length > 0){ %>
+    <div class="alert-container" id="create-alert-container">
+      <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+        <i class="fa-regular fa-circle-check fa-2xl"></i>
+        <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+      </div>
+      <div class="progress progress-<%= createMsg.status[0] %>"></div>
+    </div>
+  <% } else if (deleteMsg.status.length > 0){ %>
+    <div class="alert-container" id="create-alert-container">
+      <div class="alert alert-<%=deleteMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+        <i class="fa-regular fa-circle-check fa-2xl"></i>
+        <span class="ms-3 fs-5"><%= deleteMsg.content[0] %></span>
+      </div>
+      <div class="progress progress-<%= deleteMsg.status[0] %>"></div>
+    </div>
+  <% } %>
+
   <!-- Main content -->
-  <main class="dynamic-container">
-    <% if (editMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
+  <main class="dynamic-container container-fluid">
+    <div class="row w-sm-50 w-75 mt-4 justify-content-end">
+      <a class="btn btn-secondary col-lg-1 col-sm-2 col-2" href="/">
+        All
+      </a>
+      <div class="col-lg-2 col-sm-4 col-4">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <% if (currentDistrict !== '') { %>
+              <%= currentDistrict %>
+            <% } else { %>
+              Quận
+            <% } %>
+          </button>
+          <ul class="dropdown-menu">
+            <% for (let i = 0; i < districts.length; i++){ %>
+            <li>
+              <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
+                <%= districts[i].district %>
+              </a>
+            </li>
+            <% } %>
+          </ul>
         </div>
-        <div class="progress progress-<%= editMsg.status[0] %>"></div>
       </div>
-    <% } else if (createMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+      <div class="col-lg-3 col-sm-5 col-6">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+          <% if (wards.length === 0) { %>
+            disabled
+          <% } %>
+          >
+          <% if (currentWard !== '') { %>
+            <%= currentWard %>
+          <% } else { %>
+            Phường
+          <% } %>
+          </button>
+          <ul class="dropdown-menu">
+            <% if (wards.length > 0) { %>
+              <% for (let i = 0; i < wards.length; i++){ %>
+                <li>
+                  <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
+                    <%= wards[i].ward %>
+                  </a>
+                </li>
+                <% } %>
+            <% } %>
+          </ul>
         </div>
-        <div class="progress progress-<%= createMsg.status[0] %>"></div>
       </div>
-    <% } %>
+    </div>
     <div class="table-container border border-2 rounded-3">
       <div class="table-header">
         <h2>Quản lý tài khoản</h2>
@@ -66,7 +130,7 @@
           </tr>
         </thead>
         <tbody>
-          <% if (pagination.accounts) { %>
+          <% if (pagination.accounts && pagination.accounts.length > 0) { %>
             <% for (let i = 0; i < pagination.accounts.length; i++) { %>
               <tr>
                 <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
@@ -95,7 +159,7 @@
             <% } %>
           <% } else { %>
             <tr>
-              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
+              <td colspan="7" class="text-center fs-5"> Không có bất kì tài khoản nào</td>
               </tr>
           <% } %>
 
@@ -108,29 +172,29 @@
       <nav aria-label="Page navigation example">
         <ul class="pagination mb-0">
           <% if (pagination.currentPage === pagination.minPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>">Previous</a></li>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Previous</a></li>
           <% }else{%>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
           <% } %>
 
           <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
             <% if (i >= pagination.minPage){ %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>"><%=i%></a></li>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
             <% } %>
           <% } %>
 
-          <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
+          <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
 
           <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
             <% if (i <= pagination.maxPage) { %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= i%>"><%= i%></a></li>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
             <% } %>
           <% } %>
 
           <% if (pagination.currentPage === pagination.maxPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage%>">Next</a></li>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Next</a></li>
           <% }else{%>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
           <% } %>
 
         </ul>
@@ -139,15 +203,6 @@
       
     <!-- The Create Modal -->
     <div class="modal fade" id="createModal" data-bs-backdrop="static">
-      <!-- <% if (createMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
-        </div>
-        <div class="progress progress-<%= createMsg.status[0] %>"></div>
-      </div>
-      <% } %> -->
       <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
         <div class="modal-content">
           <!-- Modal Header -->
@@ -341,7 +396,7 @@
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn gray-button" data-bs-dismiss="modal" id="confirm-delete-button">Hủy bỏ</button>
+            <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
             <button class="btn red-button" id="confirm-delete-button" data-bs-dismiss="modal">Xóa</button>
           </div>
 
