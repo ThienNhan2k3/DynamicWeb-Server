@@ -10,15 +10,15 @@
       </li>
       <li class="nav-item w-100 d-flex flex-row align-items-center my-1">
         <img src="/images/acceptReports.png" alt="" class="img-fluid mx-2">
-        <a href="/<%= accountType %>/list-boards/<%= selectedId %>" class="nav-link sidenav-link "> Danh sách bảng quảng cáo</a>
+        <a href="/<%= accountType %>/list-boards/<%= selectedId %>" class="nav-link sidenav-link  <% if (selectedId == -1) { %> disabled <% } %> "> Danh sách bảng quảng cáo</a>
       </li>
       <li class="nav-item w-100 d-flex flex-row align-items-center my-1">
         <img src="/images/acceptReports.png" alt="" class="img-fluid mx-2">
-        <a href="/<%= accountType %>/my-requests/" class="nav-link sidenav-link ">Yêu cầu của tôi</a>
+        <a href="/<%= accountType %>/my-requests" class="nav-link sidenav-link ">Yêu cầu của tôi</a>
       </li>
       <li class="nav-item w-100 d-flex flex-row align-items-center my-1">
         <img src="/images/report.png" alt="" class="img-fluid mx-2">
-        <a href="/<%= accountType %>/thong-ke-bao-cao.html" class="nav-link sidenav-link ">Xử lý báo cáo</a>
+        <a href="/<%= accountType %>/list-reports" class="nav-link sidenav-link ">Xử lý báo cáo</a>
       </li>
     </ul>
 </nav>

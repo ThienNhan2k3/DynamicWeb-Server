@@ -196,4 +196,34 @@ controller.showMyRequests = async (req, res) => {
     });
 }
 
+controller.deleteRequest = async (req, res) => {
+    let {tableName, requestId} = req.body;
+    console.log(req.body);
+    try {
+        if (tableName == 'BoardRequest') {
+            await models.BoardRequest.destroy({where: {id: requestId}});
+        }
+        if (tableName == 'AdsPlacementRequest') {
+            await models.AdsPlacementRequest.destroy({where: {id: requestId}});
+        }
+        if (tableName == 'PermitRequest') {
+            await models.PermitRequest.destroy({where: {id: requestId}});
+        }
+        res.redirect('back');
+    } catch (error) {
+        res.send("Huỷ yêu cầu thất bại!");
+        console.error(error);
+    }
+}
+
+controller.showListReports = async (req, res) => {
+
+
+
+    return res.render("PhuongQuan/list-reports.ejs", {
+        tab: "Danh sách báo cáo",
+        selectedId: req.session.selectedAdsplacementId
+    });
+}
+
 module.exports = controller;
