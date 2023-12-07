@@ -31,6 +31,59 @@
     <%- include("./subPartials/navbar.ejs") %> 
     <!-- Main content -->
     <main class="dynamic-container mb-5 container-fluid">
+      <div class="row w-sm-50 w-75 mt-4 justify-content-end">
+        <a class="btn btn-secondary col-lg-1 col-sm-2 col-2" href="/department/viewAdsRequest">
+          All
+        </a>
+        <div class="col-lg-2 col-sm-4 col-4">
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <% if (currentDistrict !== '') { %>
+                <%= currentDistrict %>
+              <% } else { %>
+                Quận
+              <% } %>
+            </button>
+            <ul class="dropdown-menu">
+              <% for (let i = 0; i < districts.length; i++){ %>
+              <li>
+                <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
+                  <%= districts[i].district %>
+                </a>
+              </li>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-5 col-6">
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            <% if (wards.length === 0) { %>
+              disabled
+            <% } %>
+            >
+            <% if (currentWard !== '') { %>
+              <%= currentWard %>
+            <% } else { %>
+              Phường
+            <% } %>
+            </button>
+            <ul class="dropdown-menu">
+              <% if (wards.length > 0) { %>
+                <% for (let i = 0; i < wards.length; i++){ %>
+                  <li>
+                    <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
+                      <%= wards[i].ward %>
+                    </a>
+                  </li>
+                  <% } %>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+
       <div class="row table-container border border-2 rounded-3 mt-3">
         <h2 class="table-header">Yêu cầu cấp phép quảng cáo</h2>
         <table class="table-body table table-striped table-responsive mb-0">
@@ -46,22 +99,63 @@
             </tr>
           </thead>
           <tbody>
-            <% for (let i = 0; i < permitRequests.length; i++) { %>
+            <% if (pagination.permitRequests.length > 0) { %>
+              <% for (let i = 0; i < pagination.permitRequests.length; i++) { %>
+                <tr>
+                  <td><%= pagination.permitRequests[i].boardType %></td>
+                  <td><%= pagination.permitRequests[i].address %>, <%= pagination.permitRequests[i].ward %>, <%= pagination.permitRequests[i].district %>, Thành phố Hồ Chí Minh</td>
+                  <td><%= pagination.permitRequests[i].content %></td>
+                  <td><%= pagination.permitRequests[i].companyName %></td>
+                  <td><%= formatDate(pagination.permitRequests[i].start) %></td>
+                  <td><%= formatDate(pagination.permitRequests[i].end) %></td>
+                  <td class="text-center">
+                    <a href="/department/viewAdsRequest/<%= pagination.permitRequests[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
+                  </td>
+                </tr>
+              <% } %>
+            <% } else { %>
               <tr>
-                <td><%= permitRequests[i].boardType %></td>
-                <td><%= permitRequests[i].address %>, <%= permitRequests[i].ward %>, <%= permitRequests[i].district %>, Thành phố Hồ Chí Minh</td>
-                <td><%= permitRequests[i].content %></td>
-                <td><%= permitRequests[i].companyName %></td>
-                <td><%= formatDate(permitRequests[i].start) %></td>
-                <td><%= formatDate(permitRequests[i].end) %></td>
-                <td class="text-center">
-                  <a href="/department/viewAdsRequest/<%= permitRequests[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
-                </td>
+                <td colspan="7" class="text-center fs-5">Không có bất kì yêu cầu cấp phép nào</td>
               </tr>
             <% } %>
           </tbody>
         </table>
       </div>
+
+      <div class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
+        <p class="pagination-text mb-0">Showing <b><%= pagination.currentPage %></b> Out of <b><%= pagination.maxPage %></b></p>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination mb-0">
+            <% if (pagination.currentPage === pagination.minPage) { %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Previous</a></li>
+            <% }else{%>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
+            <% } %>
+  
+            <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
+              <% if (i >= pagination.minPage){ %>
+                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+              <% } %>
+            <% } %>
+  
+            <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
+  
+            <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
+              <% if (i <= pagination.maxPage) { %>
+                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+              <% } %>
+            <% } %>
+  
+            <% if (pagination.currentPage === pagination.maxPage) { %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Next</a></li>
+            <% }else{%>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
+            <% } %>
+  
+          </ul>
+        </nav>
+      </div>
+      
       
     </main> 
     <!-- Footer -->

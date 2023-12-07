@@ -29,7 +29,7 @@ const {
 //Import routes
 const citizenRoutes = require("./routes/citizen.js");
 const authRoutes = require("./routes/auth.js");
-const departmentRoutes = require("./routes/department.js");
+const departmentRoutes = require("./routes/departmentRoute.js");
 const wardDistrictRoutes = require("./routes/ward_district.js");
 const account = require("./models/account.js");
 

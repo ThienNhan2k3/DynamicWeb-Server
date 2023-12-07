@@ -82,9 +82,9 @@ controller.accountManagement = async (req, res) => {
     const accountTypes = ["Phuong", "Quan", "So"]
     const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
     let accounts = await Account.findAll(options);
-    const sizePage = 5;
+
     const minPage = 1;
-    const accountsPerPage = 1;
+    const accountsPerPage = 5;
     const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
     let pagination = {};
     if (page < minPage || page > maxPage) {
@@ -99,7 +99,6 @@ controller.accountManagement = async (req, res) => {
                 minPage: 1,
                 currentPage: page,
                 maxPage: 1,
-                sizePage,
                 limitPage: 2,
                 accounts: [],
             }
@@ -109,13 +108,12 @@ controller.accountManagement = async (req, res) => {
             minPage,
             currentPage: page,
             maxPage,
-            sizePage,
             limitPage: 2,
-            accounts: accounts.slice((page - 1) * sizePage, page * sizePage),
+            accounts: accounts.slice((page - 1) * accountsPerPage, page * accountsPerPage),
         }
     }
     const currentUrl = req.url.slice(1);
-    
+    console.log(pagination);
     return res.render("So/accountManagement.ejs", {
         accountTypes,
         districts, 
@@ -308,23 +306,25 @@ controller.deleteAccount = async (req, res) => {
 
 
 controller.viewAdsRequest = async (req, res) => {
-    // let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-    // let district = req.query.district || '';
-    // let ward = req.query.ward || '';
+    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+    let district = req.query.district || '';
+    let ward = req.query.ward || '';
 
-    // let wards = [], currentDistrict = '', currentWard = ''; 
-    // if (district.trim() !== '') {
-    //     wards = await Area.findAll({
-    //         where: {
-    //             district
-    //         }
-    //     })
-
-    //     currentDistrict = district;
-    //     if (ward.trim() !== '') {
-    //         currentWard = ward;
-    //     }
-    // }
+    let wards = [], currentDistrict = '', currentWard = ''; 
+    let whereCondition = '';
+    if (district.trim() !== '') {
+        wards = await Area.findAll({
+            where: {
+                district
+            }
+        })
+        whereCondition += `WHERE A.district="${district}" `;
+        currentDistrict = district;
+        if (ward.trim() !== '') {
+            currentWard = ward;
+            whereCondition += ` AND A.ward="${ward}"`;
+        }
+    }
 
     const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
     let permitRequests = await sequelize.query(`
@@ -336,52 +336,50 @@ controller.viewAdsRequest = async (req, res) => {
         LEFT JOIN boardTypes BTs ON Bs.boardTypeId = BTs.id
         LEFT JOIN adsPlacements APs ON Bs.adsPlacementId = APs.id
         LEFT JOIN areas A ON APs.areaId = A.id
-    `, { type: sequelize.QueryTypes.SELECT });
+    ` + whereCondition, { type: sequelize.QueryTypes.SELECT });
 
-    console.log(permitRequests);
-    // const sizePage = 5;
-    // const minPage = 1;
-    // const accountsPerPage = 1;
-    // const maxPage = Math.ceil(accounts.length * 1.0 / accountsPerPage);
-    // let pagination = {};
-    // if (page < minPage || page > maxPage) {
-    //     if (deleteMsg.status.length > 0) {
-    //         page = (maxPage <= 0) ? 1 : maxPage;
-    //         return res.redirect("/department" + createWardDistrictPageQueryString(req.url, 'page=', page));
-    //     } else {
-    //         if (page !== 1) {
-    //             return res.send("<h1>Page not found</h1>")
-    //         }
-    //         pagination = {
-    //             minPage: 1,
-    //             currentPage: page,
-    //             maxPage: 1,
-    //             sizePage,
-    //             limitPage: 2,
-    //             accounts: [],
-    //         }
-    //     }
-    // } else {
-    //     pagination = {
-    //         minPage,
-    //         currentPage: page,
-    //         maxPage,
-    //         sizePage,
-    //         limitPage: 2,
-    //         accounts: accounts.slice((page - 1) * sizePage, page * sizePage),
-    //     }
-    // }
-    // const currentUrl = req.url.slice(1);
+    const minPage = 1;
+    const requestsPerPage = 1;
+    const maxPage = Math.ceil(permitRequests.length * 1.0 / requestsPerPage);
+    let pagination = {};
+    console.log(page, minPage, permitRequests.length);
+    if (page < minPage || page > maxPage) {
+        if (page !== 1) {
+            return res.send("<h1>Page not found</h1>");
+        }
+        pagination = {
+            minPage: 1,
+            currentPage: page,
+            maxPage: 1,
+            limitPage: 2,
+            permitRequests: [],
+        }
+    } else {
+        pagination = {
+            minPage,
+            currentPage: page,
+            maxPage,
+            limitPage: 2,
+            permitRequests: permitRequests.slice((page - 1) * requestsPerPage, page * requestsPerPage),
+        }
+    }
+    const currentUrl = req.url.slice(1);
+    console.log(pagination);
     
     return res.render("So/viewAdsRequest.ejs", {
-        permitRequests,
         formatDate: (date) => {
             return date.toLocaleDateString({
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
             })
-        }
+        },
+        pagination,
+        currentUrl,
+        districts,
+        wards,
+        currentDistrict,
+        currentWard
     });
 }
 

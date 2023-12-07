@@ -1,5 +1,5 @@
 const express = require("express");
-const controller = require("../controllers/department");
+const controller = require("../controllers/departmentController");
 const router = express.Router();
 
 /*-------------------- AccountManagement --------------------*/
