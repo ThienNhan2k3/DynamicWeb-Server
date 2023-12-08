@@ -7,5 +7,6 @@ router.get("/accountManagement/api/wards", controller.getWardsWithSpecificDistri
 router.post("/accountManagement", controller.createAccount);
 router.put("/accountManagement", controller.editAccount);
 router.delete("/accountManagement", controller.deleteAccount);
+router.get("/adplaceManagement", controller.adplaceManagement);
 
 module.exports = router;

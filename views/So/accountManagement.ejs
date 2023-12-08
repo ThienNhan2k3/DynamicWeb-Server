@@ -1,139 +1,177 @@
 <!DOCTYPE html>
-<html lang="en" >
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <title>Sở | Quản lý tài khoản</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
+<html lang="en">
 
-    <!-- Font awesome -->
-    <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="/css/So/style.css">
-    <link rel="stylesheet" href="/css/So/table.css">
-    <link rel="stylesheet" href="/css/So/alert.css">
-    <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <title>Sở | Quản lý tài khoản</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
-  <body>
+  <!-- Font awesome -->
+  <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/So/style.css">
+  <link rel="stylesheet" href="/css/So/table.css">
+  <link rel="stylesheet" href="/css/So/alert.css">
+  <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
+</head>
+
+<body>
   <%- include("../partials/header.ejs") %>
-  <!-- Navbar content -->
-  <%- include("./subPartials/navbar.ejs") %> 
-  <!-- Main content -->
-  <main class="dynamic-container">
-    <% if (editMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
-        </div>
-        <div class="progress progress-<%= editMsg.status[0] %>"></div>
-      </div>
-    <% } else if (createMsg.status.length > 0){ %>
-      <div class="alert-container" id="create-alert-container">
-        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-          <i class="fa-regular fa-circle-check fa-2xl"></i>
-          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
-        </div>
-        <div class="progress progress-<%= createMsg.status[0] %>"></div>
-      </div>
-    <% } %>
-    <div class="table-container border border-2 rounded-3">
-      <div class="table-header">
-        <h2>Quản lý tài khoản</h2>
-        <div class="button-container">
-          <button class="green-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#createModal">
-            <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
-            Thêm tài khoản
-          </button>
-        </div>
-      </div>
-      <table class="table-body table table-striped table-responsive mb-0">
-        <thead>
-          <tr>
-            <th scope="col">Họ và tên</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phường</th>
-            <th scope="col">Quận</th>
-            <th scope="col">Loại</th>
-            <th scope="col" style="text-align: center;">Chức năng</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (pagination.accounts) { %>
-            <% for (let i = 0; i < pagination.accounts.length; i++) { %>
-              <tr>
-                <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
-                <td><%= pagination.accounts[i].email %></td>
-                <% if (pagination.accounts[i].ward != null) { %> 
-                <td> <%= pagination.accounts[i].ward %></td>
-                <% } else {%>
-                  <td></td>
-                <% } %>
-                <% if (pagination.accounts[i].district != null) { %> 
-                  <td> <%= pagination.accounts[i].district %></td>
-                  <% } else {%>
-                    <td></td>
-                  <% } %>
-                <td><%= pagination.accounts[i].type %></td>
-                <td class="function-icons text-center">
-                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].district %>" data-ward="<%= pagination.accounts[i].ward %>" onclick="showEditUserModal(this)"></i>
-                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
-                </td>
-              </tr>
+    <!-- Navbar content -->
+    <%- include("./subPartials/navbar.ejs") %>
+      <!-- Main content -->
+      <main class="dynamic-container">
+        <% if (editMsg.status.length> 0){ %>
+          <div class="alert-container" id="create-alert-container">
+            <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+              <i class="fa-regular fa-circle-check fa-2xl"></i>
+              <span class="ms-3 fs-5">
+                <%= editMsg.content[0] %>
+              </span>
+            </div>
+            <div class="progress progress-<%= editMsg.status[0] %>"></div>
+          </div>
+          <% } else if (createMsg.status.length> 0){ %>
+            <div class="alert-container" id="create-alert-container">
+              <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+                <i class="fa-regular fa-circle-check fa-2xl"></i>
+                <span class="ms-3 fs-5">
+                  <%= createMsg.content[0] %>
+                </span>
+              </div>
+              <div class="progress progress-<%= createMsg.status[0] %>"></div>
+            </div>
             <% } %>
-          <% } else { %>
-            <tr>
-              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
-              </tr>
-          <% } %>
+              <div class="table-container border border-2 rounded-3">
+                <div class="table-header">
+                  <h2>Quản lý tài khoản</h2>
+                  <div class="button-container">
+                    <button class="green-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#createModal">
+                      <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
+                      Thêm tài khoản
+                    </button>
+                  </div>
+                </div>
+                <table class="table-body table table-striped table-responsive mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col">Họ và tên</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Phường</th>
+                      <th scope="col">Quận</th>
+                      <th scope="col">Loại</th>
+                      <th scope="col" style="text-align: center;">Chức năng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (pagination.accounts) { %>
+                      <% for (let i=0; i < pagination.accounts.length; i++) { %>
+                        <tr>
+                          <td>
+                            <%= pagination.accounts[i].firstName %>
+                              <%= pagination.accounts[i].lastName %>
+                          </td>
+                          <td>
+                            <%= pagination.accounts[i].email %>
+                          </td>
+                          <% if (pagination.accounts[i].ward !=null) { %>
+                            <td>
+                              <%= pagination.accounts[i].ward %>
+                            </td>
+                            <% } else {%>
+                              <td></td>
+                              <% } %>
+                                <% if (pagination.accounts[i].district !=null) { %>
+                                  <td>
+                                    <%= pagination.accounts[i].district %>
+                                  </td>
+                                  <% } else {%>
+                                    <td></td>
+                                    <% } %>
+                                      <td>
+                                        <%= pagination.accounts[i].type %>
+                                      </td>
+                                      <td class="function-icons text-center">
+                                        <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal"
+                                          data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>"
+                                          data-type="<%= pagination.accounts[i].type %>"
+                                          data-district="<%= pagination.accounts[i].district %>"
+                                          data-ward="<%= pagination.accounts[i].ward %>"
+                                          onclick="showEditUserModal(this)"></i>
+                                        <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal"
+                                          data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
+                                      </td>
+                        </tr>
+                        <% } %>
+                          <% } else { %>
+                            <tr>
+                              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
+                            </tr>
+                            <% } %>
 
-        </tbody>
-      </table>
-    </div>
+                  </tbody>
+                </table>
+              </div>
 
-    <div class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
-      <p class="pagination-text mb-0">Showing <b><%= pagination.currentPage %></b> Out of <b><%= pagination.maxPage %></b></p>
-      <nav aria-label="Page navigation example">
-        <ul class="pagination mb-0">
-          <% if (pagination.currentPage === pagination.minPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>">Previous</a></li>
-          <% }else{%>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
-          <% } %>
+              <div
+                class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
+                <p class="pagination-text mb-0">Showing <b>
+                    <%= pagination.currentPage %>
+                  </b> Out of <b>
+                    <%= pagination.maxPage %>
+                  </b></p>
+                <nav aria-label="Page navigation example">
+                  <ul class="pagination mb-0">
+                    <% if (pagination.currentPage===pagination.minPage) { %>
+                      <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                          href="?page=<%= pagination.currentPage %>">Previous</a></li>
+                      <% }else{%>
+                        <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                            href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
+                        <% } %>
 
-          <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
-            <% if (i >= pagination.minPage){ %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>"><%=i%></a></li>
-            <% } %>
-          <% } %>
+                          <% for (let i=pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++)
+                            { %>
+                            <% if (i>= pagination.minPage){ %>
+                              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>">
+                                  <%=i%>
+                                </a></li>
+                              <% } %>
+                                <% } %>
 
-          <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
+                                  <li class="page-item" aria-current="page"><a
+                                      class="page-link text-dark fw-bold border-0"
+                                      href="?page=<%= pagination.currentPage %>" style="background-color: #0FC2C0;">
+                                      <%= pagination.currentPage %>
+                                    </a></li>
 
-          <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
-            <% if (i <= pagination.maxPage) { %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= i%>"><%= i%></a></li>
-            <% } %>
-          <% } %>
+                                  <% for (let i=pagination.currentPage + 1; i <=pagination.currentPage +
+                                    pagination.limitPage; i++) { %>
+                                    <% if (i <=pagination.maxPage) { %>
+                                      <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                                          href="?page=<%= i%>">
+                                          <%= i%>
+                                        </a></li>
+                                      <% } %>
+                                        <% } %>
 
-          <% if (pagination.currentPage === pagination.maxPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage%>">Next</a></li>
-          <% }else{%>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
-          <% } %>
+                                          <% if (pagination.currentPage===pagination.maxPage) { %>
+                                            <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                                                href="?page=<%= pagination.currentPage%>">Next</a></li>
+                                            <% }else{%>
+                                              <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                                                  href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
+                                              <% } %>
 
-        </ul>
-      </nav>
-    </div>
-      
-    <!-- The Create Modal -->
-    <div class="modal fade" id="createModal" data-bs-backdrop="static">
-      <!-- <% if (createMsg.status.length > 0){ %>
+                  </ul>
+                </nav>
+              </div>
+
+              <!-- The Create Modal -->
+              <div class="modal fade" id="createModal" data-bs-backdrop="static">
+                <!-- <% if (createMsg.status.length > 0){ %>
       <div class="alert-container" id="create-alert-container">
         <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
           <i class="fa-regular fa-circle-check fa-2xl"></i>
@@ -142,265 +180,292 @@
         <div class="progress progress-<%= createMsg.status[0] %>"></div>
       </div>
       <% } %> -->
-      <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
-        <div class="modal-content">
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title">Tạo tài khoản</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
-          </div>
+                <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
+                  <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Tạo tài khoản</h4>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
+                    </div>
 
-          <!-- Modal body -->
-          <div class="modal-body">
-            <form action="/department/accountManagement" method="POST">
-              <fieldset class="container">
-                <div class="row mb-3">
-                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
-                    <div class="mb-0 form-floating is-invalid">
-                      <input 
-                      type="text" 
-                      <% if(createErr.error.firstName.length > 0){ %> class="form-control  is-invalid" 
-                      <% } else { %>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.firstName %>"
-                      id="firstNameCreateModal" name="firstNameCreateModal" autocomplete="true" placeholder="">
-                      <label for="firstNameCreateModal" class="mb-2">Tên</label>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                      <form action="/department/accountManagement" method="POST">
+                        <fieldset class="container">
+                          <div class="row mb-3">
+                            <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
+                              <div class="mb-0 form-floating is-invalid">
+                                <input type="text" <% if(createErr.error.firstName.length> 0){ %> class="form-control
+                                is-invalid"
+                                <% } else { %>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.firstName %>"
+                                      id="firstNameCreateModal" name="firstNameCreateModal" autocomplete="true"
+                                      placeholder="">
+                                      <label for="firstNameCreateModal" class="mb-2">Tên</label>
+                              </div>
+                              <% if(createErr.error.firstName.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.firstName[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+                            <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                              <div class="mb-0 form-floating is-invalid">
+                                <input type="text" <% if(createErr.error.lastName.length> 0){ %>
+                                class="form-control is-invalid"
+                                <% } else {%>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.lastName %>"
+                                      id="lastNameCreateModal" name="lastNameCreateModal" autocomplete="true"
+                                      placeholder="">
+                                      <label for="lastNameCreateModal" class="mb-2">Tên đệm và họ</label>
+                              </div>
+                              <% if(createErr.error.lastName.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.lastName[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+
+                          <div class="row mb-3">
+                            <div class="col col-12 p-0 has-validation">
+                              <div class="form-floating is-invalid">
+                                <input type="text" <% if(createErr.error.username.length> 0){ %>
+                                class="form-control is-invalid"
+                                <% } else { %>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.username %>"
+                                      id="usernameCreateModal" name="usernameCreateModal" autocomplete="true"
+                                      placeholder="">
+                                      <label for="usernameCreateModal" class="mb-2">Tên tài khoản</label>
+                              </div>
+                              <% if(createErr.error.username.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.username[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <div class="col col-12 p-0 has-validation">
+                              <div class="form-floating is-invalid">
+                                <input type="email" id="emailCreateModal" <% if(createErr.error.email.length> 0){ %>
+                                class="form-control is-invalid"
+                                <% } else { %>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.email %>"
+                                      name="emailCreateModal" autocomplete="true" placeholder="example@gmail.com"
+                                      pattern="^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\.[a-z]{2,}$">
+                                      <label for="emailCreateModal" class="mb-2">Email</label>
+                              </div>
+                              <% if(createErr.error.email.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.email[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <div class="col col-12 p-0 has-validation">
+                              <div class="form-floating is-invalid">
+                                <input type="password" id="passwordCreateModal" <% if(createErr.error.password.length>
+                                0){ %>
+                                class="form-control is-invalid"
+                                <% } else {%>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.password %>"
+                                      name="passwordCreateModal"
+                                      autocomplete="true"
+                                      placeholder="">
+                                      <label for="passwordCreateModal" class="mb-2">Mật khẩu</label>
+                              </div>
+                              <div id="passwordStrengthIndicator">
+                                <div>
+                                  <span class="week"></span>
+                                  <span class="medium"></span>
+                                  <span class="strong"></span>
+                                </div>
+                                <div id="textPasswordStrength"></div>
+                              </div>
+                              <% if(createErr.error.password.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.password[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <div class="col col-12 p-0 has-validation">
+                              <div class="form-floating is-invalid">
+                                <input type="password" id="confirmPasswordCreateModal" <%
+                                  if(createErr.error.confirmPassword.length> 0){ %>
+                                class="form-control is-invalid"
+                                <% }else { %>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.confirmPassword %>"
+                                      name="confirmPasswordCreateModal" autocomplete="true" placeholder="">
+                                      <label for="confirmPasswordCreateModal" class="mb-2">Xác nhận mật khẩu</label>
+                              </div>
+                              <% if(createErr.error.confirmPassword.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= createErr.error.confirmPassword[0] %>
+                                </div>
+                                <% } %>
+                            </div>
+
+                          </div>
+                          <div class="row fw-semibold fs-4 mb-2">Phân công khu vực quản lý</div>
+                          <div class="row g-md-3 g-2">
+                            <div class="col-6 col-md-4">
+                              <select name="accountTypeSelectCreateModal" class="form-select"
+                                id="accountTypeSelectCreateModal" required
+                                onchange="selectAccountType(event, document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))">
+                                <option value="">Loại tài khoản</option>
+                                <% for (let i=0; i < accountTypes.length; i++){ %>
+                                  <option value="<%= accountTypes[i] %>" class="accountTypes">
+                                    <%= accountTypes[i] %>
+                                  </option>
+                                  <% } %>
+                              </select>
+                            </div>
+                            <div class="col-6 col-md-4">
+                              <select name="districtSelectCreateModal" class="form-select" required
+                                id="districtSelectCreateModal" selected="selected"
+                                onchange="districtSelectChange(document.getElementById('accountTypeSelectCreateModal'), document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))"
+                                disabled="true">
+                                <option value="">Quận/Huyện</option>
+                                <% for (let i=0; i < districts.length; i++){ %>
+                                  <option value="<%= districts[i].district %>" class="districts">
+                                    <%= districts[i].district %>
+                                  </option>
+                                  <% } %>
+                              </select>
+                            </div>
+                            <div class="col-6 col-md-4">
+                              <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal"
+                                required disabled="false">
+                                <option value="">Phường</option>
+                              </select>
+                            </div>
+
+                          </div>
+                        </fieldset>
+
+                        <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo tài
+                          khoản</button>
+                      </form>
                     </div>
-                    <% if(createErr.error.firstName.length > 0) { %>
-                      <div class="invalid-feedback"> <%= createErr.error.firstName[0] %></div>
-                    <% } %>
-                  </div>
-                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
-                    <div class="mb-0 form-floating is-invalid">
-                      <input 
-                      type="text"
-                      <% if(createErr.error.lastName.length > 0){ %>
-                        class="form-control  is-invalid"
-                      <% } else {%>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.lastName %>"
-                      id="lastNameCreateModal" name="lastNameCreateModal" autocomplete="true" placeholder="">
-                      <label for="lastNameCreateModal" class="mb-2">Tên đệm và họ</label>
-                    </div>
-                    <% if(createErr.error.lastName.length > 0) { %>
-                      <div class="invalid-feedback"> <%= createErr.error.lastName[0] %></div>
-                    <% } %>
+
                   </div>
                 </div>
+              </div>
 
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input 
-                      type="text"
-                      <% if(createErr.error.username.length > 0){ %>
-                        class="form-control is-invalid"
-                      <% } else { %>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.username %>"
-                      id="usernameCreateModal" name="usernameCreateModal" autocomplete="true" placeholder="">
-                      <label for="usernameCreateModal" class="mb-2">Tên tài khoản</label>
+              <!-- The Delete Modal -->
+              <div class="modal fade" id="deleteModal" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Xóa tài khoản</h4>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <% if(createErr.error.username.length > 0) { %>
-                      <div class="invalid-feedback"> <%= createErr.error.username[0] %></div>
-                    <% } %>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                      Bạn có chắc chắn rằng bạn muốn xóa tài khoản này không ?
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                      <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
+                      <button class="btn red-button" id="confirm-delete-button" data-bs-dismiss="modal">Xóa</button>
+                    </div>
+
                   </div>
                 </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input 
-                      type="email" 
-                      id="emailCreateModal" 
-                      <% if(createErr.error.email.length > 0){ %>
-                        class="form-control is-invalid" 
-                      <% } else { %>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.email %>" 
-                      name="emailCreateModal" autocomplete="true" placeholder="example@gmail.com" pattern="^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\.[a-z]{2,}$">
-                      <label for="emailCreateModal" class="mb-2">Email</label>
+              </div>
+
+              <!-- The Edit Modal -->
+              <div class="modal fade" id="editModal" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Phân khu vực quản lý</h4>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <% if(createErr.error.email.length > 0) { %>
-                    <div class="invalid-feedback"> <%= createErr.error.email[0] %></div>
-                    <% } %>
+
+                    <!-- Modal body -->
+                    <div class="modal-body p-2">
+                      <form action="#" id="editForm">
+                        <fieldset class="container">
+                          <input type="hidden" id="idEditModal" name="idEditModal">
+                          <div class="row g-2 g-md-3">
+                            <div class="col-6 col-md-4">
+                              <select name="accountTypeSelectEditModal" class="form-select"
+                                id="accountTypeSelectEditModal" required
+                                onchange="selectAccountType(event, document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
+                                <option value="">Loại tài khoản</option>
+                                <% for (let i=0; i < accountTypes.length; i++){ %>
+                                  <option value="<%= accountTypes[i] %>" class="accountTypes">
+                                    <%= accountTypes[i] %>
+                                  </option>
+                                  <% } %>
+                              </select>
+                            </div>
+                            <div class="col-6 col-md-4">
+                              <select name="districtSelectEditModal" class="form-select" required
+                                id="districtSelectEditModal" selected="selected"
+                                onchange="districtSelectChange(document.getElementById('accountTypeSelectEditModal'), document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))"
+                                disabled="true">
+                                <option value="">Quận/Huyện</option>
+                                <% for (let i=0; i < districts.length; i++){ %>
+                                  <option value="<%= districts[i].district %>" class="districts">
+                                    <%= districts[i].district %>
+                                  </option>
+                                  <% } %>
+                              </select>
+                            </div>
+                            <div class="col-6 col-md-4">
+                              <select name="wardSelectEditModal" class="form-select" id="wardSelectEditModal" required
+                                disabled="false">
+                                <option value="">Phường</option>
+                              </select>
+                            </div>
+                        </fieldset>
+                      </form>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer" style="background-color: #C4D4D6;">
+                      <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
+                      <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="confirm-edit-button">Cập
+                        nhật</button>
+                    </div>
+
                   </div>
                 </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input 
-                      type="password" 
-                      id="passwordCreateModal" 
-                      <% if(createErr.error.password.length > 0){ %>
-                        class="form-control is-invalid" 
-                      <% } else {%>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.password %>"  
-                      name="passwordCreateModal"
-                      autocomplete="true"
-                      placeholder="">
-                      <label for="passwordCreateModal" class="mb-2">Mật khẩu</label>
-                    </div>
-                    <div id="passwordStrengthIndicator">
-                      <div>
-                        <span class="week"></span>
-                        <span class="medium"></span>
-                        <span class="strong"></span>
-                      </div>
-                      <div id="textPasswordStrength"></div>
-                    </div>
-                    <% if(createErr.error.password.length > 0) { %>
-                      <div class="invalid-feedback"> <%= createErr.error.password[0] %></div>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
-                    <div class="form-floating is-invalid">
-                      <input 
-                      type="password" 
-                      id="confirmPasswordCreateModal"
-                      <% if(createErr.error.confirmPassword.length > 0){ %> 
-                        class="form-control is-invalid" 
-                      <% }else { %>
-                        class="form-control"
-                      <% } %>
-                      value="<%= createErr.value.confirmPassword %>"
-                      name="confirmPasswordCreateModal" autocomplete="true" placeholder="">
-                    <label for="confirmPasswordCreateModal" class="mb-2">Xác nhận mật khẩu</label>
-                    </div>
-                    <% if(createErr.error.confirmPassword.length > 0) { %>
-                    <div class="invalid-feedback"> <%= createErr.error.confirmPassword[0] %></div>
-                    <% } %>
-                  </div>
-                  
-                </div>
-                <div class="row fw-semibold fs-4 mb-2">Phân công khu vực quản lý</div>
-                <div class="row g-md-3 g-2">
-                  <div class="col-6 col-md-4">
-                    <select name="accountTypeSelectCreateModal" class="form-select" id="accountTypeSelectCreateModal" required onchange="selectAccountType(event, document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))">
-                      <option value="">Loại tài khoản</option>
-                      <% for (let i = 0; i < accountTypes.length; i++){ %>
-                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="districtSelectCreateModal" class="form-select" required  id="districtSelectCreateModal" selected="selected" onchange="districtSelectChange(document.getElementById('accountTypeSelectCreateModal'), document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))" disabled="true">
-                      <option value="">Quận/Huyện</option>
-                      <% for (let i = 0; i < districts.length; i++){ %>
-                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required disabled="false">
-                      <option value="">Phường</option>
-                    </select>
-                  </div>
-                  
-                </div>
-              </fieldset>
-
-              <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo tài khoản</button>
-            </form>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-
-    <!-- The Delete Modal -->
-    <div class="modal fade" id="deleteModal" data-bs-backdrop="static">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title">Xóa tài khoản</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body">
-            Bạn có chắc chắn rằng bạn muốn xóa tài khoản này không ?
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
-            <button class="btn red-button" id="confirm-delete-button" data-bs-dismiss="modal">Xóa</button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- The Edit Modal -->
-    <div class="modal fade" id="editModal" data-bs-backdrop="static">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title">Phân khu vực quản lý</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body p-2">
-            <form action="#" id="editForm">
-              <fieldset class="container">
-                <input type="hidden" id="idEditModal" name="idEditModal">
-                <div class="row g-2 g-md-3">
-                  <div class="col-6 col-md-4">
-                    <select name="accountTypeSelectEditModal" class="form-select" id="accountTypeSelectEditModal" required onchange="selectAccountType(event, document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
-                      <option value="">Loại tài khoản</option>
-                      <% for (let i = 0; i < accountTypes.length; i++){ %>
-                        <option value="<%= accountTypes[i] %>" class="accountTypes"><%= accountTypes[i] %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="districtSelectEditModal" class="form-select" required  id="districtSelectEditModal" selected="selected" onchange="districtSelectChange(document.getElementById('accountTypeSelectEditModal'), document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))" disabled="true">
-                      <option value="">Quận/Huyện</option>
-                      <% for (let i = 0; i < districts.length; i++){ %>
-                        <option value="<%= districts[i].district %>" class="districts"><%= districts[i].district %></option>
-                      <% } %>
-                    </select>
-                  </div>
-                  <div class="col-6 col-md-4">
-                    <select name="wardSelectEditModal" class="form-select" id="wardSelectEditModal" required disabled="false">
-                      <option value="">Phường</option>
-                    </select>
-                  </div>
-              </fieldset>
-            </form>
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer" style="background-color: #C4D4D6;">
-            <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy bỏ</button>
-            <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="confirm-edit-button">Cập nhật</button>
-          </div>
-
-        </div>
-      </div>
-    </div>
+              </div>
 
 
-  </main> 
-  <!-- Footer -->
-  <%- include("../partials/footer.ejs") %>
+      </main>
+      <!-- Footer -->
+      <%- include("../partials/footer.ejs") %>
 
-  <!-- Javascript -->
-  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
-  <script type="importmap">
+        <!-- Javascript -->
+        <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js"
+          crossorigin="anonymous"></script>
+        <script type="importmap">
     {
       "imports": {
         "@popperjs/core": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js",
@@ -408,26 +473,21 @@
       }
     }
   </script>
-  <% if (createMsg.status.length > 0){ %>
-    <script type="module">
-      import * as bootstrap from 'bootstrap'
-      const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
-      myModal.show();
-    </script>
-  <% } %>
-  <script src="/javascript/So/accountManagement.js"></script>
-  <script src="/javascript/So/passwordStrengthIndicator.js"></script>
-  <script src="/javascript/So/navbar.js"></script>
-  
+        <% if (createMsg.status.length> 0){ %>
+          <script type="module">
+            import * as bootstrap from 'bootstrap'
+            const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
+            myModal.show();
+          </script>
+          <% } %>
+            <script src="/javascript/So/accountManagement.js"></script>
+            <script src="/javascript/So/passwordStrengthIndicator.js"></script>
+            <script src="/javascript/So/navbar.js"></script>
+
 </body>
-  <script
-    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"
-  ></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-    crossorigin="anonymous"
-  ></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+  integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+  integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+
 </html>
