@@ -9,169 +9,128 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
-  <!-- Font awesome -->
-  <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/So/style.css">
-  <link rel="stylesheet" href="/css/So/table.css">
-  <link rel="stylesheet" href="/css/So/alert.css">
-  <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
-</head>
+    <!-- Font awesome -->
+    <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/So/style.css">
+    <link rel="stylesheet" href="/css/So/table.css">
+    <link rel="stylesheet" href="/css/So/alert.css">
+    <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
+  </head>
 
 <body>
   <%- include("../partials/header.ejs") %>
-    <!-- Navbar content -->
-    <%- include("./subPartials/navbar.ejs") %>
-      <!-- Main content -->
-      <main class="dynamic-container">
-        <% if (editMsg.status.length> 0){ %>
-          <div class="alert-container" id="create-alert-container">
-            <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-              <i class="fa-regular fa-circle-check fa-2xl"></i>
-              <span class="ms-3 fs-5">
-                <%= editMsg.content[0] %>
-              </span>
-            </div>
-            <div class="progress progress-<%= editMsg.status[0] %>"></div>
-          </div>
-          <% } else if (createMsg.status.length> 0){ %>
-            <div class="alert-container" id="create-alert-container">
-              <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-                <i class="fa-regular fa-circle-check fa-2xl"></i>
-                <span class="ms-3 fs-5">
-                  <%= createMsg.content[0] %>
-                </span>
-              </div>
-              <div class="progress progress-<%= createMsg.status[0] %>"></div>
-            </div>
+  <!-- Navbar content -->
+  <%- include("./subPartials/navbar.ejs") %> 
+  <!-- Main content -->
+  <main class="dynamic-container">
+    <% if (editMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= editMsg.status[0] %>"></div>
+      </div>
+    <% } else if (createMsg.status.length > 0){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
+        </div>
+        <div class="progress progress-<%= createMsg.status[0] %>"></div>
+      </div>
+    <% } %>
+    <div class="table-container border border-2 rounded-3">
+      <div class="table-header">
+        <h2>Quản lý tài khoản</h2>
+        <div class="button-container">
+          <button class="green-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
+            Thêm tài khoản
+          </button>
+        </div>
+      </div>
+      <table class="table-body table table-striped table-responsive mb-0">
+        <thead>
+          <tr>
+            <th scope="col">Họ và tên</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phường</th>
+            <th scope="col">Quận</th>
+            <th scope="col">Loại</th>
+            <th scope="col" style="text-align: center;">Chức năng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (pagination.accounts) { %>
+            <% for (let i = 0; i < pagination.accounts.length; i++) { %>
+              <tr>
+                <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
+                <td><%= pagination.accounts[i].email %></td>
+                <% if (pagination.accounts[i].ward != null) { %> 
+                <td> <%= pagination.accounts[i].ward %></td>
+                <% } else {%>
+                  <td></td>
+                <% } %>
+                <% if (pagination.accounts[i].district != null) { %> 
+                  <td> <%= pagination.accounts[i].district %></td>
+                  <% } else {%>
+                    <td></td>
+                  <% } %>
+                <td><%= pagination.accounts[i].type %></td>
+                <td class="function-icons text-center">
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].district %>" data-ward="<%= pagination.accounts[i].ward %>" onclick="showEditUserModal(this)"></i>
+                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
+                </td>
+              </tr>
             <% } %>
-              <div class="table-container border border-2 rounded-3">
-                <div class="table-header">
-                  <h2>Quản lý tài khoản</h2>
-                  <div class="button-container">
-                    <button class="green-button px-3 py-1 rounded" data-bs-toggle="modal" data-bs-target="#createModal">
-                      <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
-                      Thêm tài khoản
-                    </button>
-                  </div>
-                </div>
-                <table class="table-body table table-striped table-responsive mb-0">
-                  <thead>
-                    <tr>
-                      <th scope="col">Họ và tên</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Phường</th>
-                      <th scope="col">Quận</th>
-                      <th scope="col">Loại</th>
-                      <th scope="col" style="text-align: center;">Chức năng</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% if (pagination.accounts) { %>
-                      <% for (let i=0; i < pagination.accounts.length; i++) { %>
-                        <tr>
-                          <td>
-                            <%= pagination.accounts[i].firstName %>
-                              <%= pagination.accounts[i].lastName %>
-                          </td>
-                          <td>
-                            <%= pagination.accounts[i].email %>
-                          </td>
-                          <% if (pagination.accounts[i].ward !=null) { %>
-                            <td>
-                              <%= pagination.accounts[i].ward %>
-                            </td>
-                            <% } else {%>
-                              <td></td>
-                              <% } %>
-                                <% if (pagination.accounts[i].district !=null) { %>
-                                  <td>
-                                    <%= pagination.accounts[i].district %>
-                                  </td>
-                                  <% } else {%>
-                                    <td></td>
-                                    <% } %>
-                                      <td>
-                                        <%= pagination.accounts[i].type %>
-                                      </td>
-                                      <td class="function-icons text-center">
-                                        <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal"
-                                          data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>"
-                                          data-type="<%= pagination.accounts[i].type %>"
-                                          data-district="<%= pagination.accounts[i].district %>"
-                                          data-ward="<%= pagination.accounts[i].ward %>"
-                                          onclick="showEditUserModal(this)"></i>
-                                        <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal"
-                                          data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>"></i>
-                                      </td>
-                        </tr>
-                        <% } %>
-                          <% } else { %>
-                            <tr>
-                              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
-                            </tr>
-                            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center fs-5">We don't have any accounts</td>
+              </tr>
+          <% } %>
 
                   </tbody>
                 </table>
               </div>
 
-              <div
-                class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
-                <p class="pagination-text mb-0">Showing <b>
-                    <%= pagination.currentPage %>
-                  </b> Out of <b>
-                    <%= pagination.maxPage %>
-                  </b></p>
-                <nav aria-label="Page navigation example">
-                  <ul class="pagination mb-0">
-                    <% if (pagination.currentPage===pagination.minPage) { %>
-                      <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                          href="?page=<%= pagination.currentPage %>">Previous</a></li>
-                      <% }else{%>
-                        <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                            href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
-                        <% } %>
+    <div class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
+      <p class="pagination-text mb-0">Showing <b><%= pagination.currentPage %></b> Out of <b><%= pagination.maxPage %></b></p>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination mb-0">
+          <% if (pagination.currentPage === pagination.minPage) { %>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>">Previous</a></li>
+          <% }else{%>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage - 1 %>">Previous</a></li>
+          <% } %>
 
-                          <% for (let i=pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++)
-                            { %>
-                            <% if (i>= pagination.minPage){ %>
-                              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>">
-                                  <%=i%>
-                                </a></li>
-                              <% } %>
-                                <% } %>
+          <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
+            <% if (i >= pagination.minPage){ %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%=i%>"><%=i%></a></li>
+            <% } %>
+          <% } %>
 
-                                  <li class="page-item" aria-current="page"><a
-                                      class="page-link text-dark fw-bold border-0"
-                                      href="?page=<%= pagination.currentPage %>" style="background-color: #0FC2C0;">
-                                      <%= pagination.currentPage %>
-                                    </a></li>
+          <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
 
-                                  <% for (let i=pagination.currentPage + 1; i <=pagination.currentPage +
-                                    pagination.limitPage; i++) { %>
-                                    <% if (i <=pagination.maxPage) { %>
-                                      <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                          href="?page=<%= i%>">
-                                          <%= i%>
-                                        </a></li>
-                                      <% } %>
-                                        <% } %>
+          <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
+            <% if (i <= pagination.maxPage) { %>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= i%>"><%= i%></a></li>
+            <% } %>
+          <% } %>
 
-                                          <% if (pagination.currentPage===pagination.maxPage) { %>
-                                            <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                                href="?page=<%= pagination.currentPage%>">Next</a></li>
-                                            <% }else{%>
-                                              <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                                  href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
-                                              <% } %>
+          <% if (pagination.currentPage === pagination.maxPage) { %>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage%>">Next</a></li>
+          <% }else{%>
+            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="?page=<%= pagination.currentPage + 1 %>">Next</a></li>
+          <% } %>
 
-                  </ul>
-                </nav>
-              </div>
-
-              <!-- The Create Modal -->
-              <div class="modal fade" id="createModal" data-bs-backdrop="static">
-                <!-- <% if (createMsg.status.length > 0){ %>
+        </ul>
+      </nav>
+    </div>
+      
+    <!-- The Create Modal -->
+    <div class="modal fade" id="createModal" data-bs-backdrop="static">
+      <!-- <% if (createMsg.status.length > 0){ %>
       <div class="alert-container" id="create-alert-container">
         <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
           <i class="fa-regular fa-circle-check fa-2xl"></i>
@@ -180,13 +139,13 @@
         <div class="progress progress-<%= createMsg.status[0] %>"></div>
       </div>
       <% } %> -->
-                <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
-                  <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                      <h4 class="modal-title">Tạo tài khoản</h4>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
-                    </div>
+      <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Tạo tài khoản</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
+          </div>
 
                     <!-- Modal body -->
                     <div class="modal-body">
@@ -379,10 +338,10 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                      Bạn có chắc chắn rằng bạn muốn xóa tài khoản này không ?
-                    </div>
+          <!-- Modal body -->
+          <div class="modal-body">
+            Bạn có chắc chắn rằng bạn muốn xóa tài khoản này không ?
+          </div>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
@@ -473,17 +432,17 @@
       }
     }
   </script>
-        <% if (createMsg.status.length> 0){ %>
-          <script type="module">
-            import * as bootstrap from 'bootstrap'
-            const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
-            myModal.show();
-          </script>
-          <% } %>
-            <script src="/javascript/So/accountManagement.js"></script>
-            <script src="/javascript/So/passwordStrengthIndicator.js"></script>
-            <script src="/javascript/So/navbar.js"></script>
-
+  <% if (createMsg.status.length > 0){ %>
+    <script type="module">
+      import * as bootstrap from 'bootstrap'
+      const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
+      myModal.show();
+    </script>
+  <% } %>
+  <script src="/javascript/So/accountManagement.js"></script>
+  <script src="/javascript/So/passwordStrengthIndicator.js"></script>
+  <script src="/javascript/So/navbar.js"></script>
+  
 </body>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
   integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

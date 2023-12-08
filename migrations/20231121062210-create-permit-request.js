@@ -9,8 +9,6 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      // size: DataTypes.STRING,
-      // quantity: DataTypes.STRING,
       content: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -31,23 +29,15 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      size: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      quantity: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
       boardId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      adsPlacementId: {
+      companyId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      companyId: {
+      accountId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

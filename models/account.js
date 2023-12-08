@@ -9,11 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({
       Area,
-      Report
+      Report,
+      PermitRequest,
+      AdsPlacementRequest,
+      BoardRequest
     }) {
       // define association here
       this.belongsTo(Area);
       this.hasMany(Report);
+      this.hasMany(PermitRequest);
+      this.hasMany(AdsPlacementRequest);
+      this.hasMany(BoardRequest);
     }
   }
   Account.init(

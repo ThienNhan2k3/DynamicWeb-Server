@@ -29,7 +29,7 @@ const {
 //Import routes
 const citizenRoutes = require("./routes/citizen.js");
 const authRoutes = require("./routes/auth.js");
-const departmentRoutes = require("./routes/department.js");
+const departmentRoutes = require("./routes/departmentRoute.js");
 const wardDistrictRoutes = require("./routes/ward_district.js");
 const account = require("./models/account.js");
 
@@ -79,15 +79,18 @@ app.use(
     store: sessionStore,
     resave: false, // we support the touch method so per the express-session docs this should be set to false
     saveUninitialized: false,
+    cookie: {
+      maxAge: 60000 * 60 * 24 * 30
+    }
   })
 );
 app.use(flash());
 
 
 //Routing
-// app.get("/test", (req, res) => {
-//   return res.send("Hello");
-// })
+app.get("/test", (req, res) => {
+  return res.render("template");
+})
 app.use("/citizen", citizenRoutes);
 app.use("/", authRoutes);
 
@@ -95,6 +98,8 @@ app.use(authUser);
 app.use("/department", authRole("So"), departmentRoutes);
 app.use("/ward", authRole("Phuong"), wardDistrictRoutes);
 app.use("/district", authRole("Quan"), wardDistrictRoutes);
+
+
 
 app.use((req, res) => {
   res.render("404");

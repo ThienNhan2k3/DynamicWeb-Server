@@ -14,8 +14,8 @@ module.exports = {
      */
     await queryInterface.sequelize.query('SELECT * FROM companies')
     await queryInterface.sequelize.query('SELECT * FROM boards');
-    await queryInterface.sequelize.query('SELECT * FROM adsplacements');
     await queryInterface.sequelize.query('SELECT * FROM reporttypes');
+    await queryInterface.sequelize.query('SELECT * FROM accounts');
 
     await queryInterface.bulkInsert(
       "permitRequests",
@@ -30,8 +30,7 @@ module.exports = {
           status: "Bị báo cáo",
           CompanyId: 1,
           BoardId: 5,
-          AdsPlacementId: 2,
-          size: null,
+          AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
         },
@@ -45,8 +44,7 @@ module.exports = {
           status: "Chưa cấp phép",
           CompanyId: 1,
           BoardId: 4,
-          AdsPlacementId: 1,
-          size: null,
+          AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
         },
@@ -60,8 +58,7 @@ module.exports = {
           status: "Chưa cấp phép",
           CompanyId: 1,
           BoardId: 3,
-          AdsPlacementId: 1,
-          size: null,
+          AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
         },
@@ -75,8 +72,7 @@ module.exports = {
           status: "Chưa cấp phép",
           CompanyId: 1,
           BoardId: 3,
-          AdsPlacementId: 1,
-          size: null,
+          AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
         },
@@ -90,8 +86,7 @@ module.exports = {
           status: "Chưa cấp phép",
           CompanyId: 1,
           BoardId: 2,
-          AdsPlacementId: 4,
-          size: null,
+          AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
         }

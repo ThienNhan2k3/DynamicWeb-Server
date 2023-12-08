@@ -59,7 +59,7 @@ function selectAccountType(e, districtSelect, wardSelect) {
     }
 }
 
-function showEditUserModal(btn) {
+function showEditAccountModal(btn) {
     const id = btn.dataset.id;
     const accountType = btn.dataset.type;
     const district = btn.dataset.district;
@@ -85,7 +85,8 @@ function showEditUserModal(btn) {
 }
 
 const confirmEditButton = document.getElementById("confirm-edit-button");
-confirmEditButton.addEventListener("click", async (e) => {
+if (confirmEditButton) {
+  confirmEditButton.addEventListener("click", async (e) => {
     e.preventDefault();
     const formData = new FormData(document.getElementById("editForm"));
     const data = Object.fromEntries(formData.entries());
@@ -98,3 +99,30 @@ confirmEditButton.addEventListener("click", async (e) => {
     });
     location.reload();
 })
+}
+
+function showDeleteAccountModal(btn) {
+  const id = btn.dataset.id;
+  document.getElementById("idDeleteModal").value = id;
+}
+
+const confirmDeleteButton = document.getElementById("confirm-delete-button");
+if (confirmDeleteButton) {
+  confirmDeleteButton.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const data = {
+      accountId: document.getElementById("idDeleteModal").value
+    }
+    console.log(data);
+    const res = await fetch("/department/accountManagement", {
+        method: "DELETE",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+    location.reload();
+})
+}
+
+
