@@ -1,4 +1,3 @@
-<<<<<<< HEAD:controllers/department.js
 const {
   Area,
   Account,
@@ -7,9 +6,6 @@ const {
   LocationType,
   sequelize,
 } = require("../models");
-=======
-const {Area, Account, PermitRequest, Board, sequelize} = require("../models");
->>>>>>> 3ad61d65399b331c63b85703e25b183558939804:controllers/departmentController.js
 const checkInput = require("../util/checkInput");
 const {createWardDistrictPageQueryString} = require("../util/queryString");
 const bcrypt = require("bcrypt");
@@ -20,7 +16,6 @@ const { Op } = require('sequelize');
 
 
 controller.accountManagement = async (req, res) => {
-<<<<<<< HEAD:controllers/department.js
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   const options = {
     attributes: ["id", "firstName", "lastName", "email", "type", "areaId"],
@@ -87,7 +82,6 @@ controller.accountManagement = async (req, res) => {
     editMsg,
   });
 };
-=======
     const createErr = {
         error: {
             firstName: req.flash("firstNameCreateModalError"),
@@ -207,8 +201,7 @@ controller.accountManagement = async (req, res) => {
         currentDistrict,
         currentWard
     });
-}
->>>>>>> 3ad61d65399b331c63b85703e25b183558939804:controllers/departmentController.js
+};
 
 controller.getWardsWithSpecificDistrict = async (req, res) => {
   const district = req.query.district || "";
@@ -313,7 +306,6 @@ controller.createAccount = async (req, res) => {
     return res.redirect("/department/accountManagement");
   }
 
-<<<<<<< HEAD:controllers/department.js
   try {
     const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
     const newAccount = await Account.create({
@@ -420,7 +412,6 @@ controller.adplaceManagement = async (req, res) => {
 };
 
 module.exports = controller;
-=======
     try {
         const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
         let areaId = 1;
@@ -590,4 +581,3 @@ controller.acceptOrDenyAdsRequest = (req, res) => {
 }
 
 module.exports = controller;
->>>>>>> 3ad61d65399b331c63b85703e25b183558939804:controllers/departmentController.js
