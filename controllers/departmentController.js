@@ -14,6 +14,8 @@ const bcrypt = require("bcrypt");
 const controller = {};
 const { Op } = require("sequelize");
 
+const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+
 controller.accountManagement = async (req, res) => {
   const createErr = {
     error: {
@@ -421,6 +423,32 @@ controller.viewAdsRequest = async (req, res) => {
 };
 
 controller.adplaceManagement = async (req, res) => {
+  const createErr = {
+    error: {
+      address: req.flash("addressCreateModalError"),
+      numBoard: req.flash("numBoardCreateModalError"),
+    },
+    value: {
+      address: req.flash("addressCreateModal")[0],
+      numBoard: req.flash("numBoardCreateModal")[0],
+      // ... add other value fields for AdsPlacement ...
+    },
+  };
+  const createMsg = {
+    status: req.flash("createMsgStatus"),
+    content: req.flash("createMsgContent"),
+  };
+
+  const editMsg = {
+    status: req.flash("editMsgStatus"),
+    content: req.flash("editMsgContent"),
+  };
+
+  const deleteMsg = {
+    status: req.flash("deleteMsgStatus"),
+    content: req.flash("deleteMsgContent"),
+  };
+
   const optionsAdsPlacement = {
     attributes: [
       "id",
@@ -515,9 +543,11 @@ controller.adplaceManagement = async (req, res) => {
   }
 
   const [districts] = await sequelize.query(
-    `SELECT DISTINCT district FROM Areas`
+    `SELECT DISTINCT district FROM Areas ORDER BY district`
   );
   const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
+  const adsTypes = await AdsType.findAll();
+  const locationsType = await LocationType.findAll();
   const currentUrl = req.url.slice(1);
   res.render("So/adplaceManagement.ejs", {
     adsPlacements,
@@ -526,7 +556,90 @@ controller.adplaceManagement = async (req, res) => {
     currentUrl,
     currentDistrict,
     currentWard,
+    createErr,
+    createMsg,
+    adsTypes,
+    locationsType,
+    editMsg,
+    deleteMsg,
   });
+};
+
+controller.createAdplace = async (req, res) => {
+  const {
+    districtSelectCreateModal,
+    wardSelectCreateModal,
+    addressCreateModal,
+    numBoardCreateModal,
+    locationTypeSelectCreateModal,
+    adTypeSelectCreateModal,
+  } = req.body;
+
+  let createFailed = false;
+
+  if (
+    !checkInput.isNumber(numBoardCreateModal) ||
+    checkInput.isEmpty(numBoardCreateModal)
+  ) {
+    req.flash("numBoardCreateModalError", "Số lượng biển không hợp lệ.");
+    createFailed = true;
+  }
+  if (checkInput.isEmpty(addressCreateModal)) {
+    req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
+    createFailed = true;
+  }
+
+  let address = await checkInput.getLatLongFromAddress(
+    addressCreateModal,
+    apiKey
+  );
+
+  if (!address) {
+    req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
+    createFailed = true;
+  }
+  if (await checkInput.isDuplicateAddress(addressCreateModal)) {
+    console.log("Địa chỉ đặt đã đc táoj.");
+    req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
+    createFailed = true;
+  }
+
+  if (createFailed) {
+    req.flash("numBoardCreateModal", numBoardCreateModal);
+    req.flash("addressCreateModal", addressCreateModal);
+
+    req.flash("createMsgStatus", "danger");
+    req.flash("createMsgContent", "Đăng ký thất bại");
+    return res.redirect("/department/adplaceManagement");
+  }
+
+  let areaId = await checkInput.findAreaIdByWardAndDistrict(
+    wardSelectCreateModal,
+    districtSelectCreateModal
+  );
+
+  let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
+    locationTypeSelectCreateModal
+  );
+  let adTypeId = await checkInput.findAdsTypeIdByAdsType(
+    adTypeSelectCreateModal
+  );
+
+  console.log(areaId, locationTypeId, adTypeId, address);
+  try {
+    console.log("Bắt đầu khởi tạo AdsPlacement");
+    const newAdsPlacement = await AdsPlacement.create({
+      address: addressCreateModal,
+      status: "Trạng thái mới",
+      long: address.lon,
+      lat: address.lat,
+    });
+    
+    console.log("Kết thúc khởi tạo AdsPlacement", newAdsPlacement);
+    req.flash("createMsgStatus", "success");
+    req.flash("createMsgContent", "Đăng ký thành công");
+    return res.redirect("/department/adplaceManagement");
+  } catch (err) {}
 };
 
 controller.acceptOrDenyAdsRequest = (req, res) => {
