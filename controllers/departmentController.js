@@ -634,8 +634,8 @@ controller.createAdplace = async (req, res) => {
       long: address.lon,
       lat: address.lat,
     });
-    
-    console.log("Kết thúc khởi tạo AdsPlacement", newAdsPlacement);
+    await newAdsPlacement.save();
+    console.log("Kết thúc khởi tạo AdsPlacement");
     req.flash("createMsgStatus", "success");
     req.flash("createMsgContent", "Đăng ký thành công");
     return res.redirect("/department/adplaceManagement");
