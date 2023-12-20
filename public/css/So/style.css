@@ -50,7 +50,7 @@ a {
 }
 
 .dynamic-container {
-    transition: 0.4s;
+    transition: 0.8s;
 }
 
 
@@ -66,6 +66,7 @@ a {
 
 .active-cont {
     margin-left: 250px;
+    width: calc(100vw);
 }
 
 

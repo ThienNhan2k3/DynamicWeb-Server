@@ -29,39 +29,22 @@
   <!-- Navbar content -->
   <%- include("./subPartials/navbar.ejs") %> 
 
-  <% if (editMsg.status.length > 0){ %>
+  <% if (message != null){ %>
     <div class="alert-container" id="create-alert-container">
-      <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+      <div class="alert alert-<%=message.status%> mb-0" role="alert" id="registerAlert">
         <i class="fa-regular fa-circle-check fa-2xl"></i>
-        <span class="ms-3 fs-5"><%= editMsg.content[0] %></span>
+        <span class="ms-3 fs-5"><%= message.content %></span>
       </div>
-      <div class="progress progress-<%= editMsg.status[0] %>"></div>
-    </div>
-  <% } else if (createMsg.status.length > 0){ %>
-    <div class="alert-container" id="create-alert-container">
-      <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-        <i class="fa-regular fa-circle-check fa-2xl"></i>
-        <span class="ms-3 fs-5"><%= createMsg.content[0] %></span>
-      </div>
-      <div class="progress progress-<%= createMsg.status[0] %>"></div>
-    </div>
-  <% } else if (deleteMsg.status.length > 0){ %>
-    <div class="alert-container" id="create-alert-container">
-      <div class="alert alert-<%=deleteMsg.status[0]%> mb-0" role="alert" id="registerAlert">
-        <i class="fa-regular fa-circle-check fa-2xl"></i>
-        <span class="ms-3 fs-5"><%= deleteMsg.content[0] %></span>
-      </div>
-      <div class="progress progress-<%= deleteMsg.status[0] %>"></div>
+      <div class="progress progress-<%= message.status %>"></div>
     </div>
   <% } %>
-
   <!-- Main content -->
   <main class="dynamic-container container-fluid">
-    <div class="row w-sm-50 w-75 mt-4 justify-content-end">
-      <a class="btn btn-secondary col-lg-1 col-sm-2 col-2" href="/">
+    <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
+      <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="/">
         All
       </a>
-      <div class="col-lg-2 col-sm-4 col-4">
+      <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
         <div class="dropdown">
           <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <% if (currentDistrict !== '') { %>
@@ -81,7 +64,7 @@
           </ul>
         </div>
       </div>
-      <div class="col-lg-3 col-sm-5 col-6">
+      <div class="col-lg-4 col-xl-3 col-sm-5 col-12">
         <div class="dropdown">
           <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false"
           <% if (wards.length === 0) { %>
@@ -131,30 +114,30 @@
           </tr>
         </thead>
         <tbody>
-          <% if (pagination.accounts && pagination.accounts.length > 0) { %>
-            <% for (let i = 0; i < pagination.accounts.length; i++) { %>
+          <% if (pagination.rows && pagination.rows.length > 0) { %>
+            <% for (let i = 0; i < pagination.rows.length; i++) { %>
               <tr>
-                <td><%= pagination.accounts[i].firstName %> <%= pagination.accounts[i].lastName %></td>
-                <td><%= pagination.accounts[i].email %></td>
-                <% if (pagination.accounts[i].type === 'So') {%>
+                <td><%= pagination.rows[i].firstName %> <%= pagination.rows[i].lastName %></td>
+                <td><%= pagination.rows[i].email %></td>
+                <% if (pagination.rows[i].type === 'So') {%>
                   <td></td>
                   <td></td>
                 <% } else { %>
-                  <% if (pagination.accounts[i].type === 'Phuong' && pagination.accounts[i].Area.ward != null) { %> 
-                    <td> <%= pagination.accounts[i].Area.ward %></td>
+                  <% if (pagination.rows[i].type === 'Phuong' && pagination.rows[i].Area.ward != null) { %> 
+                    <td> <%= pagination.rows[i].Area.ward %></td>
                     <% } else {%>
                       <td></td>
                     <% } %>
-                    <% if (pagination.accounts[i].Area.district != null) { %> 
-                      <td> <%= pagination.accounts[i].Area.district %></td>
+                    <% if (pagination.rows[i].Area.district != null) { %> 
+                      <td> <%= pagination.rows[i].Area.district %></td>
                     <% } else {%>
                       <td></td>
                     <% } %>
                 <% } %> 
-                <td><%= pagination.accounts[i].type %></td>
+                <td><%= pagination.rows[i].type %></td>
                 <td class="function-icons text-center">
-                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.accounts[i].id %>" data-type="<%= pagination.accounts[i].type %>" data-district="<%= pagination.accounts[i].Area.district %>" data-ward="<%= pagination.accounts[i].Area.ward %>" onclick="showEditAccountModal(this)"></i>
-                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.accounts[i].id %>" onclick="showDeleteAccountModal(this)"></i>
+                  <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<%= pagination.rows[i].id %>" data-type="<%= pagination.rows[i].type %>" data-district="<%= pagination.rows[i].Area.district %>" data-ward="<%= pagination.rows[i].Area.ward %>" onclick="showEditAccountModal(this)"></i>
+                  <i class="fas fa-trash" style="color: #EB3223;" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<%= pagination.rows[i].id %>" onclick="showDeleteAccountModal(this)"></i>
                 </td>
               </tr>
             <% } %>
@@ -173,7 +156,7 @@
       <nav aria-label="Page navigation example">
         <ul class="pagination mb-0">
           <% if (pagination.currentPage === pagination.minPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Previous</a></li>
+            <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Previous</button></li>
           <% }else{%>
             <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
           <% } %>
@@ -193,7 +176,7 @@
           <% } %>
 
           <% if (pagination.currentPage === pagination.maxPage) { %>
-            <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Next</a></li>
+            <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Next</button></li>
           <% }else{%>
             <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
           <% } %>
@@ -463,22 +446,6 @@
   <%- include("../partials/footer.ejs") %>
 
   <!-- Javascript -->
-  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
-  <script type="importmap">
-    {
-      "imports": {
-        "@popperjs/core": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js",
-        "bootstrap": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.esm.min.js"
-      }
-    }
-  </script>
-  <% if (createMsg.status.length > 0){ %>
-    <script type="module">
-      import * as bootstrap from 'bootstrap'
-      const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
-      myModal.show();
-    </script>
-  <% } %>
   <script src="/javascript/So/accountManagement.js"></script>
   <script src="/javascript/So/passwordStrengthIndicator.js"></script>
   <script src="/javascript/toggleNavigation.js"></script>
