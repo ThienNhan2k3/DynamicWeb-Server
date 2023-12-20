@@ -158,6 +158,15 @@
                 >Previous</a
               >
             </li>
+            <% if(hasPreviousPreviousPage) { %>
+              <li class="page-item">
+              <a
+                class="page-link text-dark fw-bold border-0"
+                href="<%=serverPath%>department/areaManagement/?page=<%= previousPage %>&district=<%= currentDistrict %> "
+                ><%= previousPage-1 %></a
+              >
+            </li>
+            <% } %>
             <li class="page-item">
               <a
                 class="page-link text-dark fw-bold border-0"
@@ -189,6 +198,15 @@
                 ><%= nextPage %></a
               >
             </li>
+            <% if(hasNextNextPage) {%>
+              <li class="page-item">
+              <a
+                class="page-link text-dark fw-bold border-0"
+                href="<%=serverPath%>department/areaManagement/?page=<%= nextPage %>&district=<%= currentDistrict %> "
+                ><%= nextPage+1 %></a
+              >
+            </li>
+            <% } %>
             <li class="page-item">
               <a
                 class="page-link text-dark fw-bold border-0"
