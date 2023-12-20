@@ -12,12 +12,15 @@ const {
   ReportType,
   sequelize,
 } = require("../models");
+const severPath = "http://localhost:5000/";
 const checkInput = require("../util/checkInput");
-const {createWardDistrictPageQueryString} = require("../util/queryString");
+const { createWardDistrictPageQueryString } = require("../util/queryString");
 const bcrypt = require("bcrypt");
 
 const controller = {};
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
+
+const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
 
 
 /*
@@ -140,174 +143,184 @@ controller.accountManagement = async (req, res) => {
         currentDistrict,
         currentWard
     });
-
-  
 }
 
 controller.getWardsWithSpecificDistrict = async (req, res) => {
-  const district = req.query.district || '';
+  const district = req.query.district || "";
 
   const options = {
-      attributes: ['ward'],
-  }
-  if (district.trim() !== '') {
-      options.where = {
-          district
-      }
+    attributes: ["ward"],
+  };
+  if (district.trim() !== "") {
+    options.where = {
+      district,
+    };
   }
   const wards = await Area.findAll(options);
 
   return res.json(wards);
-
-}
-
+};
 
 controller.createAccount = async (req, res) => {
   const {
-      firstNameCreateModal,
-      lastNameCreateModal, 
-      usernameCreateModal, 
-      emailCreateModal, 
-      passwordCreateModal, 
-      confirmPasswordCreateModal,
-      accountTypeSelectCreateModal, 
-      districtSelectCreateModal,
-      wardSelectCreateModal
+    firstNameCreateModal,
+    lastNameCreateModal,
+    usernameCreateModal,
+    emailCreateModal,
+    passwordCreateModal,
+    confirmPasswordCreateModal,
+    accountTypeSelectCreateModal,
+    districtSelectCreateModal,
+    wardSelectCreateModal,
   } = req.body;
 
   let loginFailed = false;
   //First name
   if (checkInput.isEmpty(firstNameCreateModal)) {
-      req.flash("firstNameCreateModalError", "Tên cán bộ không thể để trống!");
-      loginFailed = true;
-  } 
+    req.flash("firstNameCreateModalError", "Tên cán bộ không thể để trống!");
+    loginFailed = true;
+  }
   //Last name
   if (checkInput.isEmpty(lastNameCreateModal)) {
-      req.flash("lastNameCreateModalError", "Tên đệm và họ của cán bộ chưa được nhập!");
-      loginFailed = true;
-  } 
-  //Username 
+    req.flash(
+      "lastNameCreateModalError",
+      "Tên đệm và họ của cán bộ chưa được nhập!"
+    );
+    loginFailed = true;
+  }
+  //Username
   if (checkInput.isEmpty(usernameCreateModal)) {
-      loginFailed = true;
-      req.flash("usernameCreateModalError", "Tên đăng nhập không thể để trống!");
+    loginFailed = true;
+    req.flash("usernameCreateModalError", "Tên đăng nhập không thể để trống!");
   } else if (await checkInput.usernameExists(usernameCreateModal)) {
-      loginFailed = true;
-      req.flash("usernameCreateModalError", "Tên đăng nhập đã tồn tại!");
+    loginFailed = true;
+    req.flash("usernameCreateModalError", "Tên đăng nhập đã tồn tại!");
   }
   //Email
   if (checkInput.isEmpty(emailCreateModal)) {
-      loginFailed = true;
-      req.flash("emailCreateModalError", "Email chưa được nhập!");
+    loginFailed = true;
+    req.flash("emailCreateModalError", "Email chưa được nhập!");
   } else if (!checkInput.isEmail(emailCreateModal)) {
-      loginFailed = true;
-      req.flash("emailCreateModalError", "Email không hợp lệ!");
+    loginFailed = true;
+    req.flash("emailCreateModalError", "Email không hợp lệ!");
   } else if (await checkInput.emailExists(emailCreateModal)) {
-      loginFailed = true;
-      req.flash("emailCreateModalError", "Email này đã được sử dụng!");
+    loginFailed = true;
+    req.flash("emailCreateModalError", "Email này đã được sử dụng!");
   }
   //Password
   if (checkInput.isEmpty(passwordCreateModal)) {
-      loginFailed = true;
-      req.flash("passwordCreateModalError", "Mật khẩu không thể bỏ trống!");
+    loginFailed = true;
+    req.flash("passwordCreateModalError", "Mật khẩu không thể bỏ trống!");
   } else if (!checkInput.isValidPassword(passwordCreateModal)) {
-      loginFailed = true;
-      req.flash("passwordCreateModalError", "Mật khẩu này quá yếu!");
+    loginFailed = true;
+    req.flash("passwordCreateModalError", "Mật khẩu này quá yếu!");
   }
-  //Confirm password 
+  //Confirm password
   if (checkInput.isEmpty(confirmPasswordCreateModal)) {
-      loginFailed = true;
-      req.flash("confirmPasswordCreateModalError", "Mật khẩu xác nhận chưa được nhập!");
-  } else if (!checkInput.isValidConfirmPassword(passwordCreateModal, confirmPasswordCreateModal)) {
-      loginFailed = true;
-      req.flash("confirmPasswordCreateModalError", "Mật khẩu xác nhận không trùng với mật khẩu!");
+    loginFailed = true;
+    req.flash(
+      "confirmPasswordCreateModalError",
+      "Mật khẩu xác nhận chưa được nhập!"
+    );
+  } else if (
+    !checkInput.isValidConfirmPassword(
+      passwordCreateModal,
+      confirmPasswordCreateModal
+    )
+  ) {
+    loginFailed = true;
+    req.flash(
+      "confirmPasswordCreateModalError",
+      "Mật khẩu xác nhận không trùng với mật khẩu!"
+    );
   }
 
   if (loginFailed) {
-      req.flash("firstNameCreateModal", firstNameCreateModal);
-      req.flash("lastNameCreateModal", lastNameCreateModal);
-      req.flash("usernameCreateModal", usernameCreateModal);
-      req.flash("emailCreateModal", emailCreateModal);
-      req.flash("passwordCreateModal", passwordCreateModal);
-      req.flash("confirmPasswordCreateModal", confirmPasswordCreateModal);
-
-      req.flash("message", JSON.stringify({
+    req.flash("firstNameCreateModal", firstNameCreateModal);
+    req.flash("lastNameCreateModal", lastNameCreateModal);
+    req.flash("usernameCreateModal", usernameCreateModal);
+    req.flash("emailCreateModal", emailCreateModal);
+    req.flash("passwordCreateModal", passwordCreateModal);
+    req.flash("confirmPasswordCreateModal", confirmPasswordCreateModal);
+    req.flash("message", JSON.stringify({
         type: "create",
         status: "danger",
         content: "Đăng ký thất bại"
-      }))
-      return res.redirect("/department/accountManagement");    
+    }))
+    return res.redirect("/department/accountManagement");    
   }
 
-  try {
-      const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
-      let areaId = 1;
-      if (accountTypeSelectCreateModal !== 'So') {
-          const options = {
-              where: {
-                  district: districtSelectCreateModal,
-              }
-          }
-          if (accountTypeSelectCreateModal === 'Phuong') {
-              options.where.ward = wardSelectCreateModal;
-          }
-          areaId = (await Area.findOne(options)).id;
-      }
-      const newAccount = await Account.create({ 
-          firstName: firstNameCreateModal, 
-          lastName: lastNameCreateModal,
-          username: usernameCreateModal,
-          email: emailCreateModal,
-          password: hashPassword,
-          type: accountTypeSelectCreateModal,
-          AreaId: areaId,
-      });
-      req.flash("message", JSON.stringify({
-        type: "create",
-        status: "success",
-        content: "Đăng ký thành công"
-      }))
-  } catch(err) {
-      console.log(err);
-      req.flash("message", JSON.stringify({
-        type: "create",
-        status: "danger",
-        content: "Đăng ký thất bại"
-      }))
-  }
-  return res.redirect("/department/accountManagement");    
-}
+    try {
+        const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
+        let areaId = 1;
+        if (accountTypeSelectCreateModal !== "So") {
+            const options = {
+                where: {
+                district: districtSelectCreateModal,
+                },
+            };
+            if (accountTypeSelectCreateModal === "Phuong") {
+                options.where.ward = wardSelectCreateModal;
+            }
+            const newAccount = await Account.create({ 
+                firstName: firstNameCreateModal, 
+                lastName: lastNameCreateModal,
+                username: usernameCreateModal,
+                email: emailCreateModal,
+                password: hashPassword,
+                type: accountTypeSelectCreateModal,
+                AreaId: areaId,
+            });
+            req.flash("message", JSON.stringify({
+                type: "create",
+                status: "success",
+                content: "Đăng ký thành công"
+            }))
+        } 
+    }
+    catch(err) {
+        console.log(err);
+        req.flash("message", JSON.stringify({
+            type: "create",
+            status: "danger",
+            content: "Đăng ký thất bại"
+        }))
+
+    }
+    return res.redirect("/department/accountManagement");
+};
 
 controller.editAccount = async (req, res) => {
-  const {
-      idEditModal,
-      accountTypeSelectEditModal, 
-      districtSelectEditModal,
-      wardSelectEditModal
-  } = req.body;
-  try {
-      let areaId = 1;
-      if (accountTypeSelectEditModal !== 'So') {
-          const options = {
-              where: {
-                  district: districtSelectEditModal,
-              }
-          }
-          if (accountTypeSelectEditModal === 'Phuong') {
-              options.where.ward = wardSelectEditModal;
-          }
-          areaId = (await Area.findOne(options)).id;
-      }
-      await Account.update(
-          {type: accountTypeSelectEditModal, AreaId: areaId},
-          {where: {id: idEditModal}}
-      )
-      req.flash("message", JSON.stringify({
-        type: "edit",
-        status: "success",
-        content: "Phân công khu vực thành công"
-      }))
-      return res.send("Account updated!");
-  } catch(err) {
+    const {
+        idEditModal,
+        accountTypeSelectEditModal,
+        districtSelectEditModal,
+        wardSelectEditModal,
+    } = req.body;
+    try {
+        let areaId = 1;
+        if (accountTypeSelectEditModal !== "So") {
+            const options = {
+                where: {
+                    district: districtSelectEditModal,
+                },
+            };
+            if (accountTypeSelectEditModal === "Phuong") {
+                options.where.ward = wardSelectEditModal;
+            }
+            await Account.update(
+                {type: accountTypeSelectEditModal, AreaId: areaId},
+                {where: {id: idEditModal}}
+            )
+            req.flash("message", JSON.stringify({
+                type: "edit",
+                status: "success",
+                content: "Phân công khu vực thành công"
+            }))
+            return res.send("Account updated!");
+        }
+    } 
+    catch(err) {
       console.error(err);
       req.flash("message", JSON.stringify({
         type: "edit",
@@ -316,93 +329,93 @@ controller.editAccount = async (req, res) => {
       }))
       return res.send("Can not update account!");
   }
-}
+};
 
 controller.deleteAccount = async (req, res) => {
   const { accountId } = req.body;
-  try {
-      await Account.destroy(
-          {where: {id: accountId}}
-      )
-      req.flash("message", JSON.stringify({
-        type: "delete",
-        status: "success",
-        content: "Xóa tài khoản thành công"
-      }))
-      return res.send("Account deleted!");
-  } catch(err) {
-      console.error(err);
-      req.flash("message", JSON.stringify({
-        type: "delete",
-        status: "danger",
-        content: "Xóa tài khoản thất bại"
-      }))
-      return res.send("Can not delete account!");
-  }
-}
+    try {
+        await Account.destroy(
+            {where: {id: accountId}}
+        )
+        req.flash("message", JSON.stringify({
+            type: "delete",
+            status: "success",
+            content: "Xóa tài khoản thành công"
+        }))
+        return res.send("Account deleted!");
+    } catch(err) {
+        console.error(err);
+        req.flash("message", JSON.stringify({
+            type: "delete",
+            status: "danger",
+            content: "Xóa tài khoản thất bại"
+        }))
+        return res.send("Can not delete account!");
+    }
+};
 
 controller.viewAdsRequests = async (req, res) => {
-  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-  let district = req.query.district || '';
-  let ward = req.query.ward || '';
+    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+    let district = req.query.district || "";
+    let ward = req.query.ward || "";
 
-  let whereCondition = {};
-  let wards = [], currentDistrict = '', currentWard = ''; 
-  if (district.trim() !== '') {
-      wards = await Area.findAll({
-          where: {
-              district
-          }
-      })
-      whereCondition.district = district;
-      currentDistrict = district;
-      if (ward.trim() !== '') {
-          currentWard = ward;
-          whereCondition.ward = ward;
-      }
-  }
-
-  const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
-  let permitRequests = await PermitRequest.findAll({
-        include: [
-            Company, {
-                model: Board,
-                include: [BoardType, {
-                        model: AdsPlacement,
-                        include: [{
-                            model: Area,
-                            where: whereCondition,
-                            required: true
-                        }],
-                        required: true
-                    },
-                ],
-                required: true
-            }, {
-                model: Account,
-                attributes: ["firstName", "lastName", "type", "email"]
+    let whereCondition = {};
+    let wards = [], currentDistrict = '', currentWard = ''; 
+    if (district.trim() !== '') {
+        wards = await Area.findAll({
+            where: {
+                district
             }
-        ],
+        })
+        whereCondition.district = district;
+        currentDistrict = district;
+        if (ward.trim() !== '') {
+            currentWard = ward;
+            whereCondition.ward = ward;
+        }
+    }
+
+    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
+    let permitRequests = await PermitRequest.findAll({
+            include: [
+                Company, {
+                    model: Board,
+                    include: [BoardType, {
+                            model: AdsPlacement,
+                            include: [{
+                                model: Area,
+                                where: whereCondition,
+                                required: true
+                            }],
+                            required: true
+                        },
+                    ],
+                    required: true
+                }, {
+                    model: Account,
+                    attributes: ["firstName", "lastName", "type", "email"]
+                }
+            ],
+        });
+    const permitRequestsPerPage = 1;
+    let pagination = await getPagination(req, res, permitRequests, permitRequestsPerPage, page);
+    const currentUrl = req.url.slice(1);
+    
+    return res.render("So/viewAdsRequest.ejs", {
+        formatDate: (date) => {
+        return date.toLocaleDateString({
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+        },
+        pagination,
+        currentUrl,
+        districts,
+        wards,
+        currentDistrict,
+        currentWard,
     });
-  const permitRequestsPerPage = 1;
-  let pagination = await getPagination(req, res, permitRequests, permitRequestsPerPage, page);
-  const currentUrl = req.url.slice(1);
-  
-  return res.render("So/viewAdsRequest.ejs", {
-      formatDate: (date) => {
-          return date.toLocaleDateString({
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-          })
-      },
-      pagination,
-      currentUrl,
-      districts,
-      wards,
-      currentDistrict,
-      currentWard
-  });
 }
 
 
@@ -601,25 +614,314 @@ const getLocationTypeName = async (adsPlacement) => {
 };
 
 controller.adplaceManagement = async (req, res) => {
-  const adsPlacements = await AdsPlacement.findAll({
-    include: [{ model: Area }, { model: LocationType }, { model: AdsType }],
-  });
-  console.log(adsPlacements.length);
+  const createErr = {
+    error: {
+      address: req.flash("addressCreateModalError"),
+      numBoard: req.flash("numBoardCreateModalError"),
+    },
+    value: {
+      address: req.flash("addressCreateModal")[0],
+      numBoard: req.flash("numBoardCreateModal")[0],
+      // ... add other value fields for AdsPlacement ...
+    },
+  };
+  const createMsg = {
+    status: req.flash("createMsgStatus"),
+    content: req.flash("createMsgContent"),
+  };
 
-  const adsPlacementsWithData = await Promise.all(
-    adsPlacements.map(async (adsPlacement) => {
-      const adsTypeName = await getAdsTypeName(adsPlacement);
-      const locationTypeName = await getLocationTypeName(adsPlacement);
-      return { ...adsPlacement.toJSON(), adsTypeName, locationTypeName };
-    })
-  );
+  const editMsg = {
+    status: req.flash("editMsgStatus"),
+    content: req.flash("editMsgContent"),
+  };
 
-  for (let i = 0; i < adsPlacementsWithData.length; i++) {
-    console.log(adsPlacementsWithData[i]);
+  const deleteMsg = {
+    status: req.flash("deleteMsgStatus"),
+    content: req.flash("deleteMsgContent"),
+  };
+
+  const optionsAdsPlacement = {
+    attributes: [
+      "id",
+      "address",
+      "status",
+      "long",
+      "lat",
+      "createdAt",
+      "updatedAt",
+      "AreaId",
+      "LocationTypeId",
+      "AdsTypeId",
+    ],
+    include: [
+      {
+        model: Area,
+        attributes: ["id", "district", "ward"],
+        where: {},
+      },
+      {
+        model: LocationType,
+        attributes: ["id", "locationType"],
+      },
+      {
+        model: AdsType,
+        attributes: ["id", "type"],
+      },
+      {
+        model: Board,
+        attributes: ["id", "size", "quantity"],
+      },
+      // ... other associations ...
+    ],
+  };
+
+  let district = req.query.district || "";
+  let ward = req.query.ward || "";
+  let search = req.query.search || "";
+  console.log(search);
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+
+  if (search.trim !== "") {
+    optionsAdsPlacement.where = {
+      [Op.or]: [
+        {
+          address: {
+            [Op.like]: `%${search}%`,
+          },
+        },
+        {
+          [Op.and]: [
+            {
+              [Op.or]: [
+                {
+                  "$Area.district$": {
+                    [Op.like]: `%${search}%`,
+                  },
+                },
+                {
+                  "$Area.ward$": {
+                    [Op.like]: `%${search}%`,
+                  },
+                },
+              ],
+            },
+            {
+              address: {
+                [Op.notLike]: `%${search}%`,
+              },
+            },
+          ],
+        },
+      ],
+    };
   }
-  res.render("So/adplaceManagement.ejs", { adsPlacementsWithData });
+
+  if (district.trim() !== "") {
+    optionsAdsPlacement.include[0].where.district = district;
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
+    });
+    currentDistrict = district;
+
+    if (ward.trim() !== "") {
+      optionsAdsPlacement.include[0].where.ward = ward;
+      currentWard = ward;
+    }
+  }
+
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas ORDER BY district`
+  );
+  const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
+  const adsTypes = await AdsType.findAll();
+  const locationsType = await LocationType.findAll();
+  const currentUrl = req.url.slice(1);
+  res.render("So/adplaceManagement.ejs", {
+    adsPlacements,
+    districts,
+    wards,
+    currentUrl,
+    currentDistrict,
+    currentWard,
+    createErr,
+    createMsg,
+    adsTypes,
+    locationsType,
+    editMsg,
+    deleteMsg,
+  });
 };
 
+controller.createAdplace = async (req, res) => {
+  const {
+    districtSelectCreateModal,
+    wardSelectCreateModal,
+    addressCreateModal,
+    numBoardCreateModal,
+    locationTypeSelectCreateModal,
+    adTypeSelectCreateModal,
+  } = req.body;
 
+  let createFailed = false;
 
+  if (
+    !checkInput.isNumber(numBoardCreateModal) ||
+    checkInput.isEmpty(numBoardCreateModal)
+  ) {
+    req.flash("numBoardCreateModalError", "Số lượng biển không hợp lệ.");
+    createFailed = true;
+  }
+  if (checkInput.isEmpty(addressCreateModal)) {
+    req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
+    createFailed = true;
+  }
+
+  let address = await checkInput.getLatLongFromAddress(
+    addressCreateModal,
+    apiKey
+  );
+
+  if (!address) {
+    req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
+    createFailed = true;
+  }
+  if (await checkInput.isDuplicateAddress(addressCreateModal)) {
+    console.log("Địa chỉ đặt đã đc táoj.");
+    req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
+    createFailed = true;
+  }
+
+  if (createFailed) {
+    req.flash("numBoardCreateModal", numBoardCreateModal);
+    req.flash("addressCreateModal", addressCreateModal);
+
+    req.flash("createMsgStatus", "danger");
+    req.flash("createMsgContent", "Đăng ký thất bại");
+    return res.redirect("/department/adplaceManagement");
+  }
+
+  let areaId = await checkInput.findAreaIdByWardAndDistrict(
+    wardSelectCreateModal,
+    districtSelectCreateModal
+  );
+
+  let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
+    locationTypeSelectCreateModal
+  );
+  let adTypeId = await checkInput.findAdsTypeIdByAdsType(
+    adTypeSelectCreateModal
+  );
+
+  console.log(areaId, locationTypeId, adTypeId, address);
+  try {
+    console.log("Bắt đầu khởi tạo AdsPlacement");
+    const newAdsPlacement = await AdsPlacement.create({
+      address: addressCreateModal,
+      status: "Trạng thái mới",
+      long: address.lon,
+      lat: address.lat,
+    });
+    await newAdsPlacement.save();
+    console.log("Kết thúc khởi tạo AdsPlacement");
+    req.flash("createMsgStatus", "success");
+    req.flash("createMsgContent", "Đăng ký thành công");
+    return res.redirect("/department/adplaceManagement");
+  } catch (err) {}
+};
+
+controller.getAreas = async (req, res) => {
+  let district = req.query.district || "";
+
+  const amount = await Area.count({
+    where: district == "" ? {} : { district: district },
+  });
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  const perPage = 5;
+
+  let areas = await Area.findAll({
+    where: district == "" ? {} : { district: district },
+    limit: perPage,
+    offset: (page - 1) * perPage,
+  });
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  const message = req.flash("manageAreaMsg");
+
+  res.render("So/areaManagement.ejs", {
+    areas: areas,
+    total: amount,
+    hasNextPage: perPage * page < amount,
+    hasNextNextPage:perPage * (page+1) < amount,
+    hasPreviousPage: page > 1,
+    hasPreviousPreviousPage:(page-1)>1,
+    nextPage: page + 1,
+    currentPage: page,
+    previousPage: page - 1,
+    lastPage: Math.ceil((amount * 1.0) / perPage),
+    districts,
+    currentDistrict: district,
+    serverPath: severPath,
+    message: message.length == 0 ? null : message[0],
+  });
+};
+
+controller.postEditArea = async (req, res) => {
+  try {
+    const { id, district, ward, path } = req.body;
+
+    if (!id || !district || !ward) {
+      req.flash("manageAreaMsg", "Các trường nhập bị sai hoặc thiếu");
+      return res.redirect(path);
+    }
+
+    const updatedArea = await Area.update(
+      { ward: ward, district: district },
+      {
+        where: { id: id },
+      }
+    );
+    if (updatedArea[0] === 0) {
+      req.flash("manageAreaMsg", "Không có trong cơ sở dữ liệu");
+      return res.redirect(path);
+    }
+    req.flash("manageAreaMsg", "Thay đổi thành công");
+    res.redirect(path);
+  } catch (error) {
+    req.flash("manageAreaMsg", "Internal server error.");
+    return res.redirect(path);
+  }
+};
+
+controller.postAddArea = async (req, res) => {
+  try {
+    const { district, ward } = req.body;
+    if (!district || !ward) {
+      req.flash("manageAreaMsg", "Các trường nhập bị sai hoặc thiếu");
+      return res.redirect("/department/areaManagement");
+    }
+
+    const existingArea = await Area.findOne({
+      where: { district: district, ward: ward },
+    });
+    if (existingArea) {
+      req.flash("manageAreaMsg", "Đã tồn tại khu vực");
+      return res.redirect("/department/areaManagement");
+    }
+
+    const newArea = await Area.create({ district: district, ward: ward });
+    await newArea.save();
+
+    req.flash("manageAreaMsg", "Tạo thành công");
+    return res.redirect("/department/areaManagement");
+  } catch (error) {
+    req.flash("manageAreaMsg", "Internal server error.");
+    return res.redirect("/department/areaManagement");
+  }
+};
 module.exports = controller;

@@ -14,126 +14,242 @@
   <link rel="stylesheet" href="/css/So/style2.css">
   <link rel="stylesheet" href="/css/So/style.css">
   <link rel="stylesheet" href="/css/So/table.css">
+  <link rel="stylesheet" href="/css/toggleNavigation.css">
   <link rel="stylesheet" href="/css/So/alert.css">
+  <link rel="stylesheet" href="/css/So/customDropbox.css">
+  <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
   <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
 </head>
+
 
 <body>
   <!-- Header -->
   <%- include("../partials/header.ejs") %>
     <!-- Navbar content -->
     <%- include("./subPartials/navbar.ejs") %>
-
-      <!-- Main content -->
-      <main class="container-fluid">
-        <div class="row" id="content">
-          <div class="col">
-            <h2>Điểm quảng cáo tại Sài Gòn</h2>
-            <div class="input-group flex-nowrap">
-              <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control" placeholder="Tìm kiếm theo địa chỉ" aria-label="find"
-                aria-describedby="addon-wrapping">
+      <% if (editMsg.status.length> 0){ %>
+        <div class="alert-container" id="create-alert-container">
+          <div class="alert alert-<%=editMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+            <i class="fa-regular fa-circle-check fa-2xl"></i>
+            <span class="ms-3 fs-5">
+              <%= editMsg.content[0] %>
+            </span>
+          </div>
+          <div class="progress progress-<%= editMsg.status[0] %>"></div>
+        </div>
+        <% } else if (createMsg.status.length> 0){ %>
+          <div class="alert-container" id="create-alert-container">
+            <div class="alert alert-<%=createMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+              <i class="fa-regular fa-circle-check fa-2xl"></i>
+              <span class="ms-3 fs-5">
+                <%= createMsg.content[0] %>
+              </span>
             </div>
-            <div class="row" id="filter">
-              <div class="col">
-                <div class="badge bg-primary text-nowrap">
-                  Số lượng: 3
-                </div>
-
+            <div class="progress progress-<%= createMsg.status[0] %>"></div>
+          </div>
+          <% } else if (deleteMsg.status.length> 0){ %>
+            <div class="alert-container" id="create-alert-container">
+              <div class="alert alert-<%=deleteMsg.status[0]%> mb-0" role="alert" id="registerAlert">
+                <i class="fa-regular fa-circle-check fa-2xl"></i>
+                <span class="ms-3 fs-5">
+                  <%= deleteMsg.content[0] %>
+                </span>
               </div>
-              <div class="col" id="filter">
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    Quận
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Quận 1</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 2</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 3</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 4</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 5</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 6</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 7</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 8</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 9</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 10</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 11</a></li>
-                    <li><a class="dropdown-item" href="#">Quận 12</a></li>
-                    <li><a class="dropdown-item" href="#">Bình Chánh</a></li>
-                    <li><a class="dropdown-item" href="#">Bình Thạnh</a></li>
-                    <li><a class="dropdown-item" href="#">Bình Tân</a></li>
-                    <li><a class="dropdown-item" href="#">Tân Bình</a></li>
-                    <li><a class="dropdown-item" href="#">Tân Phú</a></li>
-                    <li><a class="dropdown-item" href="#">Phú Nhuận</a></li>
-
-                  </ul>
-                </div>
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    Phường
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Phường 1</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 2</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 3</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 4</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 5</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 6</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 7</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 8</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 9</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 10</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 11</a></li>
-                    <li><a class="dropdown-item" href="#">Phường 12</a></li>
-                  </ul>
-                </div>
-              </div>
+              <div class="progress progress-<%= deleteMsg.status[0] %>"></div>
             </div>
+            <% } %>
 
-            <div class="col">
-              <div class="col">
-                <% for (let i=0;i<adsPlacementsWithData.length;i++) { %>
-                  <div class="property-card">
-                    <img class="property-image" src="./assets/rectangle-12.png" />
-                    <div class="property-details">
-                      <div class="address">
-                        <p class="property-address">
-                          <%= adsPlacementsWithData[i].address %><br>Phường 3 Quận 4
-                        </p>
+              <!-- Main content -->
+              <main class="container-fluid">
+                <div class="row" id="content">
+                  <div class="col">
+                    <h2>Điểm quảng cáo tại Sài Gòn</h2>
+                    <form action="adplaceManagement" method="GET">
+                      <div class="input-group flex-nowrap">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Tìm kiếm theo địa chỉ" aria-label="find"
+                          aria-describedby="addon-wrapping" name="search">
                       </div>
-                      <div class="property-info">
-                        <div class="property-info-item">
-                          <p class="info-label">Hình thức:</p>
-                          <p class="info-value">
-                            <%= adsPlacementsWithData[i].adsTypeName %>
-                          </p>
+                    </form>
+
+                    <div class="row" id="filter">
+                      <div class="col">
+                        <div class="badge bg-primary text-nowrap">
+                          Số lượng: <%= adsPlacements.length %>
                         </div>
-                        <div class="property-info-item">
-                          <p class="info-label">Phân loại:</p>
-                          <p class="info-value">
-                            <%= adsPlacementsWithData[i].locationTypeName %>
-                          </p>
-                        </div>
-                        <div class="property-info-item">
-                          <p class="info-label">Số lượng:</p>
-                          <p class="info-value">1 trụ/bảng</p>
-                        </div>
+
                       </div>
-                      <div class="property-actions">
-                        <i class="fas fa-pen edit-button" style="color: #f29d38;" data-bs-toggle="modal"
-                          data-bs-target="#permissionReport-sub"></i>
-                        <i class="fas fa-trash delete-button" style="color: #EB3223;" data-bs-toggle="modal"
-                          data-bs-target="#deleteLocation"></i>
+                      <div class="col">
+                        <button class="green-button add-button px-3 py-1 rounded" data-bs-toggle="modal"
+                          data-bs-target="#createModal">
+                          <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
+                          Thêm điểm quảng cáo
+                        </button>
+                      </div>
+                      <div class="col" id="filter">
+
+                        <a class="btn all btn-secondary text-center custom-button" href="adplaceManagement">
+                          All
+                        </a>
+
+
+
+                        <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <% if (currentDistrict !=='' ) { %>
+                              <%= currentDistrict %>
+                                <% } else { %>
+                                  Quận
+                                  <% } %>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <% for (let i=0; i < districts.length; i++){ %>
+                              <li>
+                                <a class="dropdown-item"
+                                  href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
+                                  <%= districts[i].district %>
+                                </a>
+                              </li>
+                              <% } %>
+                          </ul>
+                        </div>
+
+                        <div class="dropdown">
+                          <button
+                            class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false" <% if (wards.length===0) { %>
+                            disabled
+                            <% } %>
+                              >
+                              <% if (currentWard !=='' ) { %>
+                                <%= currentWard %>
+                                  <% } else { %>
+                                    Phường
+                                    <% } %>
+                          </button>
+
+                          <ul class="dropdown-menu">
+                            <% if (wards.length> 0) { %>
+                              <% for (let i=0; i < wards.length; i++){ %>
+                                <li>
+                                  <a class="dropdown-item"
+                                    href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
+                                    <%= wards[i].ward %>
+                                  </a>
+                                </li>
+                                <% } %>
+                                  <% } %>
+                          </ul>
+                        </div>
                       </div>
                     </div>
+
+                    <div class="col">
+                      <div class="col">
+                        <% for (let i=0;i<adsPlacements.length;i++) { %>
+                          <div class="property-card" id="property_<%= adsPlacements[i].id %>"
+                            onclick="navigateToLocation('<%= adsPlacements[i].long %>', '<%= adsPlacements[i].lat %>')">
+                            <img class="property-image" src="./assets/rectangle-12.png" />
+                            <div class="property-details">
+                              <div class="address">
+                                <p class="property-address">
+                                  <%= adsPlacements[i].address %><br>
+                                    <%= adsPlacements[i].Area.ward %>,
+                                      <%= adsPlacements[i].Area.district %>
+                                </p>
+                              </div>
+                              <div class="property-info">
+                                <div class="property-info-item">
+                                  <p class="info-label">Hình thức:</p>
+                                  <p class="info-value">
+                                    <%= adsPlacements[i].AdsType.type %>
+                                  </p>
+                                </div>
+                                <div class="property-info-item">
+                                  <p class="info-label">Phân loại:</p>
+                                  <p class="info-value">
+                                    <%= adsPlacements[i].LocationType.locationType %>
+                                  </p>
+                                </div>
+                                <div class="property-info-item">
+                                  <p class="info-label">Số lượng:</p>
+                                  <p class="info-value">
+                                    <% if (adsPlacements[i].Boards.length===0) { %> 0 trụ
+                                      <% } else{%>
+                                        <%= adsPlacements[i].Boards[0].dataValues.quantity %>
+                                          <% } %>
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="property-actions">
+                                <i class="fas fa-pen edit-button" style="color: #f29d38;" data-bs-toggle="modal"
+                                  data-bs-target="#permissionReport-sub"></i>
+                                <i class="fas fa-trash delete-button" style="color: #EB3223;" data-bs-toggle="modal"
+                                  data-bs-target="#deleteLocation"></i>
+                              </div>
+                            </div>
+                          </div>
+
+                          <% } %>
+
+
+                            <nav class="mt-3" aria-label="Page navigation">
+                              <ul class="pagination">
+                                <li class="page-item disabled">
+                                  <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                  </a>
+                                </li>
+                                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                  <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </nav>
+
+                      </div>
+                    </div>
+
                   </div>
 
-                  <% } %>
+                  <div class="col" id="mapbox"></div>
 
+                  <div class="col" id="location-details">
+                    <h4 class="mt-3">Thông tin bảng QC</h4>
+                    <div class="card">
+                      <div class="card-body">
+                        <span class="text-muted">#ID: 123</span>
+                        <h4 class="card-title" id="board-title">
+                          Trụ, cụm pano
+                          <span class="ms-2 badge bg-success">Đã quy hoạch</span>
+                        </h4>
+                        <p class="card-text" id="board-address">Đồng Khởi - Nguyễn Du (Sở Văn hoá và Thể thao), Phường
+                          Bến Nghé,
+                          Quận 1
+                        </p>
 
+                        <p>
+                          Kích thước: <span class="details-info" id="board-size">Chưa có thông tin</span> <br>
+                          Số lượng: <span class="details-info" id="board-quantity">Chưa có thông tin</span> <br>
+                          Hình thức: <span class="details-info" id="board-form">Chưa có thông tin</span> <br>
+                          Phân loại: <span class="details-info" id="board-classification">Chưa có thông tin</span> <br>
+                        </p>
+                        <img class="img-thumbnail mb-3" src="./assets/rectangle-12.png" alt="">
+                        <div class="d-flex flex-column justify-content-between">
+                          <button id="contract-button">
+                            Hợp đồng QC</button>
+                          <button type="button" class="btn btn-outline-danger fw-semibold">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            0 BÁO CÁO VI PHẠM</button>
+                        </div>
+                      </div>
+                    </div>
                     <nav class="mt-3" aria-label="Page navigation">
                       <ul class="pagination">
                         <li class="page-item disabled">
@@ -151,213 +267,303 @@
                         </li>
                       </ul>
                     </nav>
+                    <div class="location-actions">
+                      <img class="edit-location-button" data-bs-toggle="modal" data-bs-target="#permissionReport-sub"
+                        src="./assets/edit.png" />
+                      <img class="delete-location-button" data-bs-toggle="modal" data-bs-target="#deleteLocation"
+                        src="./assets/delete.png" />
+                    </div>
 
+                  </div>
+
+                </div>
+              </main>
+
+              <!-- Modal create adplaceme -->
+
+              <div class="modal fade" id="createModal" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
+                  <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Thêm điểm quảng cáo</h4>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                      <form action="/department/adplaceManagement" method="POST">
+                        <fieldset class="container-fluid">
+                          <div class="row fw-semibold fs-4 mb-2">Khu vực đặt điểm quảng cáo</div>
+
+                          <div class="row g-md-3 g-2 mb-3">
+                            <div class="col-6 col-md-6">
+                              <select name="districtSelectCreateModal" class="form-select" required
+                                id="districtSelectCreateModal"
+                                onchange="districtSelectChange(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))">
+                                <option value="">Quận/Huyện</option>
+                                <% for (let i=0; i < districts.length; i++){ %>
+                                  <option value="<%= districts[i].district %>" class="districts">
+                                    <%= districts[i].district %>
+                                  </option>
+                                  <% } %>
+                              </select>
+                            </div>
+                            <div class="col-6 col-md-6">
+                              <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal"
+                                required disabled>
+                                <option value="">Phường</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo và số lượng biển</div>
+                          <div class="row g-md-3 g-2 mb-3">
+                            <!-- Left column -->
+                            <div class="col col-md-5.5 p-0 has-validation mb-3">
+                              <div class="form-floating is-invalid">
+                                <input type="address" id="addressCreateModal" <% if(createErr.error.address.length> 0){
+                                %>
+                                class="form-control is-invalid"
+                                <% } else {%>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.address %>"
+                                      name="addressCreateModal"
+                                      autocomplete="true"
+                                      placeholder="">
+                                      <label for="addressCreateModal" class="mb-2">Địa chỉ</label>
+                              </div>
+                            </div>
+
+                            <div class="col-md-1"></div><!-- Empty column for spacing -->
+
+                            <!-- Right column -->
+                            <div class="col col-md-5.5 p-0 has-validation">
+                              <div class="form-floating is-invalid">
+                                <input type="numBoard" id="numBoardCreateModal" <% if(createErr.error.numBoard.length>
+                                0){ %>
+                                class="form-control is-invalid"
+                                <% } else {%>
+                                  class="form-control"
+                                  <% } %>
+                                    value="<%= createErr.value.numBoard %>"
+                                      name="numBoardCreateModal"
+                                      autocomplete="true"
+                                      placeholder="">
+                                      <label for="numBoardCreateModal" class="mb-2">Số lượng biển</label>
+                              </div>
+                              <% if(createErr.error.numBoard.length> 0) { %>
+                                <div class="invalid-feedback">
+                                  <%= console.log(createErr) %>
+                                </div>
+                                <% } %>
+
+                            </div>
+                          </div>
+
+
+                          <div class="row fw-semibold fs-4 mb-2">Phân loại đất và Hình thức của điểm quảng cáo</div>
+                          <div class="row g-md-3 g-2">
+                            <div class="col-6 col-md-6">
+                              <select name="locationTypeSelectCreateModal" class="form-select"
+                                id="locationTypeSelectCreateModal" required>
+                                <option value="">Phân loại đất</option>
+                                <%for (let i=0; i < locationsType.length; i++){ %>
+                                  <option value="<%= locationsType[i].locationType %>" class="locationType">
+                                    <%= locationsType[i].locationType %>
+                                  </option>
+                                  <% } %>
+
+                              </select>
+                            </div>
+
+                            <div class="col-6 col-md-6">
+                              <select name="adTypeSelectCreateModal" class="form-select" id="adTypeSelectCreateModal"
+                                required>
+                                <option value="">Hình thức</option>
+                                <%for (let i=0; i < adsTypes.length; i++){ %>
+                                  <option value="<%= adsTypes[i].type %>" class="adTypes">
+                                    <%= adsTypes[i].type %>
+                                  </option>
+                                  <% } %>
+
+                              </select>
+                            </div>
+                          </div>
+
+                          <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo điểm quảng
+                            cáo</button>
+
+
+                        </fieldset>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+
+
+              <div class="modal fade" id="permissionReport-sub" aria-hidden="true"
+                aria-labelledby="permissionReport-sub" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header" id="modal-header">
+                      <div class="container d-flex flex-column align-items-center">
+                        <h1 class="modal-title fs-5" id="permissionReport-sub"> Chỉnh sửa thông tin biển quảng cáo</h1>
+                      </div>
+                      <div class="align-self-start">
+                        <button type="button align-self-start" class="btn-close" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                      </div>
+                    </div>
+                    <div class="modal-body justify-content-center">
+                      <form action="" class="text-center">
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
+                              <label for="floatingInput">Kích thước</label>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
+                              <label for="floatingInput">Khu vực</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="email" class="form-control" id="floatingInput"
+                                placeholder="name@example.com">
+                              <label for="floatingInput">Tên công ty đăng ký quảng cáo</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="email" class="form-control" id="floatingInput"
+                                placeholder="name@example.com">
+                              <label for="floatingInput">Vị trí</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                              <option selected>Hình thức quảng cáo</option>
+                              <option value="1">One</option>
+                              <option value="2">Two</option>
+                              <option value="3">Three</option>
+                            </select>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                              <option selected>Loại bảng quảng cáo</option>
+                              <option value="1">One</option>
+                              <option value="2">Two</option>
+                              <option value="3">Three</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="email" class="form-control" id="floatingInput"
+                                placeholder="name@example.com">
+                              <label for="floatingInput">Email</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="input-group mb-3">
+                              <span class="input-group-text" id="basic-addon1">+84</span>
+                              <input type="text" class="form-control" placeholder="Số điện thoại" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="date" class="form-control" id="floatingInput" placeholder="Từ">
+                              <label for="floatingInput">Ngày bắt đầu hợp đồng</label>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <div class="form-floating mb-3">
+                              <input type="date" class="form-control" id="floatingInput" placeholder="Đến">
+                              <label for="floatingInput">Ngày kết thúc hợp đồng</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row mt-4">
+                          <div class="col">
+                            <div class="form-floating">
+                              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
+                                style="height: 100px"></textarea>
+                              <label for="floatingTextarea2">Nội dung quảng cáo</label>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Đoạn mã HTML cho nút "Submit" và modal -->
+                        <button type="submit" class="btn btn-success container-fluid" id="submit">Cập nhật</button>
 
 
 
-          </div>
-
-          <div class="col" id="map"></div>
-
-          <div class="col" id="location-details">
-            <h4 class="mt-3">Thông tin bảng QC</h4>
-            <div class="card">
-              <div class="card-body">
-                <span class="text-muted">#ID: 123</span>
-                <h4 class="card-title" id="board-title">
-                  Trụ, cụm pano
-                  <span class="ms-2 badge bg-success">Đã quy hoạch</span>
-                </h4>
-                <p class="card-text" id="board-address">Đồng Khởi - Nguyễn Du (Sở Văn hoá và Thể thao), Phường Bến Nghé,
-                  Quận 1
-                </p>
-
-                <p>
-                  Kích thước: <span class="details-info" id="board-size">Chưa có thông tin</span> <br>
-                  Số lượng: <span class="details-info" id="board-quantity">Chưa có thông tin</span> <br>
-                  Hình thức: <span class="details-info" id="board-form">Chưa có thông tin</span> <br>
-                  Phân loại: <span class="details-info" id="board-classification">Chưa có thông tin</span> <br>
-                </p>
-                <img class="img-thumbnail mb-3" src="./assets/rectangle-12.png" alt="">
-                <div class="d-flex flex-column justify-content-between">
-                  <button id="contract-button">
-                    Hợp đồng QC</button>
-                  <button type="button" class="btn btn-outline-danger fw-semibold">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    0 BÁO CÁO VI PHẠM</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <nav class="mt-3" aria-label="Page navigation">
-              <ul class="pagination">
-                <li class="page-item disabled">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                  </a>
-                </li>
-                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <div class="location-actions">
-              <img class="edit-location-button" data-bs-toggle="modal" data-bs-target="#permissionReport-sub"
-                src="./assets/edit.png" />
-              <img class="delete-location-button" data-bs-toggle="modal" data-bs-target="#deleteLocation"
-                src="./assets/delete.png" />
-            </div>
 
-          </div>
+              <div class="modal fade" id="deleteLocation" aria-hidden="true" aria-labelledby="deleteLocation"
+                tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content" id="modal-content">
+                    <div class="modal-header" id="modal-header">
+                      <div class="container d-flex flex-column align-items-center">
+                        <h1 class="modal-title fs-5" id="permissionReport-sub">Xác nhận xóa điểm quảng cáo</h1>
+                      </div>
+                      <div class="align-self-start">
+                        <button type="button align-self-start" class="btn-close" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                      </div>
+                    </div>
+                    <div class="modal-body justify-content-center">
+                      <p>
+                        Bạn có chắc muốn xóa điểm quảng cáo ?<br>
+                        Mọi dữ liệu sẽ không thể khôi phục.
+                      </p>
+                      <button type="submit" class="btn btn-success container-fluid bg-danger">Xóa</button>
 
-        </div>
-      </main>
-
-      <div class="modal fade" id="permissionReport-sub" aria-hidden="true" aria-labelledby="permissionReport-sub"
-        tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content">
-            <div class="modal-header" id="modal-header">
-              <div class="container d-flex flex-column align-items-center">
-                <h1 class="modal-title fs-5" id="permissionReport-sub"> Chỉnh sửa thông tin biển quảng cáo</h1>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="align-self-start">
-                <button type="button align-self-start" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-              </div>
-            </div>
-            <div class="modal-body justify-content-center">
-              <form action="" class="text-center">
-                <div class="row">
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-                      <label for="floatingInput">Kích thước</label>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-                      <label for="floatingInput">Khu vực</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                      <label for="floatingInput">Tên công ty đăng ký quảng cáo</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                      <label for="floatingInput">Vị trí</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                      <option selected>Hình thức quảng cáo</option>
-                      <option value="1">One</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                    </select>
-                  </div>
-                  <div class="col">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                      <option selected>Loại bảng quảng cáo</option>
-                      <option value="1">One</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                      <label for="floatingInput">Email</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="input-group mb-3">
-                      <span class="input-group-text" id="basic-addon1">+84</span>
-                      <input type="text" class="form-control" placeholder="Số điện thoại" aria-label="Username"
-                        aria-describedby="basic-addon1">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="date" class="form-control" id="floatingInput" placeholder="Từ">
-                      <label for="floatingInput">Ngày bắt đầu hợp đồng</label>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="form-floating mb-3">
-                      <input type="date" class="form-control" id="floatingInput" placeholder="Đến">
-                      <label for="floatingInput">Ngày kết thúc hợp đồng</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row mt-4">
-                  <div class="col">
-                    <div class="form-floating">
-                      <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                        style="height: 100px"></textarea>
-                      <label for="floatingTextarea2">Nội dung quảng cáo</label>
-                    </div>
-                  </div>
-                </div>
-                <!-- Đoạn mã HTML cho nút "Submit" và modal -->
-                <button type="submit" class="btn btn-success container-fluid" id="submit">Cập nhật</button>
 
-
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal fade" id="deleteLocation" aria-hidden="true" aria-labelledby="deleteLocation" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content" id="modal-content">
-            <div class="modal-header" id="modal-header">
-              <div class="container d-flex flex-column align-items-center">
-                <h1 class="modal-title fs-5" id="permissionReport-sub">Xác nhận xóa điểm quảng cáo</h1>
-              </div>
-              <div class="align-self-start">
-                <button type="button align-self-start" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-              </div>
-            </div>
-            <div class="modal-body justify-content-center">
-              <p>
-                Bạn có chắc muốn xóa điểm quảng cáo ?<br>
-                Mọi dữ liệu sẽ không thể khôi phục.
-              </p>
-              <button type="submit" class="btn btn-success container-fluid bg-danger">Xóa</button>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <%- include("../partials/footer.ejs") %>
+              <!-- Footer -->
+              <%- include("../partials/footer.ejs") %>
+                <!-- Javascript -->
+                <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js"
+                  crossorigin="anonymous"></script>
+                <script type="importmap">
+  {
+    "imports": {
+      "@popperjs/core": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js",
+      "bootstrap": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.esm.min.js"
+    }
+  }
+</script>
+                <% if (createMsg.status.length> 0){ %>
+                  <script type="module">
+                    import * as bootstrap from 'bootstrap'
+                    const myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
+                    myModal.show();
+                  </script>
+                  <% } %>
 </body>
 
 
@@ -365,8 +571,8 @@
   integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
   integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-
-<script>
+<script src="/javascript/So/map.js"></script>
+<!-- <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw';
   const map = new mapboxgl.Map({
     container: 'map',
@@ -374,6 +580,48 @@
     center: [-74.5, 40],
     zoom: 9
   });
+</script> -->
+
+<script>
+  function districtSelectChange(districtSelect, wardSelect, callback) {
+    // Kiểm tra xem quận đã được chọn chưa
+    if (districtSelect.value === "") {
+      // Nếu quận chưa được chọn, disable dropdown phường và làm rỗng nó
+      wardSelect.disabled = true;
+      wardSelect.innerHTML = '<option value="">Phường</option>';
+      if (callback) {
+        callback();
+      }
+      return; // Không cần thực hiện fetch nếu quận chưa được chọn
+    }
+
+    // Nếu quận đã được chọn, thực hiện fetch để lấy danh sách phường
+    fetch(`/department/accountManagement/api/wards?district=${districtSelect.value}`)
+      .then((res) => res.json())
+      .then((data) => {
+        wardSelect.innerHTML = "";
+        let option = document.createElement("option");
+        option.setAttribute("value", "");
+        option.textContent = "Phường";
+        wardSelect.appendChild(option);
+
+        // Thêm từng phường vào dropdown
+        for (let i = 0; i < data.length; i++) {
+          option = document.createElement("option");
+          option.setAttribute("value", data[i].ward);
+          option.textContent = data[i].ward;
+          wardSelect.appendChild(option);
+        }
+
+        // Bật dropdown phường và gọi callback nếu có
+        wardSelect.disabled = false;
+        if (callback) {
+          callback();
+        }
+      })
+      .catch(err => console.error(err));
+  }
+
 </script>
 
 <script>
@@ -469,5 +717,24 @@
 
 
 </script>
+
+<script>
+  function navigateToLocation(long, lat) {
+    map.flyTo({
+      center: [parseFloat(long), parseFloat(lat)],
+      zoom: 15,
+    });
+  }
+</script>
+
+
+<style>
+  .custom-button {
+    border: none;
+    font-weight: bold;
+    padding: 10px 20px;
+    text-align: left;
+  }
+</style>
 
 </html>

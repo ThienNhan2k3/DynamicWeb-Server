@@ -1,12 +1,9 @@
-//Variable definition
 const sipulatedColor = "#40eb34";
 const nonSipulatedColor = "#d3eb34";
 const reportedColor = "#eb3434";
 const selfReportedColor = "#848991";
 const unclusteredRadius = 12;
-const accountType = document.querySelector("#account-type").innerText;
-const accountWard = document.querySelector("#account-ward").innerText;
-const accountDistrict = document.querySelector("#account-district").innerText;
+
 let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
@@ -26,7 +23,6 @@ const reportedPopup = new mapboxgl.Popup({
 
 const serverPath = "http://localhost:5000";
 
-//Function definition
 const inspectCluster = (e, layer) => {
   const features = map.queryRenderedFeatures(e.point, {
     layers: [`${layer}-cluster`],
@@ -198,8 +194,8 @@ const getInfoOnclickUnclustered = async (e) => {
   //Update pagination
   let paginationData = "";
   paginationData += `<li class="page-item disabled">
-    <a class="page-link" href="#" aria-label="Previous">
-      <span aria-hidden="true">&laquo;</span></a></li>`;
+      <a class="page-link" href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span></a></li>`;
   for (let i = 0; i < adsData.length; i++) {
     if (i == 3) {
       break;
@@ -216,11 +212,11 @@ const getInfoOnclickUnclustered = async (e) => {
   }
   if (adsData.length <= 1) {
     paginationData += `<li class="page-item disabled">
-      <a class="page-link" href="#" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span></a></li>`;
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span></a></li>`;
   } else {
     paginationData += `<a class="page-link" href="#" aria-label="Next">
-      <span aria-hidden="true">&raquo;</span></a>`;
+        <span aria-hidden="true">&raquo;</span></a>`;
   }
   HTMLpagination.innerHTML = paginationData;
   //Pagination feature
@@ -389,7 +385,6 @@ const getInfoOnclickUnclustered = async (e) => {
   });
 };
 
-//Map generation
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
 const map = new mapboxgl.Map({
@@ -399,7 +394,6 @@ const map = new mapboxgl.Map({
   center: [106.569958, 10.722345],
   zoom: 12,
 });
-
 // Map navigation control
 map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new mapboxgl.FullscreenControl());
@@ -413,54 +407,14 @@ map.on("load", async () => {
     `${serverPath}/citizen/get-nonsipulated`
   );
   const fetchedReportData = await fetch(`${serverPath}/citizen/get-report`);
-  let sipulated = await fetchedsipulatedData.json();
-  let nonSipulated = await fetchedNonSipulatedData.json();
-  let reported = await fetchedReportData.json();
-
-  sipulated = JSON.parse(sipulated);
-  nonSipulated = JSON.parse(nonSipulated);
-  reported = JSON.parse(reported);
-
-  // Sort for placement that belongs to specified area
-  if (accountType == "Quan") {
-    sipulated.features = sipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
-
-    nonSipulated.features = nonSipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
-
-    reported.features = reported.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
-  } else if (accountType == "Phuong") {
-    sipulated.features = sipulated.features.filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        p.properties.area.ward == accountWard
-      );
-    });
-
-    nonSipulated.features = nonSipulated.features.filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        p.properties.area.ward == accountWard
-      );
-    });
-
-    reported.features = reported.features.filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        p.properties.area.ward == accountWard
-      );
-    });
-  }
+  const sipulated = await fetchedsipulatedData.json();
+  const nonSipulated = await fetchedNonSipulatedData.json();
+  const reported = await fetchedReportData.json();
 
   // Sipulated source data
   map.addSource("sipulated", {
     type: "geojson",
-    data: sipulated,
+    data: JSON.parse(sipulated),
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 20,
@@ -548,7 +502,7 @@ map.on("load", async () => {
   //Non sipulated section
   map.addSource("nonSipulated", {
     type: "geojson",
-    data: nonSipulated,
+    data: JSON.parse(nonSipulated),
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 15,
@@ -635,7 +589,7 @@ map.on("load", async () => {
   //Reported section
   map.addSource("reported", {
     type: "geojson",
-    data: reported,
+    data: JSON.parse(reported),
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 15,
@@ -718,51 +672,4 @@ map.on("load", async () => {
   map.on("mouseleave", "reported-cluster", () => {
     map.getCanvas().style.cursor = "";
   });
-});
-
-//Toggle layer
-const sipulatedToggle = document.querySelector("#firstCheckboxStretched");
-const nonSipulatedToggle = document.querySelector("#secondCheckboxStretched");
-const reportedToggle = document.querySelector("#thirdCheckboxStretched");
-const selfReportedToggle = document.querySelector("#forthCheckboxStretched");
-
-sipulatedToggle.addEventListener("change", (e) => {
-  toggleEvent(e, "sipulated");
-});
-nonSipulatedToggle.addEventListener("change", (e) => {
-  toggleEvent(e, "nonSipulated");
-});
-reportedToggle.addEventListener("change", (e) => {
-  toggleEvent(e, "reported");
-});
-
-// Reverse geo-location
-const locationInput = document.querySelector("#location-input");
-const searchBtn = document.querySelector("#search-button");
-
-searchBtn.addEventListener("click", searchFunc);
-locationInput.addEventListener("keypress", (e) => {
-  e.preventDefault();
-  if (e.key == "Enter") {
-    searchFunc(e);
-  }
-});
-
-//Get board ID example
-const createPermissionButtonHalf = document.querySelector(
-  "#createPermissionButton-half"
-);
-
-createPermissionButtonHalf.addEventListener("click", (e) => {
-  let page =
-    document.querySelector(".page-item.active") != null
-      ? document.querySelector(".page-item.active").innerText
-      : undefined;
-
-  if (page == undefined) {
-    return;
-  }
-  selectedBoard = adsData[page - 1];
-  console.log(selectedBoard);
-  alert(selectedBoard.id);
 });

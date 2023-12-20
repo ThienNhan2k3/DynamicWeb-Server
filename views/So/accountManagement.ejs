@@ -176,7 +176,7 @@
           <% } %>
 
           <% if (pagination.currentPage === pagination.maxPage) { %>
-            <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Next</button></li>
+            <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled >Next</a></li>
           <% }else{%>
             <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
           <% } %>

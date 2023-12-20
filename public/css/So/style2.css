@@ -160,6 +160,11 @@ main {
   width: 600px;
 }
 
+.add-button,
+.all { 
+  height: fit-content;
+}
+
 .property-image {
   width: 250px;
   float: left;
@@ -235,7 +240,7 @@ main {
   margin-left: 10px;
 }
 
-#map {
+#mapbox {
   width: 100%; /* Sử dụng chiều rộng 100% của phần tử cha */
   height: 1000px; /* Sử dụng chiều cao 100% của phần tử cha */
   border-radius: 2rem;
@@ -261,8 +266,15 @@ main {
   height: 100%;
 }
 
-.active-location-details #map {
+#green-button {
+  position: absolute;
+  left: 10px;
+}
+
+.active-location-details #mapbox {
   height: 100%;
+  border-radius: 2rem;
+  margin-bottom: 10px;
 }
 .active-location-details #content {
   display: grid;
