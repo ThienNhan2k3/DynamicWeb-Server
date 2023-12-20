@@ -18,5 +18,8 @@ router.post("/adplaceManagement", controller.createAdplace);
 /*-------------------- ViewAdsRequest --------------------*/
 router.get("/viewAdsRequest", controller.viewAdsRequest);
 router.get("/viewAdsRequest/:id", controller.acceptOrDenyAdsRequest);
-
+// Area management
+router.get("/areaManagement",controller.getAreas)
+router.post("/editArea",controller.postEditArea)
+router.post('/addArea',controller.postAddArea)
 module.exports = router;

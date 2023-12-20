@@ -7,6 +7,7 @@ const {
   Board,
   sequelize,
 } = require("../models");
+const severPath = "http://localhost:5000/";
 const checkInput = require("../util/checkInput");
 const { createWardDistrictPageQueryString } = require("../util/queryString");
 const bcrypt = require("bcrypt");
@@ -646,4 +647,93 @@ controller.acceptOrDenyAdsRequest = (req, res) => {
   return res.send("Hello world");
 };
 
+controller.getAreas = async (req, res) => {
+  let district = req.query.district || "";
+
+  const amount = await Area.count({
+    where: district == "" ? {} : { district: district },
+  });
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  const perPage = 5;
+
+  let areas = await Area.findAll({
+    where: district == "" ? {} : { district: district },
+    limit: perPage,
+    offset: (page - 1) * perPage,
+  });
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  const message = req.flash("manageAreaMsg");
+
+  res.render("So/areaManagement.ejs", {
+    areas: areas,
+    total: amount,
+    hasNextPage: perPage * page < amount,
+    hasPreviousPage: page > 1,
+    nextPage: page + 1,
+    currentPage: page,
+    previousPage: page - 1,
+    lastPage: Math.ceil((amount * 1.0) / perPage),
+    districts,
+    currentDistrict: district,
+    serverPath: severPath,
+    message: message.length == 0 ? null : message[0],
+  });
+};
+
+controller.postEditArea = async (req, res) => {
+  try {
+    const { id, district, ward, path } = req.body;
+
+    if (!id || !district || !ward) {
+      req.flash("manageAreaMsg", "Các trường nhập bị sai hoặc thiếu");
+      return res.redirect(path);
+    }
+
+    const updatedArea = await Area.update(
+      { ward: ward, district: district },
+      {
+        where: { id: id },
+      }
+    );
+    if (updatedArea[0] === 0) {
+      req.flash("manageAreaMsg", "Không có trong cơ sở dữ liệu");
+      return res.redirect(path);
+    }
+    req.flash("manageAreaMsg", "Thay đổi thành công");
+    res.redirect(path);
+  } catch (error) {
+    req.flash("manageAreaMsg", "Internal server error.");
+    return res.redirect(path);
+  }
+};
+
+controller.postAddArea = async (req, res) => {
+  try {
+    const { district, ward } = req.body;
+    if (!district || !ward) {
+      req.flash("manageAreaMsg", "Các trường nhập bị sai hoặc thiếu");
+      return res.redirect("/department/areaManagement");
+    }
+
+    const existingArea = await Area.findOne({
+      where: { district: district, ward: ward },
+    });
+    if (existingArea) {
+      req.flash("manageAreaMsg", "Đã tồn tại khu vực");
+      return res.redirect("/department/areaManagement");
+    }
+
+    const newArea = await Area.create({ district: district, ward: ward });
+    await newArea.save();
+
+    req.flash("manageAreaMsg", "Tạo thành công");
+    return res.redirect("/department/areaManagement");
+  } catch (error) {
+    req.flash("manageAreaMsg", "Internal server error.");
+    return res.redirect("/department/areaManagement");
+  }
+};
 module.exports = controller;
