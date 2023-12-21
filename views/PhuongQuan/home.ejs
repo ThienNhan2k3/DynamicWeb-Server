@@ -32,7 +32,12 @@
     <%- include("../partials/header.ejs") %>
     <!-- Navbar content -->
     <%- include("./subPartials/navbar.ejs") %>
+    <!-- Data -->
+    <div id="account-ward" style="display: none;"><%= area.ward %></div>
+    <div id="account-district" style="display: none;"><%= area.district %></div>
+    <div id="account-type" style="display: none;"><%= type %></div>
     <!-- Main content -->
+    
     <main class="dynamic-container map-container">
       <div class="tab-content h-100 pb-3">
         <div
