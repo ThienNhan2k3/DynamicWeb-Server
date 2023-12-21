@@ -4,6 +4,7 @@ const title = require('../middlewares/title.js');
 const router = express.Router();
 
 router.get("/home", title.role, controller.home);
+router.post("/home", title.role, controller.addPermitRequest);
 router.get("/list-adsplacements", title.role, controller.showListAdsplacements);
 router.post("/list-adsplacements", title.role, controller.editAdsplacement);
 router.get("/list-boards/:id", title.role, controller.showListBoards);

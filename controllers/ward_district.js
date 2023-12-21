@@ -4,11 +4,35 @@ const Op = Sequelize.Op;
 const controller = {};
 
 controller.home = async (req, res) => {
-    
+
+    res.locals.adsTypes = await models.AdsType.findAll();
+    res.locals.companies = await models.Company.findAll();
+
     return res.render("PhuongQuan/home.ejs", {
         tab: "Trang chủ",
         selectedId: req.session.selectedAdsplacementId
     });
+}
+
+controller.addPermitRequest = async (req, res) => {
+
+    let {adsplacementId, address, adsTypeId, locationTypeId, status, reason} = req.body;
+    try {
+        await models.AdsPlacementRequest.create({
+            AdsPlacementId: adsplacementId,
+            address: address,
+            AdsTypeId: adsTypeId,
+            LocationTypeId: locationTypeId,
+            status: status,
+            reason: reason,
+            AccountId: req.session.accountId,
+            requestStatus: "Chờ phê duyệt"
+        });
+        res.redirect("./list-adsplacements");
+    } catch (error) {
+        res.send("Gửi yêu cầu thất bại!");
+        console.error(error);
+    }
 }
 
 controller.showListAdsplacements = async (req, res) => {
@@ -217,8 +241,6 @@ controller.deleteRequest = async (req, res) => {
 }
 
 controller.showListReports = async (req, res) => {
-
-
 
     return res.render("PhuongQuan/list-reports.ejs", {
         tab: "Danh sách báo cáo",
