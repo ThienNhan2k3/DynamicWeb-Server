@@ -157,6 +157,8 @@
                   class="btn btn-outline-success fw-semibold toBCVP"
                   data-bs-toggle="modal"
                   data-bs-target="#permitRequestAndCreateBoardModal"
+                  data-id="-1"
+                  onclick="showAddBoardModal(this)"
                 >
                   <i class="fa-solid fa-triangle-exclamation"></i>
                   Tạo yêu cầu cấp phép trên bảng quảng cáo mới
@@ -227,6 +229,8 @@
                         data-bs-toggle="modal"
                         data-bs-target="#permitRequestModal"
                         id="createPermissionButton-half"
+                        data-id="-1"
+                        onclick="showAddPermitRequestModal('#permitRequestForm', this)"
                       >
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         Tạo yêu cầu cấp phép
@@ -282,5 +286,5 @@
   ></script>
   <script src="/javascript/toggleNavigation.js"></script>
   <script src="/javascript/PhuongQuan/map.js"></script>
-  <script src="/javascript/PhuongQuan/home.js"></script>
+  <script src="/javascript/PhuongQuan/permit-request.js"></script>
 </html>

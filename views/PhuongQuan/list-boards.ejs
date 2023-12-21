@@ -102,7 +102,7 @@
                 <td><%= board.quantity %></td>
                 <td><%= board.BoardType.type %></td>
                 <td>
-                  <a href="" data-bs-toggle="modal" data-bs-target="#permitRequestModal">
+                  <a href="" data-bs-toggle="modal" data-bs-target="#permitRequestModal" data-id="<%= board.id %>"  onclick="showAddPermitRequestModal('#permitRequestForm', this)">
                     <i class="fa-solid fa-file-circle-plus"></i>
                   </a>
                 </td>
@@ -146,4 +146,5 @@
   ></script>
   <script src="/javascript/toggleNavigation.js"></script>
   <script src="/javascript/PhuongQuan/list-boards.js"></script>
+  <script src="/javascript/PhuongQuan/permit-request.js"></script>
 </html>

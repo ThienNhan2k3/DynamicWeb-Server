@@ -124,29 +124,17 @@ tabindex="-1"
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-floating">
-              <select class="form-select" id="adsTypeEdit" name="adsTypeId" required>
-                <option value="">Vui lòng chọn hình thức quảng cáo</option>
-                <% adsTypes.forEach(type => { %>
-                  <option value="<%= type.id %>"><%= type.type %></option>
-                <% }); %>
-              </select>
-              <label for="adsTypeEdit">Hình thức quảng cáo</label>
-            </div>
-          </div>
-        </div>
         <div class="row mt-4">
           <div class="col">
             <div class="form-floating">
               <textarea
                 class="form-control"
                 placeholder="Leave a comment here"
-                id="floatingTextarea2"
+                id="contentEdit"
+                name="content"
                 style="height: 100px" required
               ></textarea>
-              <label for="floatingTextarea2">Nội dung quảng cáo</label>
+              <label for="content">Nội dung quảng cáo</label>
             </div>
             <div class="mb-3">
               <label for="formFile" class="form-label">Hình ảnh</label>
@@ -154,7 +142,7 @@ tabindex="-1"
             </div>
           </div>
         </div>
-        <button type="submit " class="btn btn-success container-fluid">
+        <button type="submit" class="btn btn-success container-fluid">
           Gửi yêu cầu
         </button>
       </form>

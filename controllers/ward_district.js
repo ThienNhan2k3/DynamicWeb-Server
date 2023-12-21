@@ -7,6 +7,7 @@ controller.home = async (req, res) => {
 
     res.locals.adsTypes = await models.AdsType.findAll();
     res.locals.companies = await models.Company.findAll();
+    res.locals.boardTypes = await models.BoardType.findAll();
 
     const account = await models.Account.findOne({
       where: { id: req.session.accountId },
@@ -27,24 +28,61 @@ controller.home = async (req, res) => {
 }
 
 controller.addPermitRequest = async (req, res) => {
-
-    let {adsplacementId, address, adsTypeId, locationTypeId, status, reason} = req.body;
+  console.log('Body:', req.body);
+  let {boardId} = req.body;
+  if (boardId == -1) {
+    let {adsPlacementId, boardTypeId, boardSize, boardQuantity} = req.body;
+    //Create new board
+    adsPlacementId = 2;
     try {
-        await models.AdsPlacementRequest.create({
-            AdsPlacementId: adsplacementId,
-            address: address,
-            AdsTypeId: adsTypeId,
-            LocationTypeId: locationTypeId,
-            status: status,
-            reason: reason,
-            AccountId: req.session.accountId,
-            requestStatus: "Chờ phê duyệt"
-        });
-        res.redirect("./list-adsplacements");
+      let newBoard = await models.Board.create({
+        size: boardSize,
+        quantity: boardQuantity,
+        BoardTypeId: boardTypeId,
+        AdsPlacementId: adsPlacementId,
+      })
+      boardId = newBoard.id;
     } catch (error) {
-        res.send("Gửi yêu cầu thất bại!");
-        console.error(error);
+      res.send("Có lỗi xảy ra!");
+      console.error(error);
     }
+  }
+  let {companyId} = req.body;
+  if (companyId == -1) {
+    let {companyName, email, phone, address} = req.body;
+    // Create new company
+    try {
+      let newCompany = await models.Company.create({
+        name: companyName,
+        phone: phone,
+        address: address,
+        email: email,
+      })
+      companyId = newCompany.id;
+    } catch (error) {
+      res.send("Có lỗi xảy ra!");
+      console.error(error);
+    }
+  }
+    
+  //Create new permit request
+  let {content, startDate, endDate} = req.body;
+  try {
+    await models.PermitRequest.create({
+      content: content,
+      image: 'Unknown',
+      start: startDate,
+      end: endDate,
+      status: 'Chưa cấp phép',
+      BoardId: boardId,
+      CompanyId: companyId,
+      AccountId: req.session.accountId
+    })
+    res.redirect('back');
+  } catch (error) {
+    res.send("Có lỗi xảy ra!");
+    console.error(error);
+  }
 }
 
 controller.showListAdsplacements = async (req, res) => {
@@ -165,6 +203,8 @@ controller.showListBoards = async (req, res) => {
 
   //Adding options for select forms
   res.locals.boardTypes = await models.BoardType.findAll();
+  res.locals.companies = await models.Company.findAll();
+  res.locals.adsTypes = await models.AdsType.findAll();
 
   return res.render("PhuongQuan/list-boards", {
     selectedId: id,
