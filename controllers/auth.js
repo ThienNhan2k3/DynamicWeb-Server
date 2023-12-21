@@ -216,14 +216,25 @@ const getLogout = (req, res) => {
   }
 };
 
+const changePassword = (req, res) => {
+  // return res.render("switchToLogin.ejs");
+  return res.render("changePassword.ejs");
+}
+
+const changeInfor = (req, res) => {
+  return res.render("changeInfor.ejs");
+}
 module.exports = {
   getForgetPassword,
   getLogin,
   postLogin,
   getLogout,
+  changePassword,
+  changeInfor,
   getOtpWaiting,
   postForgetPassword,
   getResetPassword,
   postOtpWaiting,
   postResetPassword,
+  
 };
