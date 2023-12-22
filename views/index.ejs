@@ -10,7 +10,14 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Font awesome -->
+    <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
+
+    <!-- CSS -->    
+    <link rel="stylesheet" href="/css/So/style.css">
+    <link rel="stylesheet" href="/css/alert.css">
+
 
     <style>
       #form-container {
@@ -36,15 +43,49 @@
 
       } 
 
+      @media only screen and (max-width: 380px) {
+        #form-container {
+          width: 100%;
+        }
+      }
 
+      .orLabel {
+        display: flex;
+        position: relative;
+      }
+      .orLabel span{
+        display: block;
+        width: 50%;
+        height: 1.5px;
+        background-color: rgb(53, 52, 52);
+      }
+
+      .orLabel div {
+        position: relative;
+        top: -13px;
+        font-size: 1.1rem;
+        width: max-content;
+        font-weight: 500;
+      }
     </style>
 
   </head>
   <body class="bg-light-subtle">
-    <% if (message.length>0) {%>
+
+    <% if (resetPwMessage.length>0) {%>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <span><%=message[0] %></span>
+        <span><%=resetPwMessage[0] %></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+     <% } %>
+
+    <% if (message && message.flag === "socialLogin"){ %>
+      <div class="alert-container" id="create-alert-container">
+        <div class="alert alert-danger mb-0" role="alert" id="registerAlert">
+          <i class="fa-regular fa-circle-check fa-2xl"></i>
+          <span class="ms-3 fs-5"><%= message.content %></span>
+        </div>
+        <div class="progress progress-danger"></div>
+
       </div>
     <% } %>
     <div class="container d-flex flex-column align-items-center mt-5">
@@ -55,31 +96,46 @@
         Đăng nhập vào hệ thống
       </div>
       <div id="form-container" class=" row rounded bg-body-secondary p-3">
-          <form action="/login" method="POST">
+          <form action="/login" method="POST" class="px-0">
             <fieldset>
               <div class="mb-3 input-group has-validation">
                 <div class="is-invalid w-100">
                   <label for="usernameOrEmail" class="form-lable mb-2">Username hoặc email</label>
-                  <input type="text" class="form-control <% if (err.usernameOrEmail.length > 0){ %> is-invalid <% } %>" id="usernameOrEmail" name="usernameOrEmail" placeholder="" required autocomplete="true">  
+                  <input type="text" class="form-control <% if (message && message.flag === 'usernameOrEmail'){ %> is-invalid <% } %>" id="usernameOrEmail" name="usernameOrEmail" placeholder="" required autocomplete="true">  
                 </div>
-                <% if(err.usernameOrEmail.length > 0) { %>
-                  <div class="invalid-feedback"> <%= err.usernameOrEmail %></div>
+                <% if(message && message.flag === "usernameOrEmail") { %>
+                  <div class="invalid-feedback"> <%= message.content %></div>
                 <% } %>
               </div>
               
               <div class="mb-3 input-group has-validation" id="passwordInputContainer">
                 <div class="is-invalid w-100">
                   <label for="password" class="form-label mb-2">Mật khẩu</label>
-                  <input type="password" id="password" class="form-control <% if (err.password.length > 0){ %> is-invalid <% } %>" name="password" placeholder="" required autocomplete="true">
+                  <input type="password" id="password" class="form-control <% if (message && message.flag === 'password'){ %> is-invalid <% } %>" name="password" placeholder="" required autocomplete="true">
                 </div>
-                <% if(err.password.length > 0) { %>
-                  <div class="invalid-feedback"> <%= err.password %> </div>
+                <% if(message && message.flag === "password") { %>
+                  <div class="invalid-feedback"> <%= message.content %></div>
                 <% } %>
                 <a href="/forget-password" id="forgotPasswordLink">Quên mật khẩu?</a>
               </div>
             </fieldset>
             <button type="submit" class="btn btn-success w-100" id="login-button">Đăng nhập</button>
           </form>
+
+          <div class="mt-4 w-100 orLabel">
+            <span></span>
+            <div>Khác</div>
+            <span></span>
+          </div>
+
+          <a class="btn btn-outline-danger mt-0 px-3 py-2" href="/login/google">
+            <i class="fa-brands fa-google me-2"></i>
+            Đăng nhập với Google
+          </a>
+          <a class="btn btn-outline-primary mt-3 px-3 py-2" href="/login/facebook">
+            <i class="fa-brands fa-facebook-f me-2"></i>
+            Đăng nhập với Facebook
+          </a>
       </div>
 
       <div class="row mt-3" id="listOfAccounts">
