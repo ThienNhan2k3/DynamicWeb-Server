@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { Account, Area } = require("../models");
 const Mailjet = require("node-mailjet");
 const Sequelize = require("sequelize");
+const checkInput = require("../util/checkInput");
 
 const mailjet = new Mailjet({
   apiKey: process.env.MJ_APIKEY_PUBLIC || "5f453b57b69003f11cdbd0d46c363385",
@@ -186,9 +187,55 @@ const getLogout = (req, res) => {
   });
 };
 
-const changePassword = (req, res) => {
+const getChangePassword = (req, res) => {
   // return res.render("switchToLogin.ejs");
-  return res.render("changePassword.ejs");
+  let errorChangePassword = req.flash("errorChangePassword")[0];
+  errorChangePassword = errorChangePassword != null ? JSON.parse(errorChangePassword) : null;
+  return res.render("changePassword.ejs", {
+    accountType : req.user.type,
+    selectedId: req.session.selectedAdsplacementId,
+    errorChangePassword
+  });
+}
+
+const postChangePassword = async (req, res) => {
+  const {currentPassword, newPassword, confirmNewPassword} = req.body;
+  try {
+    const isMatch = await bcrypt.compare(currentPassword, req.user.password);
+    if (!isMatch) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "currentPassword", content: "Mật khẩu hiện tại không đúng "}));
+      return res.redirect("/changePassword");
+    }
+
+    if (!checkInput.isValidPassword(newPassword)) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "newPassword", content: "Mật khẩu hiện tại quá yếu "}));
+      return res.redirect("/changePassword");
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "confirmNewPassword", content: "Mật khẩu xác nhận không trùng với mật khẩu mới"}));
+      return res.redirect("/changePassword");
+    }
+    
+    const newHashPassword = await bcrypt.hash(newPassword, 12);
+    await Account.update(
+      {password: newHashPassword},
+      {where: {id: req.user.id}}
+    )
+
+    req.session.destroy((err) => {
+      console.error(err);
+    });
+    return res.render("switchToLogin.ejs", {
+      switchToLoginMessage: "Đổi mật khẩu thành công",
+    });
+
+
+  } catch(err) {
+    console.error(err);
+    req.flash("errorChangePassword", JSON.stringify({ flag: "serverError", content: "Đổi mật khẩu thất bại"}))
+    return res.redirect("/changePassword");
+  }
 }
 
 const changeInfor = (req, res) => {
@@ -199,7 +246,8 @@ module.exports = {
   getLogin,
   postLogin,
   getLogout,
-  changePassword,
+  getChangePassword,
+  postChangePassword,
   changeInfor,
   getOtpWaiting,
   postForgetPassword,

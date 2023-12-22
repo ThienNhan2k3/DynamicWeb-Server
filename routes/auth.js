@@ -28,7 +28,8 @@ router.get("/login/facebook/callback", passport.authenticate("facebook", {
 
 
 router.get("/logout", authUser, authController.getLogout);
-router.get("/changePassword", authUser, authController.changePassword);
+router.get("/changePassword", authUser, authController.getChangePassword);
+router.post("/changePassword", authUser, authController.postChangePassword);
 router.get("/changeInfor", authUser, authController.changeInfor);
 
 router.get("/forget-password", authController.getForgetPassword);
