@@ -104,14 +104,14 @@ const postOtpWaiting = async (req, res, next) => {
     return res.json({
       redirect: `/reset-password?account=${accountId}&otp=${inputOtp}`,
     });
-    // res.redirect(`/reset-password?account=${accountId}&otp=${inputOtp}`);
   }
 };
 
 const getResetPassword = (req, res, next) => {
   const accountId = req.query.account;
   const otp = req.query.otp;
-  res.render("auth/resetPassword.ejs", { accountId: accountId, otp: otp });
+  const errorMessage=req.flash('resetPasswordMsg')
+  res.render("auth/resetPassword.ejs", { accountId: accountId, otp: otp,errorMessage:errorMessage });
 };
 
 const postResetPassword = async (req, res, next) => {
@@ -125,8 +125,13 @@ const postResetPassword = async (req, res, next) => {
     const hashedPassword=await bcrypt.hash(newPassword,12)
     account.password = hashedPassword;
     await account.save();
+    req.flash("resetPasswordMsg","Đặt lại mật khẩu thành công")
+    res.redirect("/");
+  } else{
+    req.flash("resetPasswordMsg","Sai mã OTP")
+    res.redirect('/reset-password')
   }
-  res.redirect("/");
+
 };
 
 const getLogin = async (req, res) => {
@@ -143,9 +148,10 @@ const getLogin = async (req, res) => {
     usernameOrEmail: req.flash("usernameOrEmail"),
     password: req.flash("password"),
   };
-
+  const message=req.flash("resetPasswordMsg")
   res.render("index", {
-    err: error
+    err: error,
+    message:message
   });
 };
 

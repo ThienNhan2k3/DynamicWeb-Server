@@ -41,6 +41,12 @@
 
   </head>
   <body class="bg-light-subtle">
+    <% if (message.length>0) {%>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <span><%=message[0] %></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
     <div class="container d-flex flex-column align-items-center mt-5">
       <div class="row justify-content-center mb-3">
         <img src="/images/logo.png" alt="Logo" style="width: 48px;" class="p-0" >
