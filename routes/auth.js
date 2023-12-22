@@ -34,10 +34,6 @@ router.get("/changeInfor", authUser, authController.changeInfor);
 router.get("/forget-password", authController.getForgetPassword);
 
 router.post("/forget-password", authController.postForgetPassword);
-// router.post("/forget-password",(req,res)=>{
-//     console.log("HMM")
-//     return res.redirect("/forget-password")
-// })
 router.get("/otp-waiting", authController.getOtpWaiting);
 router.post("/otp-waiting", authController.postOtpWaiting);
 router.get("/reset-password", authController.getResetPassword);

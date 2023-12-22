@@ -32,8 +32,9 @@
 
 <body class="bg-light-subtle">
   <% if (errorMessage.length>0) {%>
-    <div class="alert alert-danger d-flex justify-content-center" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
       <span><%=errorMessage[0] %></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   <% } %>
   <div class="container d-flex flex-column align-items-center mt-5">
