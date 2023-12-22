@@ -6,7 +6,3 @@ function showEditAdsplacementModal(btn) {
     document.querySelector('#locationTypeEdit').value = btn.dataset.locationType;
     document.querySelector('#statusEdit').value = btn.dataset.status;
 }
-
-var urlParams = new URLSearchParams(window.location.search);
-let selectedArea = urlParams.get('selectedArea');
-document.getElementById("selectedArea").querySelector("option[value='" + selectedArea + "']").selected = true;

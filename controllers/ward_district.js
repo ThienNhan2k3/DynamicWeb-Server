@@ -285,10 +285,81 @@ controller.deleteRequest = async (req, res) => {
 };
 
 controller.showListReports = async (req, res) => {
+
+  let options = {
+    include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ['address'],
+        include: [{
+          model: models.Area,
+          where: {}
+        }],
+        where: {}
+      },
+      {model: models.ReportType},
+    ],
+    where: {},
+  };
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.session.accountType == "Phuong") {
+    options.include[0].include[0].where.ward = req.session.accountWard;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea.trim() != "" && selectedArea != "all") {
+      options.include[0].where.areaId = selectedArea;
+    } else {
+      options.include[0].include[0].where.district = req.session.accountDistrict;
+    }
+  }
+
+  res.locals.reports = await models.Report.findAll(options);
+
+  res.locals.myArea = await models.Area.findAll({
+    where: { district: req.session.accountDistrict },
+    order: [["ward", "ASC"]],
+  });
+
   return res.render("PhuongQuan/list-reports.ejs", {
     tab: "Danh sách báo cáo",
     selectedId: req.session.selectedAdsplacementId,
   });
 };
+
+controller.showReportDetails = async (req, res) => {
+
+  let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+
+  if (id == -1) {
+    return res.send("Report not found!");
+  }
+
+  res.locals.report = await models.Report.findOne({
+    where: {id}
+  })
+
+  return res.render("PhuongQuan/view-report-details.ejs", {
+    tab: "Chi tiết báo cáo",
+    selectedId: req.session.selectedAdsplacementId,
+  })
+}
+
+controller.updateReportDetails = async (req, res) => {
+  let {reportId, method, status} = req.body;
+  try {
+    await models.Report.update({
+      method: method,
+      status: status,
+      AccountId: req.session.accountId
+    },
+    {where: {id: reportId}});
+    res.redirect('back');
+  } catch (error) {
+    res.send('Xử lý báo cáo thất bại!');
+    console.error(error);
+  }
+}
 
 module.exports = controller;

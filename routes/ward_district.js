@@ -12,5 +12,7 @@ router.post("/list-boards", title.role, controller.editBoard);
 router.get("/my-requests", title.role, controller.showMyRequests);
 router.post("/my-requests", controller.deleteRequest);
 router.get("/list-reports", title.role, controller.showListReports);
+router.get("/list-reports/:id", title.role, controller.showReportDetails);
+router.post("/list-reports/", title.role, controller.updateReportDetails);
 
 module.exports = router;
