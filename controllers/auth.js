@@ -139,81 +139,43 @@ const getLogin = async (req, res) => {
     }
   }
 
-  const error = {
-    usernameOrEmail: req.flash("usernameOrEmail"),
-    password: req.flash("password"),
-  };
-
+  const error = req.flash("error")[0];
+  console.log("Error: ", error);
+  const message = (error != null || typeof error === 'object') ? JSON.parse(error) : null;
   res.render("index", {
-    err: error
+    message
   });
 };
 
 const postLogin = async (req, res) => {
-  const usernameOrEmail = req.body.usernameOrEmail ? req.body.usernameOrEmail.trim() : ""; 
-  const password  = req.body.password;
-  if (!usernameOrEmail) {
-    req.flash("usernameOrEmail", "Username or email is empty");
-    return res.redirect("/");
-  }
-  
-  try {
-    const account = await Account.findOne({
-      include: [
-        {model: Area}
-      ],
-      where: {
-        [Sequelize.Op.or]: {
-          username: usernameOrEmail,
-          email: usernameOrEmail,
-        },
-      },
-    });
-    if (!account) {
-      req.flash("usernameOrEmail", "Username or email doesn't exist");
-      return res.redirect("/");
-    }
-    const isMatch = await bcrypt.compare(password, account.password);
-    if (!isMatch) {
-      req.flash("password", "Your password is not valid");
-      return res.redirect("/");
-    }
-
-    req.session.accountId = account.id;
-
-    if (account.type === 'So') {
+  console.log("Auth");
+  req.session.accountId = req.user.id;
+  if (req.user.type === 'So') {
       req.session.accountType = 'department';
       res.redirect("/department/accountManagement");
-    }
+  }
 
-    else if (account.type === 'Quan') {
+  else if (req.user.type === 'Quan') {
       req.session.accountType = 'district';
-      req.session.accountDistrict = account.Area.district;
+      req.session.accountDistrict = req.user.Area.district;
       req.session.selectedAdsplacementId = -1;
       res.redirect("/district/home");
-    }
+  }
 
-    else if (account.type === 'Phuong') {
+  else if (req.user.type === 'Phuong') {
       req.session.accountType = 'ward';
-      req.session.accountWard = account.Area.ward;
-      req.session.accountDistrict = account.Area.district;
+      req.session.accountWard = req.user.Area.ward;
+      req.session.accountDistrict = req.user.Area.district;
       req.session.selectedAdsplacementId = -1;
       res.redirect("/ward/home");
-    }
-
-  } catch (err) {
-    console.log(err);
-    res.redirect("/login");
   }
 };
 
 const getLogout = (req, res) => {
-  if (req.session.accountId) {
-    req.session.destroy((err) => {
-      console.error(err);
-      res.redirect("/");
-    });
-  }
+  req.session.destroy((err) => {
+    console.error(err);
+    res.redirect("/");
+  });
 };
 
 const changePassword = (req, res) => {
