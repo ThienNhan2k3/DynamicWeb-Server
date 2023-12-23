@@ -2,9 +2,39 @@ const express = require('express');
 const controller = require('../controllers/ward_district.js');
 const title = require('../middlewares/title.js');
 const router = express.Router();
+const multer = require("multer");
+
+//Multer config
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "images/permitRequests");
+    },
+    filename: (req, file, cb) => {
+      cb(
+        null,
+        new Date().toISOString().replace(/:/g, "-") +
+          "-" +
+          file.originalname.replace(" ", "-")
+      );
+    },
+});
+  
+const fileFilter = (req, file, cb) => {
+    if (
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+};
+  
+const upload = multer({ storage: fileStorage, fileFilter: fileFilter });
 
 router.get("/home", title.role, controller.home);
-router.post("/home", title.role, controller.addPermitRequest);
+router.post("/home", title.role, upload.single("img"), controller.addPermitRequest);
 router.get("/list-adsplacements", title.role, controller.showListAdsplacements);
 router.post("/list-adsplacements", title.role, controller.editAdsplacement);
 router.get("/list-boards/:id", title.role, controller.showListBoards);

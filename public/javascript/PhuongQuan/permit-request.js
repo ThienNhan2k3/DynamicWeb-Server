@@ -15,17 +15,6 @@ function checkValidFirstForm(e) {
 }
 
 async function submit2Forms(url) {
-  // var firstForm = document.getElementById("createBoardForm");
-  // var secondForm = document.getElementById("permitRequestWithNewBoardForm");
-
-  // firstForm.attr('onsubmit', 'return true');
-
-  // $('#permitRequestWithNewBoardForm :input[isacopy]').remove();
-  // if (!EntryCheck()) return false; 
-  // $('#createBoardForm :input').not(':submit').clone().hide().attr('isacopy','y').appendTo('#permitRequestWithNewBoardForm');
-  // return true;
-
-  console.log(url);
   let formData = new FormData(document.getElementById("permitRequestWithNewBoardForm"));
 
   formData.append("adsPlacementId", document.querySelector('#adsPlacementIdEdit').value);
@@ -34,13 +23,13 @@ async function submit2Forms(url) {
   formData.append("boardQuantity", document.querySelector('#boardQuantityEdit').value);
   formData.append("content", document.querySelector('#createBoardForm #contentEdit').value);
 
-  console.log(Array.from(formData));
-
   await fetch(url,
     {
         body: formData,
         method: "post"
     });
+
+  location.reload()
 }
 
 function updateCompanyInfo(e, formId) {

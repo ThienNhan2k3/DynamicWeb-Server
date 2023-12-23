@@ -26,7 +26,7 @@ tabindex="-1"
     </div>
     <div class="modal-body">
       <!-- Body 1 -->
-      <form action="/<%= accountType %>/home" method="POST" id="permitRequestForm">
+      <form action="/<%= accountType %>/home" method="POST" id="permitRequestForm" enctype="multipart/form-data">
         <input type="hidden" name="boardId" id="boardIdEdit"/>
         <input type="hidden" name="companyId" id="companyIdEdit"/>
         <!-- First row -->
@@ -137,8 +137,8 @@ tabindex="-1"
               <label for="content">Nội dung quảng cáo</label>
             </div>
             <div class="mb-3">
-              <label for="formFile" class="form-label">Hình ảnh</label>
-              <input class="form-control" type="file" id="formFile"/>
+              <label for="imageEdit" class="form-label">Hình ảnh</label>
+              <input class="form-control" type="file" id="imageEdit" name="img" accept="image/*" required/>
             </div>
           </div>
         </div>

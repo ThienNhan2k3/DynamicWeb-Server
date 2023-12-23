@@ -28,7 +28,6 @@ controller.home = async (req, res) => {
 }
 
 controller.addPermitRequest = async (req, res) => {
-  console.log('Body:', req.body);
   let {boardId} = req.body;
   if (boardId == -1) {
     let {adsPlacementId, boardTypeId, boardSize, boardQuantity} = req.body;
@@ -68,9 +67,19 @@ controller.addPermitRequest = async (req, res) => {
   //Create new permit request
   let {content, startDate, endDate} = req.body;
   try {
+    const file = req.file;
+    console.log('image', file);
+    let imageUrl;
+    const path = [];
+    path.push(file.path);
+    if (file) {
+      path.push(file.path);
+      imageUrl = path.join(",");
+      imageUrl = imageUrl.replace(/\\/g, "/");
+    }
     await models.PermitRequest.create({
       content: content,
-      image: 'Unknown',
+      image: imageUrl,
       start: startDate,
       end: endDate,
       status: 'Chưa cấp phép',
