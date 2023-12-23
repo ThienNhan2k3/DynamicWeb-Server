@@ -31,11 +31,11 @@
     <%- include("./subPartials/navbar.ejs") %> 
     <!-- Main content -->
     <main class="dynamic-container mb-5 container-fluid">
-      <div class="row w-sm-50 w-75 mt-4 justify-content-end">
-        <a class="btn btn-secondary col-lg-1 col-sm-2 col-2" href="/department/viewAdsRequest">
+      <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
+        <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="/department/viewAdsRequest">
           All
         </a>
-        <div class="col-lg-2 col-sm-4 col-4">
+        <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
           <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <% if (currentDistrict !== '') { %>
@@ -55,7 +55,7 @@
             </ul>
           </div>
         </div>
-        <div class="col-lg-3 col-sm-5 col-6">
+        <div class="col-lg-4 col-xl-3 col-sm-5 col-12">
           <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false"
             <% if (wards.length === 0) { %>
@@ -99,17 +99,17 @@
             </tr>
           </thead>
           <tbody>
-            <% if (pagination.permitRequests.length > 0) { %>
-              <% for (let i = 0; i < pagination.permitRequests.length; i++) { %>
+            <% if (pagination.rows.length > 0) { %>
+              <% for (let i = 0; i < pagination.rows.length; i++) { %>
                 <tr>
-                  <td><%= pagination.permitRequests[i].boardType %></td>
-                  <td><%= pagination.permitRequests[i].address %>, <%= pagination.permitRequests[i].ward %>, <%= pagination.permitRequests[i].district %>, Thành phố Hồ Chí Minh</td>
-                  <td><%= pagination.permitRequests[i].content %></td>
-                  <td><%= pagination.permitRequests[i].companyName %></td>
-                  <td><%= formatDate(pagination.permitRequests[i].start) %></td>
-                  <td><%= formatDate(pagination.permitRequests[i].end) %></td>
+                  <td><%= pagination.rows[i].Board.BoardType.type %></td>
+                  <td><%= pagination.rows[i].Board.AdsPlacement.address %>, <%=  pagination.rows[i].Board.AdsPlacement.Area.ward %>, <%= pagination.rows[i].Board.AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</td>
+                  <td><%= pagination.rows[i].content %></td>
+                  <td><%= pagination.rows[i].Company.name %></td>
+                  <td><%= formatDate(pagination.rows[i].start) %></td>
+                  <td><%= formatDate(pagination.rows[i].end) %></td>
                   <td class="text-center">
-                    <a href="/department/viewAdsRequest/<%= pagination.permitRequests[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
+                    <a href="/department/viewAdsRequest/<%= pagination.rows[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
                   </td>
                 </tr>
               <% } %>
@@ -127,7 +127,7 @@
         <nav aria-label="Page navigation example">
           <ul class="pagination mb-0">
             <% if (pagination.currentPage === pagination.minPage) { %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Previous</a></li>
+              <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Previous</button></li>
             <% }else{%>
               <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
             <% } %>
@@ -147,7 +147,7 @@
             <% } %>
   
             <% if (pagination.currentPage === pagination.maxPage) { %>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>">Next</a></li>
+              <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Next</button></li>
             <% }else{%>
               <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
             <% } %>

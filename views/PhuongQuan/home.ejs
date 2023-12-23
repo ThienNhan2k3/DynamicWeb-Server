@@ -32,7 +32,12 @@
     <%- include("../partials/header.ejs") %>
     <!-- Navbar content -->
     <%- include("./subPartials/navbar.ejs") %>
+    <!-- Data -->
+    <div id="account-ward" style="display: none;"><%= area.ward %></div>
+    <div id="account-district" style="display: none;"><%= area.district %></div>
+    <div id="account-type" style="display: none;"><%= type %></div>
     <!-- Main content -->
+    
     <main class="dynamic-container map-container">
       <div class="tab-content h-100 pb-3">
         <div
@@ -151,7 +156,9 @@
                   type="button"
                   class="btn btn-outline-success fw-semibold toBCVP"
                   data-bs-toggle="modal"
-                  data-bs-target="#permissionReport"
+                  data-bs-target="#permitRequestAndCreateBoardModal"
+                  data-id="-1"
+                  onclick="showAddBoardModal(this)"
                 >
                   <i class="fa-solid fa-triangle-exclamation"></i>
                   Tạo yêu cầu cấp phép trên bảng quảng cáo mới
@@ -220,8 +227,10 @@
                         type="button"
                         class="btn btn-outline-success fw-semibold toBCVP"
                         data-bs-toggle="modal"
-                        data-bs-target="#permissionReport-half"
+                        data-bs-target="#permitRequestModal"
                         id="createPermissionButton-half"
+                        data-id="-1"
+                        onclick="showAddPermitRequestModal('#permitRequestForm', this)"
                       >
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         Tạo yêu cầu cấp phép
@@ -261,359 +270,9 @@
     <!-- Footer -->
     <%- include("../partials/footer.ejs") %>
 
-    <!-- Permisson report form with full info -->
-    <div
-      class="modal fade"
-      id="permissionReport"
-      aria-hidden="true"
-      aria-labelledby="permissionReport"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="container d-flex flex-column align-items-center">
-              <h1 class="modal-title fs-5" id="permissionReport">
-                Yêu cầu cấp phép quảng cáo
-              </h1>
-              <p class="modal-title">Bước 1/2</p>
-            </div>
-            <div class="align-self-start">
-              <button
-                type="button align-self-start"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-          </div>
-          <div class="modal-body">
-            <!-- Body 1 -->
-            <form action="">
-              <!-- First row -->
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating">
-                    <select
-                      class="form-select"
-                      id="floatingSelect"
-                      aria-label="Floating label select example"
-                    >
-                      <option selected>Loại bảng quảng cáo</option>
-                      <option value="1">One</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                    </select>
-                    <label for="floatingSelect">Works with selects</label>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="15x15"
-                    />
-                    <label for="floatingInput">Kích thước</label>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <select
-                    class="form-select"
-                    id="floatingSelect"
-                    aria-label="Floating label select example"
-                  >
-                    <option selected>Hình thức quảng cáo</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row mt-4">
-                <div class="col">
-                  <div class="form-floating">
-                    <textarea
-                      class="form-control"
-                      placeholder="Leave a comment here"
-                      id="floatingTextarea2"
-                      style="height: 100px"
-                    ></textarea>
-                    <label for="floatingTextarea2">Nội dung quảng cáo</label>
-                  </div>
-                  <div class="mb-3">
-                    <label for="formFile" class="form-label">Hình ảnh</label>
-                    <input class="form-control" type="file" id="formFile" />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col"></div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-primary"
-              data-bs-target="#permissionReport-sub"
-              data-bs-toggle="modal"
-            >
-              Tiếp theo
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="modal fade"
-      id="permissionReport-sub"
-      aria-hidden="true"
-      aria-labelledby="permissionReport-sub"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="container d-flex flex-column align-items-center">
-              <h1 class="modal-title fs-5" id="permissionReport">
-                Yêu cầu cấp phép quảng cáo
-              </h1>
-              <p class="modal-title">Bước 2/2</p>
-            </div>
-            <div class="align-self-start">
-              <button
-                type="button align-self-start"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-          </div>
-          <div class="modal-body justify-content-center">
-            <form action="" class="text-center">
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="name@example.com"
-                    />
-                    <label for="floatingInput"
-                      >Tên công ty đăng ký quảng cáo</label
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="name@example.com"
-                    />
-                    <label for="floatingInput">Email</label>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon1">+84</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Số điện thoại"
-                      aria-label="Username"
-                      aria-describedby="basic-addon1"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="Từ"
-                    />
-                    <label for="floatingInput">Ngày bắt đầu hợp đồng</label>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="Đến"
-                    />
-                    <label for="floatingInput">Ngày kết thúc hợp đồng</label>
-                  </div>
-                </div>
-              </div>
-              <button type="submit " class="btn btn-success container-fluid">
-                Gửi yêu cầu
-              </button>
-            </form>
-          </div>
-          <div class="modal-footer justify-content-start">
-            <button
-              class="btn btn-primary"
-              data-bs-target="#permissionReport"
-              data-bs-toggle="modal"
-            >
-              Về trước
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Permission form with half info -->
-    <div
-      class="modal fade"
-      id="permissionReport-half"
-      aria-hidden="true"
-      aria-labelledby="permissionReport-half"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="container d-flex flex-column align-items-center">
-              <h1 class="modal-title fs-5" id="permissionReport-half">
-                Yêu cầu cấp phép quảng cáo
-              </h1>
-              <p class="modal-title">Bước 1/2</p>
-            </div>
-            <div class="align-self-start">
-              <button
-                type="button align-self-start"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-          </div>
-          <div class="modal-body">
-            <!-- Body 1 -->
-            <form action="">
-              <!-- First row -->
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="name@example.com"
-                    />
-                    <label for="floatingInput"
-                      >Tên công ty đăng ký quảng cáo</label
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="name@example.com"
-                    />
-                    <label for="floatingInput">Email</label>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon1">+84</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Số điện thoại"
-                      aria-label="Username"
-                      aria-describedby="basic-addon1"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="Từ"
-                    />
-                    <label for="floatingInput">Ngày bắt đầu hợp đồng</label>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="form-floating mb-3">
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="floatingInput"
-                      placeholder="Đến"
-                    />
-                    <label for="floatingInput">Ngày kết thúc hợp đồng</label>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <select
-                    class="form-select"
-                    id="floatingSelect"
-                    aria-label="Floating label select example"
-                  >
-                    <option selected>Hình thức quảng cáo</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row mt-4">
-                <div class="col">
-                  <div class="form-floating">
-                    <textarea
-                      class="form-control"
-                      placeholder="Leave a comment here"
-                      id="floatingTextarea2"
-                      style="height: 100px"
-                    ></textarea>
-                    <label for="floatingTextarea2">Nội dung quảng cáo</label>
-                  </div>
-                  <div class="mb-3">
-                    <label for="formFile" class="form-label">Hình ảnh</label>
-                    <input class="form-control" type="file" id="formFile" />
-                  </div>
-                </div>
-              </div>
-              <button type="submit " class="btn btn-success container-fluid">
-                Gửi yêu cầu
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <!-- Modals -->
+    <%- include("./subPartials/form-add-permit-request.ejs") %>
+    <%- include("./subPartials/form-add-permit-request-new-board.ejs") %>
   </body>
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -627,4 +286,5 @@
   ></script>
   <script src="/javascript/toggleNavigation.js"></script>
   <script src="/javascript/PhuongQuan/map.js"></script>
+  <script src="/javascript/PhuongQuan/permit-request.js"></script>
 </html>

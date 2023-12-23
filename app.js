@@ -32,6 +32,7 @@ const authRoutes = require("./routes/auth.js");
 const departmentRoutes = require("./routes/departmentRoute.js");
 const wardDistrictRoutes = require("./routes/ward_district.js");
 const account = require("./models/account.js");
+const passport = require("passport");
 
 // initalize sequelize with session store
 const SessionStore = require("connect-session-sequelize")(session.Store);
@@ -85,6 +86,12 @@ app.use(
   })
 );
 app.use(flash());
+
+/*-----------Passport Authentication-----------*/
+require("./util/passportSetup.js");
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 //Routing
