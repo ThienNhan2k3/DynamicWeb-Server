@@ -1,36 +1,42 @@
 const models = require("../models");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
+const Mailjet = require("node-mailjet");
 const controller = {};
 
+const mailjet = new Mailjet({
+  apiKey: process.env.MJ_APIKEY_PUBLIC || "5f453b57b69003f11cdbd0d46c363385",
+  apiSecret:
+    process.env.MJ_APIKEY_PRIVATE || "b7af7b365498a7f77d1270fb86fa5826",
+});
+
 controller.home = async (req, res) => {
+  res.locals.adsTypes = await models.AdsType.findAll();
+  res.locals.companies = await models.Company.findAll();
+  res.locals.boardTypes = await models.BoardType.findAll();
 
-    res.locals.adsTypes = await models.AdsType.findAll();
-    res.locals.companies = await models.Company.findAll();
-    res.locals.boardTypes = await models.BoardType.findAll();
+  const account = await models.Account.findOne({
+    where: { id: req.session.accountId },
+    include: [
+      {
+        model: models.Area,
+        required: true,
+      },
+    ],
+  });
 
-    const account = await models.Account.findOne({
-      where: { id: req.session.accountId },
-      include: [
-        {
-          model: models.Area,
-          required: true,
-        },
-      ],
-    });
-
-    return res.render("PhuongQuan/home.ejs", {
-        tab: "Trang chủ",
-        selectedId: req.session.selectedAdsplacementId,
-        area: account.Area,
-        type: account.type,
-    });
-}
+  return res.render("PhuongQuan/home.ejs", {
+    tab: "Trang chủ",
+    selectedId: req.session.selectedAdsplacementId,
+    area: account.Area,
+    type: account.type,
+  });
+};
 
 controller.addPermitRequest = async (req, res) => {
   let {boardId} = req.body;
   if (boardId == -1) {
-    let {adsPlacementId, boardTypeId, boardSize, boardQuantity} = req.body;
+    let { adsPlacementId, boardTypeId, boardSize, boardQuantity } = req.body;
     //Create new board
     adsPlacementId = 2;
     try {
@@ -39,16 +45,16 @@ controller.addPermitRequest = async (req, res) => {
         quantity: boardQuantity,
         BoardTypeId: boardTypeId,
         AdsPlacementId: adsPlacementId,
-      })
+      });
       boardId = newBoard.id;
     } catch (error) {
       res.send("Có lỗi xảy ra!");
       console.error(error);
     }
   }
-  let {companyId} = req.body;
+  let { companyId } = req.body;
   if (companyId == -1) {
-    let {companyName, email, phone, address} = req.body;
+    let { companyName, email, phone, address } = req.body;
     // Create new company
     try {
       let newCompany = await models.Company.create({
@@ -56,16 +62,16 @@ controller.addPermitRequest = async (req, res) => {
         phone: phone,
         address: address,
         email: email,
-      })
+      });
       companyId = newCompany.id;
     } catch (error) {
       res.send("Có lỗi xảy ra!");
       console.error(error);
     }
   }
-    
+
   //Create new permit request
-  let {content, startDate, endDate} = req.body;
+  let { content, startDate, endDate } = req.body;
   try {
     const file = req.file;
     console.log('image', file);
@@ -82,17 +88,17 @@ controller.addPermitRequest = async (req, res) => {
       image: imageUrl,
       start: startDate,
       end: endDate,
-      status: 'Chưa cấp phép',
+      status: "Chưa cấp phép",
       BoardId: boardId,
       CompanyId: companyId,
-      AccountId: req.session.accountId
-    })
-    res.redirect('back');
+      AccountId: req.session.accountId,
+    });
+    res.redirect("back");
   } catch (error) {
     res.send("Có lỗi xảy ra!");
     console.error(error);
   }
-}
+};
 
 controller.showListAdsplacements = async (req, res) => {
   let options = {
@@ -294,19 +300,20 @@ controller.deleteRequest = async (req, res) => {
 };
 
 controller.showListReports = async (req, res) => {
-
   let options = {
     include: [
       {
         model: models.AdsPlacement,
-        attribute: ['address'],
-        include: [{
-          model: models.Area,
-          where: {}
-        }],
-        where: {}
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
       },
-      {model: models.ReportType},
+      { model: models.ReportType },
     ],
     where: {},
   };
@@ -320,7 +327,8 @@ controller.showListReports = async (req, res) => {
     if (selectedArea.trim() != "" && selectedArea != "all") {
       options.include[0].where.areaId = selectedArea;
     } else {
-      options.include[0].include[0].where.district = req.session.accountDistrict;
+      options.include[0].include[0].where.district =
+        req.session.accountDistrict;
     }
   }
 
@@ -338,7 +346,6 @@ controller.showListReports = async (req, res) => {
 };
 
 controller.showReportDetails = async (req, res) => {
-
   let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
 
   if (id == -1) {
@@ -346,29 +353,67 @@ controller.showReportDetails = async (req, res) => {
   }
 
   res.locals.report = await models.Report.findOne({
-    where: {id}
-  })
+    where: { id },
+  });
 
   return res.render("PhuongQuan/view-report-details.ejs", {
     tab: "Chi tiết báo cáo",
     selectedId: req.session.selectedAdsplacementId,
-  })
-}
+  });
+};
 
 controller.updateReportDetails = async (req, res) => {
-  let {reportId, method, status} = req.body;
+  let { reportId, method, status } = req.body;
   try {
-    await models.Report.update({
-      method: method,
-      status: status,
-      AccountId: req.session.accountId
-    },
-    {where: {id: reportId}});
-    res.redirect('back');
+    await models.Report.update(
+      {
+        method: method,
+        status: status,
+        AccountId: req.session.accountId,
+      },
+      { where: { id: reportId } }
+    );
+    const report = await models.Report.findOne({ where: { id: reportId } });
+    const account = await models.Account.findOne({
+      where: { id: req.session.accountId },
+      include: [{ model: models.Area }],
+    });
+
+    // Send email
+    const request = await mailjet.post("send", { version: "v3.1" }).request({
+      Messages: [
+        {
+          From: {
+            Email: "hiiback0608@gmail.com",
+            Name: "Sở văn hóa và du lịch",
+          },
+          To: [
+            {
+              Email: report.email,
+              Name: report.email,
+            },
+          ],
+          TemplateID: 5485692,
+          Subject: "Phản hồi về báo cáo",
+          TemplateLanguage: true,
+          Variables: {
+            citizenName: report.name,
+            content: method,
+            officerName: `${account.lastName} ${account.firstName}`,
+            officerType:
+              account.type == "Quan"
+                ? `Cán bộ  ${account.Area.district.toLowerCase()}`
+                : ` Cán bộ ${account.Area.ward.toLowerCase()}`,
+            email: account.email,
+          },
+        },
+      ],
+    });
+    res.redirect("back");
   } catch (error) {
-    res.send('Xử lý báo cáo thất bại!');
+    res.send("Xử lý báo cáo thất bại!");
     console.error(error);
   }
-}
+};
 
 module.exports = controller;

@@ -130,7 +130,6 @@ controller.accountManagement = async (req, res) => {
         flag = true;
     }
     const pagination = await getPagination(req, res, accounts, 5, page, 2, flag);
-    console.log(pagination);
     const currentUrl = req.url.slice(1);
     return res.render("So/accountManagement.ejs", {
         accountTypes,
@@ -298,29 +297,29 @@ controller.editAccount = async (req, res) => {
         wardSelectEditModal,
     } = req.body;
     try {
-        let areaId = 1;
-        if (accountTypeSelectEditModal !== "So") {
-            const options = {
-                where: {
-                    district: districtSelectEditModal,
-                },
-            };
-            if (accountTypeSelectEditModal === "Phuong") {
-                options.where.ward = wardSelectEditModal;
-            }
-            await Account.update(
-                {type: accountTypeSelectEditModal, AreaId: areaId},
-                {where: {id: idEditModal}}
-            )
-            req.flash("message", JSON.stringify({
-                type: "edit",
-                status: "success",
-                content: "Phân công khu vực thành công"
-            }))
-            return res.send("Account updated!");
+      let areaId = 1;
+      if (accountTypeSelectEditModal !== "So") {
+        const options = {
+            where: {
+                district: districtSelectEditModal,
+            },
+        };
+        if (accountTypeSelectEditModal === "Phuong") {
+          options.where.ward = wardSelectEditModal;
         }
-    } 
-    catch(err) {
+        areaId = (await Area.findOne(options)).id;
+      }
+      await Account.update(
+        {type: accountTypeSelectEditModal, AreaId: areaId},
+        {where: {id: idEditModal}}
+      )
+        req.flash("message", JSON.stringify({
+            type: "edit",
+            status: "success",
+            content: "Phân công khu vực thành công"
+        }))
+        return res.send("Account updated!");
+    }  catch(err) {
       console.error(err);
       req.flash("message", JSON.stringify({
         type: "edit",

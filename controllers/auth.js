@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { Account, Area } = require("../models");
 const Mailjet = require("node-mailjet");
 const Sequelize = require("sequelize");
+const checkInput = require("../util/checkInput");
 
 const mailjet = new Mailjet({
   apiKey: process.env.MJ_APIKEY_PUBLIC || "5f453b57b69003f11cdbd0d46c363385",
@@ -104,14 +105,14 @@ const postOtpWaiting = async (req, res, next) => {
     return res.json({
       redirect: `/reset-password?account=${accountId}&otp=${inputOtp}`,
     });
-    // res.redirect(`/reset-password?account=${accountId}&otp=${inputOtp}`);
   }
 };
 
 const getResetPassword = (req, res, next) => {
   const accountId = req.query.account;
   const otp = req.query.otp;
-  res.render("auth/resetPassword.ejs", { accountId: accountId, otp: otp });
+  const errorMessage=req.flash('resetPasswordMsg')
+  res.render("auth/resetPassword.ejs", { accountId: accountId, otp: otp,errorMessage:errorMessage });
 };
 
 const postResetPassword = async (req, res, next) => {
@@ -125,8 +126,13 @@ const postResetPassword = async (req, res, next) => {
     const hashedPassword=await bcrypt.hash(newPassword,12)
     account.password = hashedPassword;
     await account.save();
+    req.flash("resetPasswordMsg","Đặt lại mật khẩu thành công")
+    res.redirect("/");
+  } else{
+    req.flash("resetPasswordMsg","Sai mã OTP")
+    res.redirect('/reset-password')
   }
-  res.redirect("/");
+
 };
 
 const getLogin = async (req, res) => {
@@ -139,86 +145,97 @@ const getLogin = async (req, res) => {
     }
   }
 
-  const error = {
-    usernameOrEmail: req.flash("usernameOrEmail"),
-    password: req.flash("password"),
-  };
 
+  const error = req.flash("error")[0];
+  console.log("Error: ", error);
+  const message = (error != null || typeof error === 'object') ? JSON.parse(error) : null;
+  const resetPwMessage=req.flash("resetPasswordMsg")
   res.render("index", {
-    err: error
+    message,
+    resetPwMessage
   });
 };
 
 const postLogin = async (req, res) => {
-  const usernameOrEmail = req.body.usernameOrEmail ? req.body.usernameOrEmail.trim() : ""; 
-  const password  = req.body.password;
-  if (!usernameOrEmail) {
-    req.flash("usernameOrEmail", "Username or email is empty");
-    return res.redirect("/");
-  }
-  
-  try {
-    const account = await Account.findOne({
-      include: [
-        {model: Area}
-      ],
-      where: {
-        [Sequelize.Op.or]: {
-          username: usernameOrEmail,
-          email: usernameOrEmail,
-        },
-      },
-    });
-    if (!account) {
-      req.flash("usernameOrEmail", "Username or email doesn't exist");
-      return res.redirect("/");
-    }
-    const isMatch = await bcrypt.compare(password, account.password);
-    if (!isMatch) {
-      req.flash("password", "Your password is not valid");
-      return res.redirect("/");
-    }
-
-    req.session.accountId = account.id;
-
-    if (account.type === 'So') {
+  console.log("Auth");
+  req.session.accountId = req.user.id;
+  if (req.user.type === 'So') {
       req.session.accountType = 'department';
       res.redirect("/department/accountManagement");
-    }
+  }
 
-    else if (account.type === 'Quan') {
+  else if (req.user.type === 'Quan') {
       req.session.accountType = 'district';
-      req.session.accountDistrict = account.Area.district;
+      req.session.accountDistrict = req.user.Area.district;
       req.session.selectedAdsplacementId = -1;
       res.redirect("/district/home");
-    }
+  }
 
-    else if (account.type === 'Phuong') {
+  else if (req.user.type === 'Phuong') {
       req.session.accountType = 'ward';
-      req.session.accountWard = account.Area.ward;
-      req.session.accountDistrict = account.Area.district;
+      req.session.accountWard = req.user.Area.ward;
+      req.session.accountDistrict = req.user.Area.district;
       req.session.selectedAdsplacementId = -1;
       res.redirect("/ward/home");
-    }
-
-  } catch (err) {
-    console.log(err);
-    res.redirect("/login");
   }
 };
 
 const getLogout = (req, res) => {
-  if (req.session.accountId) {
-    req.session.destroy((err) => {
-      console.error(err);
-      res.redirect("/");
-    });
-  }
+  req.session.destroy((err) => {
+    console.error(err);
+    res.redirect("/");
+  });
 };
 
-const changePassword = (req, res) => {
+const getChangePassword = (req, res) => {
   // return res.render("switchToLogin.ejs");
-  return res.render("changePassword.ejs");
+  let errorChangePassword = req.flash("errorChangePassword")[0];
+  errorChangePassword = errorChangePassword != null ? JSON.parse(errorChangePassword) : null;
+  return res.render("changePassword.ejs", {
+    accountType : req.user.type,
+    selectedId: req.session.selectedAdsplacementId,
+    errorChangePassword
+  });
+}
+
+const postChangePassword = async (req, res) => {
+  const {currentPassword, newPassword, confirmNewPassword} = req.body;
+  try {
+    const isMatch = await bcrypt.compare(currentPassword, req.user.password);
+    if (!isMatch) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "currentPassword", content: "Mật khẩu hiện tại không đúng "}));
+      return res.redirect("/changePassword");
+    }
+
+    if (!checkInput.isValidPassword(newPassword)) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "newPassword", content: "Mật khẩu hiện tại quá yếu "}));
+      return res.redirect("/changePassword");
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      req.flash("errorChangePassword", JSON.stringify({ flag: "confirmNewPassword", content: "Mật khẩu xác nhận không trùng với mật khẩu mới"}));
+      return res.redirect("/changePassword");
+    }
+    
+    const newHashPassword = await bcrypt.hash(newPassword, 12);
+    await Account.update(
+      {password: newHashPassword},
+      {where: {id: req.user.id}}
+    )
+
+    req.session.destroy((err) => {
+      console.error(err);
+    });
+    return res.render("switchToLogin.ejs", {
+      switchToLoginMessage: "Đổi mật khẩu thành công",
+    });
+
+
+  } catch(err) {
+    console.error(err);
+    req.flash("errorChangePassword", JSON.stringify({ flag: "serverError", content: "Đổi mật khẩu thất bại"}))
+    return res.redirect("/changePassword");
+  }
 }
 
 const changeInfor = (req, res) => {
@@ -229,7 +246,8 @@ module.exports = {
   getLogin,
   postLogin,
   getLogout,
-  changePassword,
+  getChangePassword,
+  postChangePassword,
   changeInfor,
   getOtpWaiting,
   postForgetPassword,

@@ -23,7 +23,7 @@ module.exports = {
       password: "$2b$12$rV7gjsFTaM/vY.jAzSjEFOXYkyMf5L/tvlz6Zadz10Pc7/tLrAspK", //nhan123
       type: "So",
       AreaId: 1,
-      email: "nhan@gmail.com",
+      email: "ntnhan21@clc.fitus.edu.vn",
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"       
     }, 
@@ -110,7 +110,18 @@ module.exports = {
       email: "khiem123@gmail.com", 
       updatedAt:"2023-11-21T04:14:54",
       createdAt:"2023-11-21T04:14:54"   
-    }, ], {});
+    },{
+      id: 9,
+      firstName: "Nhân",
+      lastName:  "Nguyễn Thiện",
+      username: "nhan032",
+      password: "$2b$12$rV7gjsFTaM/vY.jAzSjEFOXYkyMf5L/tvlz6Zadz10Pc7/tLrAspK", //nhan123
+      type: "So",
+      AreaId: 1,
+      email: "thnhan032@gmail.com",
+      updatedAt:"2023-11-21T04:14:54",
+      createdAt:"2023-11-21T04:14:54"       
+    },  ], {});
   },
 
   async down (queryInterface, Sequelize) {
