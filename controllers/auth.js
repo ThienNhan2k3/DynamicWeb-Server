@@ -239,8 +239,30 @@ const postChangePassword = async (req, res) => {
 }
 
 const changeInfor = (req, res) => {
-  return res.render("changeInfor.ejs");
+  return res.render("changeInfor.ejs", {
+    tab: "Chỉnh sửa thông tin",
+    selectedId: req.session.selectedAdsplacementId,
+  });
 }
+
+const updateInfor = async (req, res) => {
+  let {name, birth, email, phone} = req.body;
+  let listName = name.split(" ");
+  try {
+    await Account.update({
+      firstName: listName.pop(),
+      lastName: listName.join(" "),
+      birth: birth,
+      email: email,
+      phone: phone
+    }, {where: {id: req.user.id}});
+    res.redirect('back');
+  } catch (error) {
+    res.send("Cập nhật thông tin tài khoản thất bại");
+    console.error(error);
+  }
+}
+
 module.exports = {
   getForgetPassword,
   getLogin,
@@ -254,5 +276,5 @@ module.exports = {
   getResetPassword,
   postOtpWaiting,
   postResetPassword,
-  
+  updateInfor,
 };

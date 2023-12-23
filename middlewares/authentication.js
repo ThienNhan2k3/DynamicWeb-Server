@@ -14,6 +14,7 @@ const models = require("../models");
 const authUser = async (req, res, next) => {
     if (req.isAuthenticated()) {
         res.locals.user = req.user;
+        res.locals.accountType = req.user.type;
         next();
     } else {
         return res.redirect("/");
