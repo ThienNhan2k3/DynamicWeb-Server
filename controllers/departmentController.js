@@ -626,13 +626,16 @@ controller.createAdplace = async (req, res) => {
   );
 
   console.log(areaId, locationTypeId, adTypeId, address);
+  console.log("Bắt đầu khởi tạo AdsPlacement");
   try {
-    console.log("Bắt đầu khởi tạo AdsPlacement");
     const newAdsPlacement = await AdsPlacement.create({
       address: addressCreateModal,
-      status: "Trạng thái mới",
+      status: "Chưa quy hoạch",
       long: address.lon,
       lat: address.lat,
+      AreaId: areaId,
+      LocationTypeId: locationTypeId,
+      AdsTypeId: adTypeId,
     });
     await newAdsPlacement.save();
     console.log("Kết thúc khởi tạo AdsPlacement");

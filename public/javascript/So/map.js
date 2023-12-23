@@ -673,3 +673,11 @@ map.on("load", async () => {
     map.getCanvas().style.cursor = "";
   });
 });
+
+function navigateToLocation(long, lat) {
+  map.flyTo({
+    center: [parseFloat(long), parseFloat(lat)],
+    zoom: 15,
+  });
+}
+
