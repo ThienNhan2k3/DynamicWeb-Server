@@ -17,6 +17,9 @@ router.get("/adplaceManagement", controller.adplaceManagement);
 router.post("/adplaceManagement", controller.createAdplace);
 router.put("/adplaceManagement", controller.editAdplace);
 router.delete("/adplaceManagement", controller.deleteAdplace);
+// boardManagement
+router.get("/boardManagement", controller.boardManagement);
+router.post("/boardManagement", controller.createBoard);
 /*-------------------- ViewAdsRequest --------------------*/
 router.get("/viewAdsRequest", controller.viewAdsRequests);
 router.get("/viewAdsRequest/:id", controller.acceptOrDenyAdsRequest);

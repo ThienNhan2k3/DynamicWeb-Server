@@ -92,7 +92,7 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
     .catch((err) => console.error(err));
 }
 
-function showEditAccountModal(button) {
+function showEditAdplaceModal(button) {
   console.log("Button clicked"); // Check if the function is triggered
 
   const id = button.dataset.id;
@@ -103,6 +103,7 @@ function showEditAccountModal(button) {
   const address = button.dataset.address;
   const status = button.dataset.status;
 
+  console.log(ward);
   // Update the content of the editModal form with the retrieved data
   document.getElementById("adTypeSelectEditModal").value = adtype;
   document.getElementById("statusEditModal").value = status;
@@ -110,9 +111,11 @@ function showEditAccountModal(button) {
   document.getElementById("wardSelectEditModal").value = ward;
   document.getElementById("addressEditModal").value = address;
   document.getElementById("locationTypeSelectEditModal").value = locationType;
+  document.getElementById("idEditModal").value = id;
 }
 function showDeleteAdplaceModal(btn) {
   const id = btn.dataset.id;
+  console.log(id);
   document.getElementById("idDeleteModal").value = id;
 }
 
@@ -121,7 +124,7 @@ if (confirmDeleteButton) {
   confirmDeleteButton.addEventListener("click", async (e) => {
     e.preventDefault();
     const data = {
-      accountId: document.getElementById("idDeleteModal").value,
+      adsPlacementId: document.getElementById("idDeleteModal").value,
     };
     console.log(data);
     const res = await fetch("/department/adplaceManagement", {

@@ -3,6 +3,7 @@ const { AdsPlacement } = require("../models");
 const { AdsType } = require("../models");
 const { Area } = require("../models");
 const { LocationType } = require("../models");
+const { BoardType } = require("../models");
 const { Op } = require("sequelize");
 
 function isEmpty(input) {
@@ -133,18 +134,34 @@ async function findLocationTypeIdByLocationType(locationType) {
 }
 
 async function findAdsTypeIdByAdsType(adType) {
-  try {
-    const result = await AdsType.findOne({
-      where: {
-        type: adType,
-      },
-      attributes: ["id"],
-    });
-    return result ? result.id : null;
-  } catch (error) {
-    console.error("Error finding Ads Type ID by Ads Type:", error);
-    throw error;
-  }
+  const result = await AdsType.findOne({
+    where: {
+      type: adType,
+    },
+    attributes: ["id"],
+  });
+  return result ? result.id : null;
+}
+
+async function findBoardsTyoeIdByBoardType(boardType) {
+  const result = await BoardType.findOne({
+    where: {
+      type: boardType,
+    },
+    attributes: ["id"],
+  });
+  return result ? result.id : null;
+}
+
+async function findAdplacementByAddress(address, areaId) {
+  const result = await AdsPlacement.findOne({
+    where: {
+      address: address,
+      areaId: areaId,
+    },
+    attributes: ["id"],
+  });
+  return result ? result.id : null;
 }
 
 module.exports = {
@@ -160,4 +177,6 @@ module.exports = {
   findAreaIdByWardAndDistrict,
   findLocationTypeIdByLocationType,
   findAdsTypeIdByAdsType,
+  findBoardsTyoeIdByBoardType,
+  findAdplacementByAddress,
 };

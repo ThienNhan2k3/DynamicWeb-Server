@@ -751,7 +751,6 @@ controller.adplaceManagement = async (req, res) => {
   let district = req.query.district || "";
   let ward = req.query.ward || "";
   let search = req.query.search || "";
-  console.log(search);
   let wards = [],
     currentDistrict = "",
     currentWard = "";
@@ -874,7 +873,11 @@ controller.createAdplace = async (req, res) => {
   }
 
   let address = await checkInput.getLatLongFromAddress(
-    addressCreateModal,
+    addressCreateModal +
+      "," +
+      wardSelectCreateModal +
+      "," +
+      districtSelectCreateModal,
     apiKey
   );
 
@@ -935,26 +938,97 @@ controller.createAdplace = async (req, res) => {
 };
 
 controller.editAdplace = async (req, res) => {
-  console.log("da vao edit");
-  const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
-  const adsPlacement = await AdsPlacement.findOne({
-    where: {
-      id,
-    },
-  });
-  const districts = await Area.findAll();
-  const locationsType = await LocationType.findAll();
-  const adsTypes = await AdsType.findAll();
-  return res.render("So/editAdplace.ejs", {
-    adsPlacement,
-    districts,
-    locationsType,
-    adsTypes,
-  });
+  const {
+    idEditModal,
+    districtSelectEditModal,
+    wardSelectEditModal,
+    addressEditModal,
+    locationTypeSelectEditModal,
+    adTypeSelectEditModal,
+    statusEditModal,
+  } = req.body;
+  console.log(
+    idEditModal,
+    districtSelectEditModal,
+    wardSelectEditModal,
+    addressEditModal,
+    locationTypeSelectEditModal,
+    adTypeSelectEditModal,
+    statusEditModal
+  );
+  let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
+    locationTypeSelectEditModal
+  );
+  let adTypeId = await checkInput.findAdsTypeIdByAdsType(adTypeSelectEditModal);
+  try {
+    await AdsPlacement.update(
+      {
+        district: districtSelectEditModal,
+        ward: wardSelectEditModal,
+        address: addressEditModal,
+        LocationTypeId: locationTypeId,
+        AdsTypeId: adTypeId,
+        status: statusEditModal,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật điểm quảng cáo thành công",
+      })
+    );
+    return res.send("AdsPlacement updated");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật thất bại",
+      })
+    );
+    return res.send("Can not update AdsPlacement");
+  }
 };
 
 controller.deleteAdplace = async (req, res) => {
+  const { adsPlacementId } = req.body;
   console.log("da vao delete");
+  try {
+    await AdsPlacement.destroy({
+      where: {
+        id: adsPlacementId,
+      },
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Xóa thành công",
+      })
+    );
+    return res.send("Adplacement deleted!");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Xóa thất bại",
+      })
+    );
+    return res.send("Can not delete adplacement!");
+  }
 };
 
 controller.getAreas = async (req, res) => {
@@ -1047,5 +1121,167 @@ controller.postAddArea = async (req, res) => {
     req.flash("manageAreaMsg", "Internal server error.");
     return res.redirect("/department/areaManagement");
   }
+};
+
+controller.boardManagement = async (req, res) => {
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  const createErr = {
+    error: {
+      address: req.flash("addressCreateModalError"),
+      height: req.flash("heightCreateModalError"),
+      weight: req.flash("weightCreateModalError"),
+    },
+    value: {
+      address: req.flash("addressCreateModal")[0],
+      height: req.flash("heightCreateModal")[0],
+      weight: req.flash("weightCreateModal")[0],
+      // ... add other value fields for AdsPlacement ...
+    },
+  };
+  const optionsBoardManagement = {
+    attributes: ["id", "size", "quantity", "boardTypeId", "adsPlacementId"],
+    include: [
+      {
+        model: BoardType,
+        attributes: ["id", "type"],
+      },
+      {
+        model: AdsPlacement,
+        attributes: ["id", "address"],
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "district", "ward"],
+            where: {},
+          },
+          {
+            model: LocationType,
+            attributes: ["id", "locationType"],
+          },
+          {
+            model: AdsType,
+            attributes: ["id", "type"],
+          },
+        ],
+      },
+    ],
+  };
+  let district = req.query.district || "";
+  console.log(district);
+  let ward = req.query.ward || "";
+  let search = req.query.search || "";
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+
+  if (district.trim() !== "") {
+    optionsBoardManagement.include[1].include[0].where.district = district;
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
+    });
+    currentDistrict = district;
+
+    if (ward.trim() !== "") {
+      optionsBoardManagement.include[1].include[0].where.ward = ward;
+      currentWard = ward;
+    }
+  }
+
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas ORDER BY district`
+  );
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message != null && message.type === "delete") {
+    flag = true;
+  }
+
+  const boards = await Board.findAll(optionsBoardManagement);
+  const currentUrl = req.url.slice(1);
+  const boardTypes = await BoardType.findAll();
+  console.log(currentUrl);
+  const pagination = await getPagination(req, res, boards, 5, page, 2, flag);
+  console.log(pagination.rows.length);
+
+  res.render("So/boardManagement.ejs", {
+    pagination,
+    boards,
+    districts,
+    wards,
+    currentUrl,
+    currentDistrict,
+    currentWard,
+    message,
+    createErr,
+    boardTypes,
+  });
+};
+
+controller.createBoard = async (req, res) => {
+  console.log(req.body);
+  const {
+    districtSelectCreateModal,
+    wardSelectCreateModal,
+    boardTypeSelectCreateModal,
+    heightCreateModal,
+    weightCreateModal,
+    addressCreateModal,
+  } = req.body;
+
+  let createFailed = false;
+  if (
+    !checkInput.isNumber(heightCreateModal) ||
+    checkInput.isEmpty(heightCreateModal)
+  ) {
+    req.flash("heightCreateModalError", "Chiều dài không hợp lệ");
+    createFailed = true;
+  }
+  if (
+    !checkInput.isNumber(weightCreateModal) ||
+    checkInput.isEmpty(weightCreateModal)
+  ) {
+    req.flash("weightCreateModal", "Chiều rộng không hợp lệ");
+    createFailed = true;
+  }
+  let boardTypeid = await checkInput.findBoardsTyoeIdByBoardType(
+    boardTypeSelectCreateModal
+  );
+
+  let adPlacementId = await checkInput.findAdplacementByAddress(
+    addressCreateModal,
+    await checkInput.findAreaIdByWardAndDistrict(
+      wardSelectCreateModal,
+      districtSelectCreateModal
+    )
+  );
+  if (boardTypeid == null || adPlacementId == null) {
+    createFailed = true;
+  }
+  if (createFailed) {
+    req.flash("addressCreateModal", addressCreateModal);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo bảng quảng cáo thất bại",
+      })
+    );
+    return res.redirect("/department/boardManagement");
+  }
+  console.log(boardTypeid, adPlacementId);
+  await Board.create({
+    size: heightCreateModal + "m x " + weightCreateModal + "m",
+    quantity: 20,
+    boardTypeId: parseInt(boardTypeid),
+    adsPlacementId: adPlacementId,
+  });
+  await newBoard.save();
+  res.redirect("/department/boardManagement");
 };
 module.exports = controller;
