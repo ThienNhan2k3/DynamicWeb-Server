@@ -22,7 +22,6 @@ const { Op } = require("sequelize");
 
 const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
 
-
 /*
     + req: request
     + res: response
@@ -34,115 +33,133 @@ const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
     +currentPage: Trang hiện tại giúp kiểm tra việc request có hợp lệ không
     + flag: Nếu trước đó đã thao tác xóa thì truyền vào cho flag = true
 */
-async function getPagination(req, res, rows, rowsPerPage, currentPage, limitPagination=2, flag=false) {
-    const minPage = 1;
-    const maxPage = Math.ceil(rows.length * 1.0 / rowsPerPage);
-    let pagination = {};
-    if (currentPage < minPage || currentPage > maxPage) {
-        if (flag) {
-            currentPage = (maxPage <= 0) ? 1 : maxPage;
-            return res.redirect("/department" + createWardDistrictPageQueryString(req.url, 'page=', currentPage));
-        } else {
-            pagination = {
-                minPage: 1,
-                currentPage: currentPage,
-                maxPage: 1,
-                limitPage: limitPagination,
-                rows: [],
-            }
-        }
+async function getPagination(
+  req,
+  res,
+  rows,
+  rowsPerPage,
+  currentPage,
+  limitPagination = 2,
+  flag = false
+) {
+  const minPage = 1;
+  const maxPage = Math.ceil((rows.length * 1.0) / rowsPerPage);
+  let pagination = {};
+  if (currentPage < minPage || currentPage > maxPage) {
+    if (flag) {
+      currentPage = maxPage <= 0 ? 1 : maxPage;
+      return res.redirect(
+        "/department" +
+          createWardDistrictPageQueryString(req.url, "page=", currentPage)
+      );
     } else {
-        pagination = {
-            minPage,
-            currentPage: currentPage,
-            maxPage,
-            limitPage: limitPagination,
-            rows: rows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage),
-        }
+      pagination = {
+        minPage: 1,
+        currentPage: currentPage,
+        maxPage: 1,
+        limitPage: limitPagination,
+        rows: [],
+      };
     }
-    return pagination;
+  } else {
+    pagination = {
+      minPage,
+      currentPage: currentPage,
+      maxPage,
+      limitPage: limitPagination,
+      rows: rows.slice(
+        (currentPage - 1) * rowsPerPage,
+        currentPage * rowsPerPage
+      ),
+    };
+  }
+  return pagination;
 }
 
 controller.accountManagement = async (req, res) => {
   const createErr = {
-      error: {
-          firstName: req.flash("firstNameCreateModalError"),
-          lastName: req.flash("lastNameCreateModalError"),
-          username: req.flash("usernameCreateModalError"),
-          email: req.flash("emailCreateModalError"),
-          password: req.flash("passwordCreateModalError"),
-          confirmPassword: req.flash("confirmPasswordCreateModalError"),
+    error: {
+      firstName: req.flash("firstNameCreateModalError"),
+      lastName: req.flash("lastNameCreateModalError"),
+      username: req.flash("usernameCreateModalError"),
+      email: req.flash("emailCreateModalError"),
+      password: req.flash("passwordCreateModalError"),
+      confirmPassword: req.flash("confirmPasswordCreateModalError"),
+    },
+    value: {
+      firstName: req.flash("firstNameCreateModal")[0],
+      lastName: req.flash("lastNameCreateModal")[0],
+      username: req.flash("usernameCreateModal")[0],
+      email: req.flash("emailCreateModal")[0],
+      password: req.flash("passwordCreateModal")[0],
+      confirmPassword: req.flash("confirmPasswordCreateModal")[0],
+    },
+  };
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let district = req.query.district || "";
+  let ward = req.query.ward || "";
+  const options = {
+    attributes: ["id", "firstName", "lastName", "email", "type"],
+    where: {
+      id: { [Op.ne]: req.session.accountId },
+    },
+    include: [
+      {
+        model: Area,
+        attributes: ["id", "district", "ward"],
+        where: {},
       },
-      value: {
-          firstName: req.flash("firstNameCreateModal")[0],
-          lastName: req.flash("lastNameCreateModal")[0],
-          username: req.flash("usernameCreateModal")[0],
-          email: req.flash("emailCreateModal")[0],
-          password: req.flash("passwordCreateModal")[0],
-          confirmPassword: req.flash("confirmPasswordCreateModal")[0],
-      }
-  }
-    let message = req.flash("message")[0]
-    message = message == null ? null : JSON.parse(message);
-    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-    let district = req.query.district || '';
-    let ward = req.query.ward || '';
-    const options = {
-        attributes: ["id", "firstName", "lastName", "email", "type"],
-        where: {
-            id: { [Op.ne]: req.session.accountId }
-        },
-        include: [{
-            model: Area,
-            attributes: ['id', 'district', 'ward'],
-            where: {}
-        }]
-    }
-    let wards = [], currentDistrict = '', currentWard = ''; 
-    if (district.trim() !== '') {
-        options.include[0].where.district = district;
-        options.where = {
-            [Op.or]: [
-                { type: 'Quan' },
-                { type: 'Phuong' }
-            ]
-        }
-        wards = await Area.findAll({
-            where: {
-                district
-            }
-        })
-        currentDistrict = district;
-        if (ward.trim() !== '') {
-            options.include[0].where.ward = ward;
-            options.where = {
-                type: "Phuong",
-            }
-            currentWard = ward;
-        }
-    }
-
-    const accountTypes = ["Phuong", "Quan", "So"]
-    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
-    let accounts = await Account.findAll(options);
-    let flag = false;
-    if (message != null && message.type === 'delete') {
-        flag = true;
-    }
-    const pagination = await getPagination(req, res, accounts, 5, page, 2, flag);
-    const currentUrl = req.url.slice(1);
-    return res.render("So/accountManagement.ejs", {
-        accountTypes,
-        districts, 
-        wards,
-        pagination,
-        createErr,
-        message,
-        currentUrl,
-        currentDistrict,
-        currentWard
+    ],
+  };
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+  if (district.trim() !== "") {
+    options.include[0].where.district = district;
+    options.where = {
+      [Op.or]: [{ type: "Quan" }, { type: "Phuong" }],
+    };
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
     });
-}
+    currentDistrict = district;
+    if (ward.trim() !== "") {
+      options.include[0].where.ward = ward;
+      options.where = {
+        type: "Phuong",
+      };
+      currentWard = ward;
+    }
+  }
+
+  const accountTypes = ["Phuong", "Quan", "So"];
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  let accounts = await Account.findAll(options);
+  let flag = false;
+  if (message != null && message.type === "delete") {
+    flag = true;
+  }
+  const pagination = await getPagination(req, res, accounts, 5, page, 2, flag);
+  const currentUrl = req.url.slice(1);
+
+  return res.render("So/accountManagement.ejs", {
+    accountTypes,
+    districts,
+    wards,
+    pagination,
+    createErr,
+    message,
+    currentUrl,
+    currentDistrict,
+    currentWard,
+  });
+};
 
 controller.getWardsWithSpecificDistrict = async (req, res) => {
   const district = req.query.district || "";
@@ -241,364 +258,422 @@ controller.createAccount = async (req, res) => {
     req.flash("emailCreateModal", emailCreateModal);
     req.flash("passwordCreateModal", passwordCreateModal);
     req.flash("confirmPasswordCreateModal", confirmPasswordCreateModal);
-    req.flash("message", JSON.stringify({
+    req.flash(
+      "message",
+      JSON.stringify({
         type: "create",
         status: "danger",
-        content: "Đăng ký thất bại"
-    }))
-    return res.redirect("/department/accountManagement");    
+        content: "Đăng ký thất bại",
+      })
+    );
+    return res.redirect("/department/accountManagement");
   }
 
-    try {
-        const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
-        let areaId = 1;
-        if (accountTypeSelectCreateModal !== "So") {
-            const options = {
-                where: {
-                district: districtSelectCreateModal,
-                },
-            };
-            if (accountTypeSelectCreateModal === "Phuong") {
-                options.where.ward = wardSelectCreateModal;
-            }
-            const newAccount = await Account.create({ 
-                firstName: firstNameCreateModal, 
-                lastName: lastNameCreateModal,
-                username: usernameCreateModal,
-                email: emailCreateModal,
-                password: hashPassword,
-                type: accountTypeSelectCreateModal,
-                AreaId: areaId,
-            });
-            req.flash("message", JSON.stringify({
-                type: "create",
-                status: "success",
-                content: "Đăng ký thành công"
-            }))
-        } 
+  try {
+    const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
+    let areaId = 1;
+    if (accountTypeSelectCreateModal !== "So") {
+      const options = {
+        where: {
+          district: districtSelectCreateModal,
+        },
+      };
+      if (accountTypeSelectCreateModal === "Phuong") {
+        options.where.ward = wardSelectCreateModal;
+      }
+      const newAccount = await Account.create({
+        firstName: firstNameCreateModal,
+        lastName: lastNameCreateModal,
+        username: usernameCreateModal,
+        email: emailCreateModal,
+        password: hashPassword,
+        type: accountTypeSelectCreateModal,
+        AreaId: areaId,
+      });
+      req.flash(
+        "message",
+        JSON.stringify({
+          type: "create",
+          status: "success",
+          content: "Đăng ký thành công",
+        })
+      );
     }
-    catch(err) {
-        console.log(err);
-        req.flash("message", JSON.stringify({
-            type: "create",
-            status: "danger",
-            content: "Đăng ký thất bại"
-        }))
-
-    }
-    return res.redirect("/department/accountManagement");
+  } catch (err) {
+    console.log(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Đăng ký thất bại",
+      })
+    );
+  }
+  return res.redirect("/department/accountManagement");
 };
 
 controller.editAccount = async (req, res) => {
-    const {
-        idEditModal,
-        accountTypeSelectEditModal,
-        districtSelectEditModal,
-        wardSelectEditModal,
-    } = req.body;
-    try {
-      let areaId = 1;
-      if (accountTypeSelectEditModal !== "So") {
-        const options = {
-            where: {
-                district: districtSelectEditModal,
-            },
-        };
-        if (accountTypeSelectEditModal === "Phuong") {
-          options.where.ward = wardSelectEditModal;
-        }
-        areaId = (await Area.findOne(options)).id;
+  const {
+    idEditModal,
+    accountTypeSelectEditModal,
+    districtSelectEditModal,
+    wardSelectEditModal,
+  } = req.body;
+  try {
+    let areaId = 1;
+    if (accountTypeSelectEditModal !== "So") {
+      const options = {
+        where: {
+          district: districtSelectEditModal,
+        },
+      };
+      if (accountTypeSelectEditModal === "Phuong") {
+        options.where.ward = wardSelectEditModal;
       }
-      await Account.update(
-        {type: accountTypeSelectEditModal, AreaId: areaId},
-        {where: {id: idEditModal}}
-      )
-        req.flash("message", JSON.stringify({
-            type: "edit",
-            status: "success",
-            content: "Phân công khu vực thành công"
-        }))
-        return res.send("Account updated!");
-    }  catch(err) {
-      console.error(err);
-      req.flash("message", JSON.stringify({
+      areaId = (await Area.findOne(options)).id;
+    }
+    await Account.update(
+      { type: accountTypeSelectEditModal, AreaId: areaId },
+      { where: { id: idEditModal } }
+    );
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Phân công khu vực thành công",
+      })
+    );
+    return res.send("Account updated!");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
         type: "edit",
         status: "danger",
-        content: "Phân công khu vực thất bại"
-      }))
-      return res.send("Can not update account!");
+        content: "Phân công khu vực thất bại",
+      })
+    );
+    return res.send("Can not update account!");
   }
 };
 
 controller.deleteAccount = async (req, res) => {
   const { accountId } = req.body;
-    try {
-        await Account.destroy(
-            {where: {id: accountId}}
-        )
-        req.flash("message", JSON.stringify({
-            type: "delete",
-            status: "success",
-            content: "Xóa tài khoản thành công"
-        }))
-        return res.send("Account deleted!");
-    } catch(err) {
-        console.error(err);
-        req.flash("message", JSON.stringify({
-            type: "delete",
-            status: "danger",
-            content: "Xóa tài khoản thất bại"
-        }))
-        return res.send("Can not delete account!");
-    }
+  try {
+    await Account.destroy({ where: { id: accountId } });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "success",
+        content: "Xóa tài khoản thành công",
+      })
+    );
+    return res.send("Account deleted!");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "danger",
+        content: "Xóa tài khoản thất bại",
+      })
+    );
+    return res.send("Can not delete account!");
+  }
 };
 
 controller.viewAdsRequests = async (req, res) => {
-    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-    let district = req.query.district || "";
-    let ward = req.query.ward || "";
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let district = req.query.district || "";
+  let ward = req.query.ward || "";
 
-    let whereCondition = {};
-    let wards = [], currentDistrict = '', currentWard = ''; 
-    if (district.trim() !== '') {
-        wards = await Area.findAll({
-            where: {
-                district
-            }
-        })
-        whereCondition.district = district;
-        currentDistrict = district;
-        if (ward.trim() !== '') {
-            currentWard = ward;
-            whereCondition.ward = ward;
-        }
-    }
-
-    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
-    let permitRequests = await PermitRequest.findAll({
-            include: [
-                Company, {
-                    model: Board,
-                    include: [BoardType, {
-                            model: AdsPlacement,
-                            include: [{
-                                model: Area,
-                                where: whereCondition,
-                                required: true
-                            }],
-                            required: true
-                        },
-                    ],
-                    required: true
-                }, {
-                    model: Account,
-                    attributes: ["firstName", "lastName", "type", "email"]
-                }
-            ],
-        });
-    const permitRequestsPerPage = 1;
-    let pagination = await getPagination(req, res, permitRequests, permitRequestsPerPage, page);
-    const currentUrl = req.url.slice(1);
-    
-    return res.render("So/viewAdsRequest.ejs", {
-        formatDate: (date) => {
-        return date.toLocaleDateString({
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-        },
-        pagination,
-        currentUrl,
-        districts,
-        wards,
-        currentDistrict,
-        currentWard,
-    });
-}
-
-
-controller.acceptOrDenyAdsRequest = async (req, res) => {
-    const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
-    let permitRequest = await PermitRequest.findOne({
-        include: [
-            Company, {
-                model: Board,
-                include: [BoardType, {
-                    model: AdsPlacement,
-                    include: [Area]
-                }]
-            }, {
-                model: Account,
-                attributes: ["firstName", "lastName", "type", "email"]
-            }
-        ],
-        where: {
-            id
-        }
-    })
-    return res.render("So/acceptOrDenyAdsRequest.ejs", {permitRequest});
-}
-
-controller.viewReports = async (req, res) => {
-    let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
-  let district = req.query.district || '';
-  let ward = req.query.ward || '';
-
-  let wards = [], currentDistrict = '', currentWard = ''; 
   let whereCondition = {};
-  if (district.trim() !== '') {
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+  if (district.trim() !== "") {
     wards = await Area.findAll({
-        where: {
-            district
-        }
-    })
+      where: {
+        district,
+      },
+    });
     whereCondition.district = district;
     currentDistrict = district;
-    if (ward.trim() !== '') {
-        currentWard = ward;
-        whereCondition.ward = ward;
+    if (ward.trim() !== "") {
+      currentWard = ward;
+      whereCondition.ward = ward;
     }
-}
+  }
 
-    const [districts] = await sequelize.query(`SELECT DISTINCT district FROM Areas`);
-    let reports = await Report.findAll({
-        include: [ReportType, {
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  let permitRequests = await PermitRequest.findAll({
+    include: [
+      Company,
+      {
+        model: Board,
+        include: [
+          BoardType,
+          {
             model: AdsPlacement,
-            include: [{
+            include: [
+              {
                 model: Area,
                 where: whereCondition,
-                required: true
-            }],
-            required: true
-        }],
-        required: true
-    });
-    const pagination = await getPagination(req, res, reports, 1, page);
-    // console.log(pagination.rows);
-    const currentUrl = req.url.slice(1);
-    return res.render("So/viewReports.ejs", {
-        formatDate: (date) => {
-            return date.toLocaleDateString({
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            })
-        },
-        pagination,
-        currentUrl,
-        districts,
-        wards,
-        currentDistrict,
-        currentWard
-    });
-}
+                required: true,
+              },
+            ],
+            required: true,
+          },
+        ],
+        required: true,
+      },
+      {
+        model: Account,
+        attributes: ["firstName", "lastName", "type", "email"],
+      },
+    ],
+  });
+  const permitRequestsPerPage = 1;
+  let pagination = await getPagination(
+    req,
+    res,
+    permitRequests,
+    permitRequestsPerPage,
+    page
+  );
+  const currentUrl = req.url.slice(1);
 
-controller.detailReport = async (req, res) => {
-    const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
-    let report = await Report.findOne({
-        include: [ReportType, {
+  return res.render("So/viewAdsRequest.ejs", {
+    formatDate: (date) => {
+      return date.toLocaleDateString({
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+    pagination,
+    currentUrl,
+    districts,
+    wards,
+    currentDistrict,
+    currentWard,
+  });
+};
+
+controller.acceptOrDenyAdsRequest = async (req, res) => {
+  const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+  let permitRequest = await PermitRequest.findOne({
+    include: [
+      Company,
+      {
+        model: Board,
+        include: [
+          BoardType,
+          {
             model: AdsPlacement,
             include: [Area],
-        }, {
-            model: Account,
-            attributes: ["firstName", "lastName", "type", "email"]
-        }],
-        where: {
-            id
-        }
+          },
+        ],
+      },
+      {
+        model: Account,
+        attributes: ["firstName", "lastName", "type", "email"],
+      },
+    ],
+    where: {
+      id,
+    },
+  });
+  return res.render("So/acceptOrDenyAdsRequest.ejs", { permitRequest });
+};
+
+controller.viewReports = async (req, res) => {
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let district = req.query.district || "";
+  let ward = req.query.ward || "";
+
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+  let whereCondition = {};
+  if (district.trim() !== "") {
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
     });
-    console.log(report);
-    return res.render("So/detailReport.ejs", {
-        report
-    })
-}
+    whereCondition.district = district;
+    currentDistrict = district;
+    if (ward.trim() !== "") {
+      currentWard = ward;
+      whereCondition.ward = ward;
+    }
+  }
+
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  let reports = await Report.findAll({
+    include: [
+      ReportType,
+      {
+        model: AdsPlacement,
+        include: [
+          {
+            model: Area,
+            where: whereCondition,
+            required: true,
+          },
+        ],
+        required: true,
+      },
+    ],
+    required: true,
+  });
+  const pagination = await getPagination(req, res, reports, 1, page);
+  // console.log(pagination.rows);
+  const currentUrl = req.url.slice(1);
+  return res.render("So/viewReports.ejs", {
+    formatDate: (date) => {
+      return date.toLocaleDateString({
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+    pagination,
+    currentUrl,
+    districts,
+    wards,
+    currentDistrict,
+    currentWard,
+  });
+};
+
+controller.detailReport = async (req, res) => {
+  const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+  let report = await Report.findOne({
+    include: [
+      ReportType,
+      {
+        model: AdsPlacement,
+        include: [Area],
+      },
+      {
+        model: Account,
+        attributes: ["firstName", "lastName", "type", "email"],
+      },
+    ],
+    where: {
+      id,
+    },
+  });
+  console.log(report);
+  return res.render("So/detailReport.ejs", {
+    report,
+  });
+};
 
 controller.statisticReport = async (req, res) => {
-    let {type, size} = req.body;
-    try {
-        let reports = await Report.findAll({
-            where: {
-                createdAt: {
-                    [Op.lt]: new Date(),
-                    [Op.gt]: new Date(new Date() - (size * (type === 'month' ? 31 : 1)) * 24 * 60 * 60 * 1000)
-                },
-                method: {
-                    [Op.not]: null
-                }, 
-                status: "Chưa xử lý"
-            }
-        });
-        
-        let labels = [], numberOfReportsList = [], waiting = 0, processed = 0;
-        if (type === 'day') {
-            for (let i = size - 1; i >= 0; i--) {
-                let date = new Date(new Date() - i * 24 * 60 * 60 * 1000);
-                labels.push(`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`);
-                numberOfReportsList.push(0);
-            }
-        } else if (type === 'month') {
-            let currentMonth = new Date().getMonth();
-            let currentYear = new Date().getFullYear();
-            while (size > 0) {
-                labels.unshift(`${currentMonth + 1}/${currentYear}`);
-                numberOfReportsList.unshift(0);
-                currentMonth -= 1;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear -= 1;
-                }
-                size -= 1;
-            }
-        }
+  let { type, size } = req.body;
+  try {
+    let reports = await Report.findAll({
+      where: {
+        createdAt: {
+          [Op.lt]: new Date(),
+          [Op.gt]: new Date(
+            new Date() -
+              size * (type === "month" ? 31 : 1) * 24 * 60 * 60 * 1000
+          ),
+        },
+        method: {
+          [Op.not]: null,
+        },
+        status: "Chưa xử lý",
+      },
+    });
 
-        for (let i = 0; i < reports.length; i++) {
-            let date = new Date(reports[i].createdAt);
-            let dateStr = (type === 'day' ? `${date.getDate()}/` : '') + `${date.getMonth() + 1}/${date.getFullYear()}`;
-            let index = labels.indexOf(dateStr);
-            if (index > -1) {
-                numberOfReportsList[index] += 1;
-                if (reports[i].method == null) {
-                    waiting += 1;
-                }  else {
-                    processed += 1;
-                }
-            }
+    let labels = [],
+      numberOfReportsList = [],
+      waiting = 0,
+      processed = 0;
+    if (type === "day") {
+      for (let i = size - 1; i >= 0; i--) {
+        let date = new Date(new Date() - i * 24 * 60 * 60 * 1000);
+        labels.push(
+          `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+        );
+        numberOfReportsList.push(0);
+      }
+    } else if (type === "month") {
+      let currentMonth = new Date().getMonth();
+      let currentYear = new Date().getFullYear();
+      while (size > 0) {
+        labels.unshift(`${currentMonth + 1}/${currentYear}`);
+        numberOfReportsList.unshift(0);
+        currentMonth -= 1;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear -= 1;
         }
-        return res.json({
-            status: "success",
-            labels, 
-            numberOfReportsList,
-        });
-    } catch (err) {
-        console.error(err);
-        return res.json({
-            status: "fail"
-        })
+        size -= 1;
+      }
     }
-}
+
+    for (let i = 0; i < reports.length; i++) {
+      let date = new Date(reports[i].createdAt);
+      let dateStr =
+        (type === "day" ? `${date.getDate()}/` : "") +
+        `${date.getMonth() + 1}/${date.getFullYear()}`;
+      let index = labels.indexOf(dateStr);
+      if (index > -1) {
+        numberOfReportsList[index] += 1;
+        if (reports[i].method == null) {
+          waiting += 1;
+        } else {
+          processed += 1;
+        }
+      }
+    }
+    return res.json({
+      status: "success",
+      labels,
+      numberOfReportsList,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.json({
+      status: "fail",
+    });
+  }
+};
 
 controller.getWaitingAndProcessedReport = async (req, res) => {
-    try {
-        let reports = await Report.findAll();
-        let waitingReports = reports.filter((report) => report.method == null);
+  try {
+    let reports = await Report.findAll();
+    let waitingReports = reports.filter((report) => report.method == null);
 
-        return res.json({
-            status: "success",
-            waiting: waitingReports.length,
-            processed: reports.length - waitingReports.length,
-        });
-    } catch (err) {
-        console.error(err);
-        return res.json({
-            status: "fail",
-            waiting: 0,
-            processed: 0,
-        })
-    } 
-}
-
-
+    return res.json({
+      status: "success",
+      waiting: waitingReports.length,
+      processed: reports.length - waitingReports.length,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.json({
+      status: "fail",
+      waiting: 0,
+      processed: 0,
+    });
+  }
+};
 
 const getLocationTypeName = async (adsPlacement) => {
   try {
@@ -624,10 +699,9 @@ controller.adplaceManagement = async (req, res) => {
       // ... add other value fields for AdsPlacement ...
     },
   };
-  const createMsg = {
-    status: req.flash("createMsgStatus"),
-    content: req.flash("createMsgContent"),
-  };
+
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
 
   const editMsg = {
     status: req.flash("editMsgStatus"),
@@ -735,11 +809,30 @@ controller.adplaceManagement = async (req, res) => {
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas ORDER BY district`
   );
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message != null && message.type === "delete") {
+    flag = true;
+  }
   const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
   const adsTypes = await AdsType.findAll();
   const locationsType = await LocationType.findAll();
   const currentUrl = req.url.slice(1);
+  const pagination = await getPagination(
+    req,
+    res,
+    adsPlacements,
+    5,
+    page,
+    2,
+    flag
+  );
+
+  const status = ["Đã quy hoạch", "Chưa quy hoạch"];
+
   res.render("So/adplaceManagement.ejs", {
+    pagination,
     adsPlacements,
     districts,
     wards,
@@ -747,11 +840,12 @@ controller.adplaceManagement = async (req, res) => {
     currentDistrict,
     currentWard,
     createErr,
-    createMsg,
     adsTypes,
     locationsType,
     editMsg,
     deleteMsg,
+    message,
+    status,
   });
 };
 
@@ -789,7 +883,6 @@ controller.createAdplace = async (req, res) => {
     createFailed = true;
   }
   if (await checkInput.isDuplicateAddress(addressCreateModal)) {
-    console.log("Địa chỉ đặt đã đc táoj.");
     req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
     createFailed = true;
   }
@@ -798,8 +891,14 @@ controller.createAdplace = async (req, res) => {
     req.flash("numBoardCreateModal", numBoardCreateModal);
     req.flash("addressCreateModal", addressCreateModal);
 
-    req.flash("createMsgStatus", "danger");
-    req.flash("createMsgContent", "Đăng ký thất bại");
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Đăng ký thất bại",
+      })
+    );
     return res.redirect("/department/adplaceManagement");
   }
 
@@ -835,6 +934,29 @@ controller.createAdplace = async (req, res) => {
   } catch (err) {}
 };
 
+controller.editAdplace = async (req, res) => {
+  console.log("da vao edit");
+  const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+  const adsPlacement = await AdsPlacement.findOne({
+    where: {
+      id,
+    },
+  });
+  const districts = await Area.findAll();
+  const locationsType = await LocationType.findAll();
+  const adsTypes = await AdsType.findAll();
+  return res.render("So/editAdplace.ejs", {
+    adsPlacement,
+    districts,
+    locationsType,
+    adsTypes,
+  });
+};
+
+controller.deleteAdplace = async (req, res) => {
+  console.log("da vao delete");
+};
+
 controller.getAreas = async (req, res) => {
   let district = req.query.district || "";
 
@@ -859,9 +981,9 @@ controller.getAreas = async (req, res) => {
     areas: areas,
     total: amount,
     hasNextPage: perPage * page < amount,
-    hasNextNextPage:perPage * (page+1) < amount,
+    hasNextNextPage: perPage * (page + 1) < amount,
     hasPreviousPage: page > 1,
-    hasPreviousPreviousPage:(page-1)>1,
+    hasPreviousPreviousPage: page - 1 > 1,
     nextPage: page + 1,
     currentPage: page,
     previousPage: page - 1,
