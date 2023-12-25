@@ -1274,14 +1274,18 @@ controller.createBoard = async (req, res) => {
     );
     return res.redirect("/department/boardManagement");
   }
-  console.log(boardTypeid, adPlacementId);
-  await Board.create({
-    size: heightCreateModal + "m x " + weightCreateModal + "m",
-    quantity: 20,
-    boardTypeId: parseInt(boardTypeid),
-    adsPlacementId: adPlacementId,
-  });
-  await newBoard.save();
+  try {
+    console.log(boardTypeid, adPlacementId);
+    await Board.create({
+      size: heightCreateModal + "m x " + weightCreateModal + "m",
+      quantity: 20,
+      boardTypeId: parseInt(boardTypeid),
+      adsPlacementId: adPlacementId,
+    });
+    await newBoard.save();
+  } catch (error) {
+    console.log(error);
+  }
   res.redirect("/department/boardManagement");
 };
 module.exports = controller;
