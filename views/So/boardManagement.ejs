@@ -40,6 +40,19 @@
                     <!-- Main content -->
                     <main class="dynamic-container container-fluid">
                         <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
+                            <form action="boardManagement" method="GET">
+                                <div class="input-group flex-nowrap">
+                                    <span class="input-group-text" id="addon-wrapping"><i
+                                            class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" <% if (search !=='' ) { %> value="<%= search
+                                        %>" <% } %> placeholder="Tìm kiếm theo địa chỉ"placeholder="Tìm kiếm theo địa
+                                            chỉ"
+                                            aria-label="find" aria-describedby="addon-wrapping" name="search">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
+
                             <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="./boardManagement">
                                 All
                             </a>
@@ -120,8 +133,7 @@
                                 </thead>
                                 <tbody>
                                     <% if (pagination.rows && pagination.rows.length> 0) { %>
-                                        <% for (let i=0; i < pagination.rows.length &&
-                                            pagination.rows[i].AdsPlacement!=null; i++) { %>
+                                        <% for (let i=0; i < pagination.rows.length; i++) { %>
                                             <tr>
                                                 <td>
                                                     <%= pagination.rows[i].size %>
@@ -143,7 +155,10 @@
                                                     <i class="fas fa-pen" style="color: #f29d38;" data-bs-toggle="modal"
                                                         data-bs-target="#editModal"
                                                         data-id="<%= pagination.rows[i].id %>"
-                                                        data-type="<%= pagination.rows[i].type %>"
+                                                        data-size="<%= pagination.rows[i].size %>"
+                                                        data-quantity="<%= pagination.rows[i].quantity %>"
+                                                        data-address="<%= pagination.rows[i].AdsPlacement.address %>"
+                                                        data-type="<%= pagination.rows[i].BoardType.type %>"
                                                         data-district="<%= pagination.rows[i].AdsPlacement.Area.district %>"
                                                         data-ward="<%= pagination.rows[i].AdsPlacement.Area.ward %>"
                                                         onclick="showEditBoardModal(this)"></i>
@@ -156,8 +171,8 @@
                                             <% } %>
                                                 <% } else { %>
                                                     <tr>
-                                                        <td colspan="7" class="text-center fs-5"> Không có bất kì tài
-                                                            khoản nào</td>
+                                                        <td colspan="7" class="text-center fs-5"> Không có bất kì bảng
+                                                            quảng cáo nào</td>
                                                     </tr>
                                                     <% } %>
 
@@ -246,7 +261,8 @@
                                     <div class="modal-body">
                                         <form action="/department/boardManagement" method="POST">
                                             <fieldset class="container-fluid">
-                                                <div class="row fw-semibold fs-4 mb-2">Khu vực đặt bảng quảng cáo</div>
+                                                <div class="row fw-semibold fs-4 mb-2">Khu vực đặt và Loại bảng quảng
+                                                    cáo</div>
                                                 <div class="row g-md-3 g-2 mb-3">
                                                     <div class="col-6 col-md-4">
                                                         <select name="districtSelectCreateModal" class="form-select"
@@ -281,12 +297,12 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo muốn đặt
-                                                    và kích thước bảng quảng cáo
+                                                <div class="row fw-semibold fs-4 mb-2">Kích thước bảng quảng cáo và Số
+                                                    lượng trụ
                                                 </div>
                                                 <div class="row g-md-3 g-2 mb-3">
                                                     <!-- Right column -->
-                                                    <div class="col col-md-5.5 p-0 has-validation">
+                                                    <div class="col col-md-3 p-0 has-validation">
                                                         <div class="form-floating is-invalid">
                                                             <input type="height" id="heightCreateModal" <%
                                                                 if(createErr.error.height.length>
@@ -307,7 +323,7 @@
 
                                                     <div class="col-md-1"></div><!-- Empty column for spacing -->
 
-                                                    <div class="col col-md-5.5 p-0 has-validation">
+                                                    <div class="col col-md-3 p-0 has-validation">
                                                         <div class="form-floating is-invalid">
                                                             <input type="weight" id="weightCreateModal" <%
                                                                 if(createErr.error.height.length>
@@ -325,11 +341,33 @@
                                                         </div>
 
                                                     </div>
+                                                    <div class="col-md-1"></div><!-- Empty column for spacing -->
 
-                                                    <div class="col-md-0.1"></div><!-- Empty column for spacing -->
+                                                    <div class="col col-md-3 p-0 has-validation">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="quantity" id="quantityCreateModal" <%
+                                                                if(createErr.error.height.length>
+                                                            0){ %>
+                                                            class="form-control is-invalid"
+                                                            <% } else {%>
+                                                                class="form-control"
+                                                                <% } %>
+                                                                    value="<%= createErr.value.quantity %>"
+                                                                        name="quantityCreateModal"
+                                                                        autocomplete="true"
+                                                                        placeholder="">
+                                                                        <label for="quantityCreateModal" class="mb-2">Số
+                                                                            lượng trụ</label>
+                                                        </div>
 
-                                                    <!-- Left column -->
-                                                    <div class="col col-md-5.5 p-0 has-validation mb-3">
+                                                    </div>
+
+
+
+                                                    <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo muốn
+                                                        đặt
+                                                    </div>
+                                                    <div class="row g-md-1 g-2 mb-3">
                                                         <div class="form-floating is-invalid">
                                                             <input type="address" id="addressCreateModal" <%
                                                                 if(createErr.error.address.length>
@@ -362,6 +400,159 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editModal" data-bs-backdrop="static">
+                            <div class="modal-dialog modal-dialog-centered modal-lg align-items-start"
+                                style="margin-top: 10px;">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Chỉnh sửa bảng quảng cáo</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            id="close-edit-button"></button>
+                                    </div>
+                                    <!-- Modal body -->
+
+                                    <div class="modal-body">
+                                        <form action="/department/boardManagement" id="editForm">
+                                            <fieldset class="container-fluid">
+                                                <input type="hidden" id="idEditModal" name="idEditModal">
+
+                                                <div class="row fw-semibold fs-4 mb-2">Khu vực đặt và Loại bảng quảng
+                                                    cáo</div>
+                                                <div class="row g-md-3 g-2 mb-3">
+                                                    <div class="col-6 col-md-4">
+                                                        <select name="districtSelectEditModal" class="form-select"
+                                                            required id="districtSelectEditModal"
+                                                            onchange="districtSelectChange(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
+                                                            <% for (let i=0; i < districts.length; i++){ %>
+                                                                <option value="<%= districts[i].district %>"
+                                                                    class="districts">
+                                                                    <%= districts[i].district %>
+                                                                </option>
+                                                                <% } %>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-6 col-md-4">
+                                                        <select name="wardSelectEditModal" class="form-select"
+                                                            id="wardSelectEditModal" required>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-6 col-md-4">
+                                                        <select name="boardTypeSelectEditModal" class="form-select"
+                                                            id="boardTypeSelectEditModal" required>
+                                                            <%for (let i=0; i < boardTypes.length; i++){ %>
+                                                                <option value="<%= boardTypes[i].type %>"
+                                                                    class="boardTypes">
+                                                                    <%= boardTypes[i].type %>
+                                                                </option>
+                                                                <% } %>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row fw-semibold fs-4 mb-2">Kích thước bảng quảng cáo và Số
+                                                    lượng trụ
+                                                </div>
+                                                <div class="row g-md-3 g-2 mb-3">
+                                                    <!-- Right column -->
+                                                    <div class="col col-md-3 p-0 has-validation">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="height" id="heightEditModal"
+                                                                class="form-control" name="heightEditModal"
+                                                                autocomplete="true" placeholder="" required>
+                                                            <label for="heightEditModal" class="mb-2">Chiều
+                                                                dài biển (m)</label>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-md-1"></div><!-- Empty column for spacing -->
+
+                                                    <div class="col col-md-3 p-0 has-validation">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="weight" id="weightEditModal"
+                                                                class="form-control" name="weightEditModal"
+                                                                autocomplete="true" placeholder="">
+                                                            <label for="weightEditModal" class="mb-2">Chiều
+                                                                rộng biển (m)</label>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-md-1"></div><!-- Empty column for spacing -->
+
+                                                    <div class="col col-md-3 p-0 has-validation">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="quantity" id="quantityEditModal"
+                                                                class="form-control" name="quantityEditModal"
+                                                                autocomplete="true" placeholder="" required>
+                                                            <label for="quantityEditModal" class="mb-2">Số
+                                                                lượng trụ</label>
+                                                        </div>
+
+                                                    </div>
+
+
+
+                                                    <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo muốn
+                                                        đặt
+                                                    </div>
+                                                    <div class="row g-md-1 g-2 mb-3">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="address" id="addressEditModal"
+                                                                class="form-control" name="addressEditModal"
+                                                                autocomplete="true" placeholder="" required>
+                                                            <label for="addressEditModal" class="mb-2">Địa
+                                                                chỉ</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+
+                                                <button type="submit" class="mt-4 btn btn-success w-100"
+                                                    id="confirm-edit-button">Chỉnh sửa bảng
+                                                    quảng cáo</button>
+
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteModal" data-bs-backdrop="static">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Xóa bảng quảng cáo</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body" style="white-space: nowrap;">
+                                        Bạn có chắc chắn rằng bạn muốn xóa bảng quảng cáo này không ?
+                                        <input type="hidden" value="" name="boardId" id="idDeleteModal">
+                                    </div>
+
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn gray-button" data-bs-dismiss="modal">Hủy
+                                            bỏ</button>
+                                        <button class="btn red-button" id="confirm-delete-button"
+                                            data-bs-dismiss="modal">Xóa</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
 
 
                     </main>

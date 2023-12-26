@@ -675,18 +675,6 @@ controller.getWaitingAndProcessedReport = async (req, res) => {
   }
 };
 
-const getLocationTypeName = async (adsPlacement) => {
-  try {
-    const locationType = await LocationType.findByPk(
-      adsPlacement.LocationTypeId
-    );
-    return locationType ? locationType.locationType : null;
-  } catch (error) {
-    console.error("Error fetching LocationType:", error);
-    throw error;
-  }
-};
-
 controller.adplaceManagement = async (req, res) => {
   const createErr = {
     error: {
@@ -811,7 +799,7 @@ controller.adplaceManagement = async (req, res) => {
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let flag = false;
 
-  if (message != null && message.type === "delete") {
+  if (message !== null && message.type === "delete") {
     flag = true;
   }
   const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
@@ -867,6 +855,15 @@ controller.createAdplace = async (req, res) => {
     req.flash("numBoardCreateModalError", "Số lượng biển không hợp lệ.");
     createFailed = true;
   }
+  let fullAddress = await checkInput.getFullAddressInfo(
+    addressCreateModal,
+    apiKey
+  );
+  const district = await checkInput.getDistrictFromAdress(fullAddress);
+  if (district !== districtSelectCreateModal) {
+    req.flash("addressCreateModalError", "Địa chỉ không hợp lệ.");
+    createFailed = true;
+  }
   if (checkInput.isEmpty(addressCreateModal)) {
     req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
     createFailed = true;
@@ -899,7 +896,7 @@ controller.createAdplace = async (req, res) => {
       JSON.stringify({
         type: "create",
         status: "danger",
-        content: "Đăng ký thất bại",
+        content: "Tạo điểm quảng cáo thất bại",
       })
     );
     return res.redirect("/department/adplaceManagement");
@@ -938,6 +935,7 @@ controller.createAdplace = async (req, res) => {
 };
 
 controller.editAdplace = async (req, res) => {
+  let editFailed = false;
   const {
     idEditModal,
     districtSelectEditModal,
@@ -959,6 +957,28 @@ controller.editAdplace = async (req, res) => {
   let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
     locationTypeSelectEditModal
   );
+  let fullAddress = await checkInput.getFullAddressInfo(
+    addressEditModal,
+    apiKey
+  );
+  const district = await checkInput.getDistrictFromAdress(fullAddress);
+  if (district !== districtSelectEditModal) {
+    req.flash("addressCreateModalError", "Địa chỉ không hợp lệ.");
+    editFailed = true;
+  }
+  if (editFailed) {
+    req.flash("addressCreateModal", addressEditModal);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Chỉnh sửa điểm quảng cáo thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
   let adTypeId = await checkInput.findAdsTypeIdByAdsType(adTypeSelectEditModal);
   try {
     await AdsPlacement.update(
@@ -1011,7 +1031,7 @@ controller.deleteAdplace = async (req, res) => {
     req.flash(
       "message",
       JSON.stringify({
-        type: "edit",
+        type: "delete",
         status: "success",
         content: "Xóa thành công",
       })
@@ -1022,7 +1042,7 @@ controller.deleteAdplace = async (req, res) => {
     req.flash(
       "message",
       JSON.stringify({
-        type: "edit",
+        type: "delete",
         status: "danger",
         content: "Xóa thất bại",
       })
@@ -1136,7 +1156,6 @@ controller.boardManagement = async (req, res) => {
       address: req.flash("addressCreateModal")[0],
       height: req.flash("heightCreateModal")[0],
       weight: req.flash("weightCreateModal")[0],
-      // ... add other value fields for AdsPlacement ...
     },
   };
   const optionsBoardManagement = {
@@ -1148,7 +1167,9 @@ controller.boardManagement = async (req, res) => {
       },
       {
         model: AdsPlacement,
-        attributes: ["id", "address"],
+        attributes: ["id", "address", "areaId"],
+        where: {},
+
         include: [
           {
             model: Area,
@@ -1167,10 +1188,32 @@ controller.boardManagement = async (req, res) => {
       },
     ],
   };
+  let search = req.query.search || "";
+  if (search.trim() !== "") {
+    optionsBoardManagement.where = {
+      [Op.or]: [
+        {
+          '$AdsPlacement.Area.district$': {
+            [Op.like]: `%${search}%`,
+          },
+        },
+        {
+          '$AdsPlacement.Area.ward$': {
+            [Op.like]: `%${search}%`,
+          },
+        },
+        {
+          '$AdsPlacement.address$': {
+            [Op.like]: `%${search}%`,
+          },
+        },
+      ],
+    };
+    
+  }
   let district = req.query.district || "";
   console.log(district);
   let ward = req.query.ward || "";
-  let search = req.query.search || "";
   let wards = [],
     currentDistrict = "",
     currentWard = "";
@@ -1193,19 +1236,19 @@ controller.boardManagement = async (req, res) => {
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas ORDER BY district`
   );
+
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let flag = false;
 
-  if (message != null && message.type === "delete") {
+  if (message !== null && message.type === "delete") {
     flag = true;
   }
 
   const boards = await Board.findAll(optionsBoardManagement);
+
   const currentUrl = req.url.slice(1);
   const boardTypes = await BoardType.findAll();
-  console.log(currentUrl);
   const pagination = await getPagination(req, res, boards, 5, page, 2, flag);
-  console.log(pagination.rows.length);
 
   res.render("So/boardManagement.ejs", {
     pagination,
@@ -1218,6 +1261,7 @@ controller.boardManagement = async (req, res) => {
     message,
     createErr,
     boardTypes,
+    search,
   });
 };
 
@@ -1230,6 +1274,7 @@ controller.createBoard = async (req, res) => {
     heightCreateModal,
     weightCreateModal,
     addressCreateModal,
+    quantityCreateModal,
   } = req.body;
 
   let createFailed = false;
@@ -1244,7 +1289,14 @@ controller.createBoard = async (req, res) => {
     !checkInput.isNumber(weightCreateModal) ||
     checkInput.isEmpty(weightCreateModal)
   ) {
-    req.flash("weightCreateModal", "Chiều rộng không hợp lệ");
+    req.flash("weightCreateModalError", "Chiều rộng không hợp lệ");
+    createFailed = true;
+  }
+  if (
+    !checkInput.isNumber(quantityCreateModal) ||
+    checkInput.isEmpty(quantityCreateModal)
+  ) {
+    req.flash("quantityCreateModalError", "Số lượng trụ không hợp lệ");
     createFailed = true;
   }
   let boardTypeid = await checkInput.findBoardsTyoeIdByBoardType(
@@ -1276,16 +1328,201 @@ controller.createBoard = async (req, res) => {
   }
   try {
     console.log(boardTypeid, adPlacementId);
-    await Board.create({
+    const newBoard = await Board.create({
       size: heightCreateModal + "m x " + weightCreateModal + "m",
-      quantity: 20,
-      boardTypeId: parseInt(boardTypeid),
-      adsPlacementId: adPlacementId,
+      quantity: quantityCreateModal + " trụ/bảng",
+      BoardTypeId: parseInt(boardTypeid),
+      AdsPlacementId: adPlacementId,
     });
     await newBoard.save();
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo bảng quảng cáo thành công",
+      })
+    );
   } catch (error) {
     console.log(error);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo bảng quảng cáo thất bại",
+      })
+    );
   }
-  res.redirect("/department/boardManagement");
+  return res.redirect("/department/boardManagement");
+};
+
+controller.editBoard = async (req, res) => {
+  console.log(req.body);
+  const {
+    districtSelectEditModal,
+    boardTypeSelectEditModal,
+    wardSelectEditModal,
+    heightEditModal,
+    weightEditModal,
+    quantityEditModal,
+    addressEditModal,
+    idEditModal,
+  } = req.body;
+  console.log(req.body);
+  let updateFailed = false;
+  if (
+    !checkInput.isNumber(heightEditModal) ||
+    checkInput.isEmpty(heightEditModal)
+  ) {
+    req.flash("heightEditModalError", "Chiều dài không hợp lệ");
+    updateFailed = true;
+  }
+  if (
+    !checkInput.isNumber(weightEditModal) ||
+    checkInput.isEmpty(weightEditModal)
+  ) {
+    req.flash("weightEditModalError", "Chiều rộng không hợp lệ");
+    updateFailed = true;
+  }
+
+  if (
+    !checkInput.isNumber(quantityEditModal) ||
+    checkInput.isEmpty(quantityEditModal)
+  ) {
+    req.flash("quantityEditModalError", "Số lần trụ không hợp lệ");
+    updateFailed = true;
+  }
+  if (checkInput.isEmpty(addressEditModal)) {
+    req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
+    updateFailed = true;
+  }
+
+  let address = await checkInput.getLatLongFromAddress(
+    addressEditModal +
+      "," +
+      wardSelectEditModal +
+      "," +
+      districtSelectEditModal,
+    apiKey
+  );
+
+  if (!address) {
+    req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
+    updateFailed = true;
+  }
+
+  let fullAddress = await checkInput.getFullAddressInfo(
+    addressEditModal,
+    apiKey
+  );
+  const district = await checkInput.getDistrictFromAdress(fullAddress);
+
+  console.log(district);
+  console.log(districtSelectEditModal);
+
+  if (district !== districtSelectEditModal) {
+    req.flash("addressEditModalError", "Địa chỉ không hợp lệ.");
+    updateFailed = true;
+  }
+
+  if (checkInput.isEmpty(addressEditModal)) {
+    req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
+    updateFailed = true;
+  }
+
+  const adPlacementId = await checkInput.findAdplacementByAddress(
+    addressEditModal,
+    await checkInput.findAreaIdByWardAndDistrict(
+      wardSelectEditModal,
+      districtSelectEditModal
+    )
+  );
+  console.log(updateFailed);
+  let boardTypeId = await checkInput.findBoardsTyoeIdByBoardType(
+    boardTypeSelectEditModal
+  );
+  if (updateFailed) {
+    req.flash("addressEditModal", addressEditModal);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật bảng quảng cáo thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
+  try {
+    await Board.update(
+      {
+        size: heightEditModal + "m x " + weightEditModal + "m",
+        quantity: quantityEditModal + " trụ/bảng",
+        BoardTypeId: parseInt(boardTypeId),
+        AdsPlacementId: adPlacementId,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+    console.log("cập nhật tc");
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật bảng quảng cáo thành công",
+      })
+    );
+    return res.send("Board updated");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật bảng quảng không thành công",
+      })
+    );
+    return res.send("Can not update board");
+  }
+};
+
+controller.deleteBoard = async (req, res) => {
+  const { boardId } = req.body;
+
+  console.log(req.body);
+
+  try {
+    await Board.destroy({
+      where: {
+        id: boardId,
+      },
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Xóa thành công",
+      })
+    );
+    return res.send("Board deleted!");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Xóa thất bại",
+      })
+    );
+    return res.send("Can not delete board!");
+  }
 };
 module.exports = controller;
