@@ -1,20 +1,3 @@
-const myModalEl = document.getElementById('createModal')
-myModalEl.addEventListener('hidden.bs.modal', function (event) {
-    const invalidFeedbacks = document.querySelectorAll(".invalid-feedback");
-    invalidFeedbacks.forEach((feedback) => feedback.remove());
-
-    const createAlertMessage = document.querySelector("#create-alert-container");
-    if (createAlertMessage) {
-        createAlertMessage.remove();
-    }
-
-    const inputElements = document.querySelectorAll(".form-control");
-    inputElements.forEach((inputElement) => {
-        if (inputElement.classList.contains("is-invalid")) {
-        inputElement.classList.remove("is-invalid");
-        }
-    })
-})
 
 function districtSelectChange(accountTypeSelect, districtSelect, wardSelect, callback) {
     if (accountTypeSelect.value === 'Phuong') {

@@ -23,6 +23,19 @@ function isEmail(email) {
   return false;
 }
 
+async function phoneExists(phone) {
+  const account = await Account.findOne({
+    where: {
+      phone,
+    },
+  });
+  if (account) {
+    return true;
+  }
+  return false;
+}
+
+
 async function emailExists(email) {
   const account = await Account.findOne({
     where: {
@@ -169,6 +182,7 @@ module.exports = {
   isEmail,
   emailExists,
   usernameExists,
+  phoneExists,
   isValidPassword,
   isValidConfirmPassword,
   isNumber,

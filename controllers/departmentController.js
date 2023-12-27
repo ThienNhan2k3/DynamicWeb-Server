@@ -10,6 +10,7 @@ const {
   Board,
   Report,
   ReportType,
+  BoardRequest,
   sequelize,
 } = require("../models");
 const severPath = "http://localhost:5000/";
@@ -85,6 +86,8 @@ controller.accountManagement = async (req, res) => {
       email: req.flash("emailCreateModalError"),
       password: req.flash("passwordCreateModalError"),
       confirmPassword: req.flash("confirmPasswordCreateModalError"),
+      birthDay: req.flash("birthDayCreateModalError"),
+      phone: req.flash("phoneCreateModalError"),
     },
     value: {
       firstName: req.flash("firstNameCreateModal")[0],
@@ -93,10 +96,13 @@ controller.accountManagement = async (req, res) => {
       email: req.flash("emailCreateModal")[0],
       password: req.flash("passwordCreateModal")[0],
       confirmPassword: req.flash("confirmPasswordCreateModal")[0],
+      birthDay: req.flash("birthDayCreateModal")[0],
+      phone: req.flash("phoneCreateModal")[0],
     },
   };
-  let message = req.flash("message")[0];
+  let message = req.flash("messageAccountManagement")[0];
   message = message == null ? null : JSON.parse(message);
+  console.log(message);
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let district = req.query.district || "";
   let ward = req.query.ward || "";
@@ -184,6 +190,8 @@ controller.createAccount = async (req, res) => {
     usernameCreateModal,
     emailCreateModal,
     passwordCreateModal,
+    birthDayCreateModal,
+    phoneCreateModal,
     confirmPasswordCreateModal,
     accountTypeSelectCreateModal,
     districtSelectCreateModal,
@@ -211,6 +219,30 @@ controller.createAccount = async (req, res) => {
   } else if (await checkInput.usernameExists(usernameCreateModal)) {
     loginFailed = true;
     req.flash("usernameCreateModalError", "Tên đăng nhập đã tồn tại!");
+  }
+  //Birthday 
+  const birthDay = new Date(birthDayCreateModal);
+  const yearToMilliseconds = 1000 * 60 * 60 * 24 * 365;
+  if (birthDay == "Invalid Date") {
+    loginFailed = true;
+    req.flash("birthDayCreateModalError", "Ngày sinh không thể để trống!");
+  } else if (birthDay > new Date()) {
+    loginFailed = true;
+    req.flash("birthDayCreateModalError", "Ngày sinh lớn hơn thời gian hiện tại!");
+  } else if (Date.now() - birthDay.getTime() - 0 * yearToMilliseconds < 0) {
+    loginFailed = true;
+    req.flash("birthDayCreateModalError", "Chưa đủ tuổi thành niên");
+  }
+  //phone
+  if (checkInput.isEmpty(phoneCreateModal)) {
+    loginFailed = true;
+    req.flash("phoneCreateModalError", "Số điện thoại không thể để trống!");
+  } else if (phoneCreateModal.length != 10) {
+    loginFailed = true;
+    req.flash("phoneCreateModalError", "Số điện thoại không hợp lệ!");
+  } else if (await checkInput.phoneExists(phoneCreateModal)) {
+    loginFailed = true;
+    req.flash("phoneCreateModalError", "Số điện thoại đã tồn tại!");
   }
   //Email
   if (checkInput.isEmpty(emailCreateModal)) {
@@ -258,8 +290,10 @@ controller.createAccount = async (req, res) => {
     req.flash("emailCreateModal", emailCreateModal);
     req.flash("passwordCreateModal", passwordCreateModal);
     req.flash("confirmPasswordCreateModal", confirmPasswordCreateModal);
+    req.flash("birthDayCreateModal", birthDayCreateModal);
+    req.flash("phoneCreateModal", phoneCreateModal);
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "create",
         status: "danger",
@@ -268,7 +302,7 @@ controller.createAccount = async (req, res) => {
     );
     return res.redirect("/department/accountManagement");
   }
-
+  console.log("Phone: ", phoneCreateModal);
   try {
     const hashPassword = await bcrypt.hash(passwordCreateModal, 12);
     let areaId = 1;
@@ -281,28 +315,31 @@ controller.createAccount = async (req, res) => {
       if (accountTypeSelectCreateModal === "Phuong") {
         options.where.ward = wardSelectCreateModal;
       }
-      const newAccount = await Account.create({
-        firstName: firstNameCreateModal,
-        lastName: lastNameCreateModal,
-        username: usernameCreateModal,
-        email: emailCreateModal,
-        password: hashPassword,
-        type: accountTypeSelectCreateModal,
-        AreaId: areaId,
-      });
-      req.flash(
-        "message",
-        JSON.stringify({
-          type: "create",
-          status: "success",
-          content: "Đăng ký thành công",
-        })
-      );
     }
+    const newAccount = await Account.create({
+      firstName: firstNameCreateModal,
+      lastName: lastNameCreateModal,
+      username: usernameCreateModal,
+      email: emailCreateModal,
+      password: hashPassword,
+      type: accountTypeSelectCreateModal,
+      birth: birthDayCreateModal,
+      phone: phoneCreateModal,
+      AreaId: areaId,
+    });
+    console.log(newAccount);
+    req.flash(
+      "messageAccountManagement",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Đăng ký thành công",
+      })
+    );
   } catch (err) {
     console.log(err);
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "create",
         status: "danger",
@@ -338,7 +375,7 @@ controller.editAccount = async (req, res) => {
       { where: { id: idEditModal } }
     );
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "edit",
         status: "success",
@@ -349,7 +386,7 @@ controller.editAccount = async (req, res) => {
   } catch (err) {
     console.error(err);
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "edit",
         status: "danger",
@@ -365,7 +402,7 @@ controller.deleteAccount = async (req, res) => {
   try {
     await Account.destroy({ where: { id: accountId } });
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "delete",
         status: "success",
@@ -376,7 +413,7 @@ controller.deleteAccount = async (req, res) => {
   } catch (err) {
     console.error(err);
     req.flash(
-      "message",
+      "messageAccountManagement",
       JSON.stringify({
         type: "delete",
         status: "danger",
@@ -674,6 +711,90 @@ controller.getWaitingAndProcessedReport = async (req, res) => {
     });
   }
 };
+
+controller.viewEditRequest = async (req, res) => {
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let district = req.query.district || "";
+  let ward = req.query.ward || "";
+
+  let whereCondition = {};
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+  if (district.trim() !== "") {
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
+    });
+    whereCondition.district = district;
+    currentDistrict = district;
+    if (ward.trim() !== "") {
+      currentWard = ward;
+      whereCondition.ward = ward;
+    }
+  }
+
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+  let boardRequest = await BoardRequest.findAll({
+    include: [
+      {
+        model: Board,
+        include: [
+          BoardType,
+          {
+            model: AdsPlacement,
+            include: [
+              {
+                model: Area,
+                where: whereCondition,
+                required: true,
+              },
+            ],
+            required: true,
+          },
+        ],
+        required: true,
+      },
+      {
+        model: Account,
+        attributes: ["firstName", "lastName", "type", "email"],
+      },
+    ],
+  });
+  const editRequestsPerPage = 1;
+  let pagination = await getPagination(
+    req,
+    res,
+    boardRequest,
+    editRequestsPerPage,
+    page
+  );
+  const currentUrl = req.url.slice(1);
+
+  return res.render("So/acceptOrDenyEditRequest.ejs", {
+    formatDate: (date) => {
+      return date.toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit" }) + " - " + date.toLocaleDateString({
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+    pagination,
+    currentUrl,
+    districts,
+    wards,
+    currentDistrict,
+    currentWard,
+  });
+}
+
+controller.acceptOrDenyEditRequest = async (req, res) => {
+  res.json({status: "success"});
+}
+
 
 const getLocationTypeName = async (adsPlacement) => {
   try {

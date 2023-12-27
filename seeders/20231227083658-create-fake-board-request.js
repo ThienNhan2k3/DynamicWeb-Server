@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up (queryInterface, Sequelize) {
     /**
      * Add seed commands here.
      *
@@ -11,22 +11,18 @@ module.exports = {
      *   name: 'John Doe',
      *   isBetaMember: false
      * }], {});
-     */
-    const { areas } = require("../data/areas");
-    await queryInterface.bulkInsert(
-      "areas",
-      areas,
-      {}
-    );
+    */
+    const { boardRequests } = require("../data/boardRequests");
+    await queryInterface.bulkInsert('boardRequests', boardRequests, {});
   },
 
-  async down(queryInterface, Sequelize) {
+  async down (queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete("areas", null, {});
-  },
+    await queryInterface.bulkDelete('boardRequests', null, {});
+  }
 };

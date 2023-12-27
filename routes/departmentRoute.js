@@ -33,6 +33,10 @@ router.get(
 );
 router.get("/viewReport/:id", controller.detailReport);
 
+// Accept or deny edit requests
+router.get("/acceptOrDenyEditRequest", controller.viewEditRequest);
+router.post("/acceptOrDenyEditRequest", controller.acceptOrDenyEditRequest);
+
 // Area management
 router.get("/areaManagement", controller.getAreas);
 router.post("/editArea", controller.postEditArea);

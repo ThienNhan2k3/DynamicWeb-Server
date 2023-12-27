@@ -234,9 +234,8 @@
                     <% } %>
                   </div>
                 </div>
-
                 <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
+                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
                     <div class="form-floating is-invalid">
                       <input 
                       type="text"
@@ -253,9 +252,26 @@
                       <div class="invalid-feedback"> <%= createErr.error.username[0] %></div>
                     <% } %>
                   </div>
+                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input 
+                      type="date"
+                      <% if(createErr.error.birthDay.length > 0){ %>
+                        class="form-control  is-invalid"
+                      <% } else {%>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.birthDay %>"
+                      id="birthDayCreateModal" name="birthDayCreateModal" autocomplete="true" placeholder="">
+                      <label for="birthDayCreateModal" class="mb-2">Ngày sinh</label>
+                    </div>
+                    <% if(createErr.error.birthDay.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.birthDay[0] %></div>
+                    <% } %>
+                  </div>
                 </div>
                 <div class="row mb-3">
-                  <div class="col col-12 p-0 has-validation">
+                  <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
                     <div class="form-floating is-invalid">
                       <input 
                       type="email" 
@@ -271,6 +287,23 @@
                     </div>
                     <% if(createErr.error.email.length > 0) { %>
                     <div class="invalid-feedback"> <%= createErr.error.email[0] %></div>
+                    <% } %>
+                  </div>
+                  <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                    <div class="mb-0 form-floating is-invalid">
+                      <input 
+                      type="tel" 
+                      <% if(createErr.error.phone.length > 0){ %>
+                        class="form-control  is-invalid"
+                      <% } else {%>
+                        class="form-control"
+                      <% } %>
+                      value="<%= createErr.value.phone %>"
+                      id="phoneCreateModal" name="phoneCreateModal" autocomplete="true" placeholder="">
+                      <label for="phoneCreateModal" class="mb-2">Số điện thoại</label>
+                    </div>
+                    <% if(createErr.error.phone.length > 0) { %>
+                      <div class="invalid-feedback"> <%= createErr.error.phone[0] %></div>
                     <% } %>
                   </div>
                 </div>
@@ -461,4 +494,13 @@
     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
     crossorigin="anonymous"
   ></script>
+
+  <% if (message != null && message.type === 'create' && message.status === 'danger'){ %>
+    <script>    
+      var myModal = new bootstrap.Modal(document.getElementById("createModal"), {});
+      document.onreadystatechange = function () {
+        myModal.show();
+      };
+    </script>
+  <% } %>
 </html>
