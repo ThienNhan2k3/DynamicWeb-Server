@@ -105,6 +105,39 @@ async function getLatLongFromAddress(address, apiKey) {
   return false;
 }
 
+async function getFullAddressInfo(address, apiKey) {
+  const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const fullAddress = data.results[0].formatted;
+
+    if (fullAddress) {
+      return fullAddress;
+    }
+  }
+
+  return false;
+}
+
+async function getDistrictFromAdress(address) {
+  const districtInfo = address.match(/(Quận|Huyện)\s(.*?),/);
+
+  if (districtInfo && districtInfo[1] && districtInfo[2]) {
+    const districtType = districtInfo[1].trim();
+    const districtName = districtInfo[2].trim();
+    console.log("Loại quận/huyện là:", districtType);
+    console.log("Tên quận/huyện là:", districtName);
+    return districtType + " " + districtName;
+  } else {
+    return null;
+  }
+}
+
 async function isDuplicateAddress(address) {
   const existingAdplace = await AdsPlacement.findOne({
     where: {
@@ -193,4 +226,6 @@ module.exports = {
   findAdsTypeIdByAdsType,
   findBoardsTyoeIdByBoardType,
   findAdplacementByAddress,
+  getFullAddressInfo,
+  getDistrictFromAdress,
 };

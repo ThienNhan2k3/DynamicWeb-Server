@@ -20,6 +20,8 @@ router.delete("/adplaceManagement", controller.deleteAdplace);
 // boardManagement
 router.get("/boardManagement", controller.boardManagement);
 router.post("/boardManagement", controller.createBoard);
+router.put("/boardManagement", controller.editBoard);
+router.delete("/boardManagement", controller.deleteBoard);
 /*-------------------- ViewAdsRequest --------------------*/
 router.get("/viewAdsRequest", controller.viewAdsRequests);
 router.get("/viewAdsRequest/:id", controller.acceptOrDenyAdsRequest);
