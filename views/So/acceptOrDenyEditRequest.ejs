@@ -32,7 +32,7 @@
     <!-- Main content -->
     <main class="dynamic-container mb-5 container-fluid">
       <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
-        <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="/department/viewAdsRequest">
+        <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="/department/acceptOrDenyEditRequest">
           All
         </a>
         <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
@@ -91,9 +91,10 @@
             <tr class="align-top">
               <th scope="col-2 align-top">Loại bảng quảng cáo</th>
               <th scope="col-2">Tên người gửi</th>
-              <th scope="col-4">Địa điểm</th>
+              <th scope="col-3">Địa điểm</th>
               <th scope="col-2">Thời gian gửi</th>
-              <th scope="col-2">Thông tin yêu cầu</th>
+              <th scope="col-2">Trạng thái</th>
+              <th scope="col-1">Thông tin yêu cầu</th>
             </tr>
           </thead>
           <tbody>
@@ -105,8 +106,37 @@
                   <td><%= pagination.rows[i].Board.AdsPlacement.address %>, <%=  pagination.rows[i].Board.AdsPlacement.Area.ward %>, <%= pagination.rows[i].Board.AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</td>
                   <td><%= formatDate(pagination.rows[i].createdAt) %></td>
                   <td>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#locationChange">Xem chi
-                      tiết</button>
+                    <% if (pagination.rows[i].requestStatus === 'Chờ xác nhận') { %>
+                    <button class="btn btn-warning">
+                        <%= pagination.rows[i].requestStatus %>
+                    </button>
+                    <% } else if (pagination.rows[i].requestStatus === 'Từ chối') { %>
+                    <button class="btn btn-danger">
+                      <%= pagination.rows[i].requestStatus %>
+                    </button>
+                    <% } else { %>
+                    <button class="btn btn-success">
+                      <%= pagination.rows[i].requestStatus %>
+                    </button>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (pagination.rows[i].requestStatus === 'Chờ xác nhận') { %>
+                        <button class="btn btn-primary" 
+                      data-bs-toggle="modal"
+                      data-bs-target="#boardRequest"
+                      data-quantity="<%= pagination.rows[i].quantity%>"
+                      data-size="<%= pagination.rows[i].size%>"
+                      data-board-id="<%= pagination.rows[i].Board.id %>"
+                      data-board-type="<%= pagination.rows[i].BoardType.type %>"
+                      data-board-type-id="<%= pagination.rows[i].BoardType.id %>"
+                      data-board-request-id="<%= pagination.rows[i].id %>"
+                      onclick="setDataToBoardRequestModal(event)">
+                      Xem chi tiết</button>
+                    <% } else { %>
+                      <button class="btn btn-primary" disabled>Xem chi tiết</button>
+                    <% } %>
+                    
                   </td>
                 </tr>
               <% } %>
@@ -158,8 +188,109 @@
     <!-- Footer -->
     <%- include("../partials/footer.ejs") %>
 
+    <!-- BoardRequest Modal -->
+    <div class="modal fade mt-5" id="boardRequest" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg align-items-start" style="margin-top: 10px;">
+          <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Tạo tài khoản</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" id="close-create-button"></button>
+            </div>
+  
+            <!-- Modal body -->
+            <div class="modal-body">
+              <form action="/department/acceptOrDenyEditRequest" method="POST" id="edit-request-form" >
+                <fieldset class="container">
+                  <div class="row mb-3 gy-3">
+                    <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
+                      <div class="mb-0 form-floating is-invalid">
+                        <input 
+                        readonly
+                        type="text" 
+                        class="form-control"
+                        id="boardType" name="boardType" autocomplete="true" placeholder="">
+                        <label for="boardType" class="mb-2">Loại bảng quảng cáo</label>
+                      </div>
+                    </div>
+                    <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                      <div class="mb-0 form-floating is-invalid">
+                        <input 
+                        readonly
+                        type="text"
+                        class="form-control"
+                        id="size" name="size" autocomplete="true" placeholder="">
+                        <label for="size" class="mb-2">Kích thước</label>
+                      </div>
+                    </div>
+                    <div class="col col-12 col-sm-6  p-0 has-validation">
+                      <div class="mb-0 form-floating is-invalid">
+                        <input 
+                        readonly
+                        type="text"
+                        class="form-control"
+                        id="quantity" name="quantity" autocomplete="true" placeholder="">
+                        <label for="quantity" class="mb-2">Số lượng</label>
+                      </div>
+                    </div>
+                    <input type="hidden" id="boardId" name="boardId">
+                    <input type="hidden" id="boardTypeId" name="boardTypeId">
+                    <input type="hidden" id="boardRequestId" name="boardRequestId">
+                  </div>
+                </fieldset>
+                <button type="submit" class="mt-4 btn btn-success w-100" id="accept-btn" onclick="acceptOrDenyEditRequest(event)">Chấp nhận</button>
+                <button type="submit" class="mt-2 btn btn-danger w-100" id="deny-btn" onclick="acceptOrDenyEditRequest(event)">Từ chối</button>
+              </form>
+            </div>
+            
+          </div>
+        </div>
+    </div>
 
     <script src="/javascript/toggleNavigation.js"></script>
+    <script>
+      function setDataToBoardRequestModal(event) {
+        console.log(event.target.dataset);
+        const size = event.target.dataset.size;
+        const quantity = event.target.dataset.quantity;
+        const boardRequestId = event.target.dataset.boardRequestId;
+        const boardId = event.target.dataset.boardId;
+        const boardType = event.target.dataset.boardType;
+        const boardTypeId = event.target.dataset.boardTypeId;
+        
+        document.getElementById("quantity").value = quantity;
+        document.getElementById("size").value = size;
+        document.getElementById("boardType").value = boardType;
+        document.getElementById("boardId").value = boardId;
+        document.getElementById("boardTypeId").value = boardTypeId;
+        document.getElementById("boardRequestId").value = boardRequestId;
+      }
+
+      function acceptOrDenyEditRequest(e) {
+        e.preventDefault();
+        console.log(e.target);
+        const formData = new FormData(document.getElementById("edit-request-form"));
+        const data = Object.fromEntries(formData.entries());
+        if (e.target.matches("#accept-btn")) {
+          data.status = "Chấp nhận";
+        } else {
+          data.status = "Từ chối";
+        }
+
+        fetch("/department/acceptOrDenyEditRequest", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(data)
+        }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          location.reload();
+        })
+        .catch(err => {console.log(err)});
+      }
+    </script>
 
   </body>
 

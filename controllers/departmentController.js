@@ -504,7 +504,8 @@ controller.viewAdsRequests = async (req, res) => {
   });
 };
 
-controller.acceptOrDenyAdsRequest = async (req, res) => {
+controller.detailRequest = async (req, res) => {
+  const previousUrl = req.query.previousUrl || "";
   const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
   let permitRequest = await PermitRequest.findOne({
     include: [
@@ -528,7 +529,19 @@ controller.acceptOrDenyAdsRequest = async (req, res) => {
       id,
     },
   });
-  return res.render("So/acceptOrDenyAdsRequest.ejs", { permitRequest });
+  return res.render("So/acceptOrDenyAdsRequest.ejs", { permitRequest, previousUrl });
+};
+
+controller.acceptOrDenyAdsRequest = async (req, res) => {
+  const {status, id, previousUrl} = req.body;
+  try {
+    await PermitRequest.update({
+      status
+    }, {where: {id}})
+    return res.json({status: "success", redirect: `${req.baseUrl}/${previousUrl}`});
+  } catch(err) {
+    return res.json({status: "fail", redirect: `${req.baseUrl}/${previousUrl}`});
+  }
 };
 
 controller.viewReports = async (req, res) => {
@@ -712,16 +725,13 @@ controller.getWaitingAndProcessedReport = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 controller.viewEditRequest = async (req, res) => {
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let district = req.query.district || "";
   let ward = req.query.ward || "";
 
   let whereCondition = {};
-  let wards = [],
-    currentDistrict = "",
-    currentWard = "";
+  let wards = [], currentDistrict = "", currentWard = "";
   if (district.trim() !== "") {
     wards = await Area.findAll({
       where: {
@@ -739,8 +749,10 @@ controller.viewEditRequest = async (req, res) => {
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas`
   );
+  console.log(whereCondition);
   let boardRequest = await BoardRequest.findAll({
     include: [
+      BoardType,
       {
         model: Board,
         include: [
@@ -774,10 +786,11 @@ controller.viewEditRequest = async (req, res) => {
     page
   );
   const currentUrl = req.url.slice(1);
+  console.log(pagination);
 
   return res.render("So/acceptOrDenyEditRequest.ejs", {
     formatDate: (date) => {
-      return date.toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit" }) + " - " + date.toLocaleDateString({
+      return date.toLocaleDateString({
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -793,9 +806,21 @@ controller.viewEditRequest = async (req, res) => {
 }
 
 controller.acceptOrDenyEditRequest = async (req, res) => {
-  res.json({status: "success"});
+  const {boardRequestId, size, quantity, boardTypeId, boardId, status} = req.body;
+  try {
+    await BoardRequest.update({
+      size,
+      quantity,
+      requestStatus: status
+    }, {where: {id: boardRequestId}})
+    await Board.update({
+      BoardTypeId: boardTypeId,
+    }, {where: {id: boardId}})
+    return res.json({status: "Success"});
+  } catch(err) {
+    return res.json({status: "Fail"});
+  }
 }
-
 
 const getLocationTypeName = async (adsPlacement) => {
   try {
@@ -809,8 +834,6 @@ const getLocationTypeName = async (adsPlacement) => {
   }
 };
 
-=======
->>>>>>> 981b966a424a68e2f670497b92af1027ae00c79b
 controller.adplaceManagement = async (req, res) => {
   const createErr = {
     error: {
