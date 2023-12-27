@@ -41,6 +41,8 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
 
 function showEditBoardModal(button) {
   console.log("button clicked");
+  const districtField = document.querySelector("#districtSelectEditModal");
+  const wardField = document.querySelector("#wardSelectEditModal");
   const id = button.dataset.id;
   const size = button.dataset.size;
   const quantity = button.dataset.quantity;
@@ -62,7 +64,9 @@ function showEditBoardModal(button) {
   document.getElementById("addressEditModal").value = address;
   document.getElementById("boardTypeSelectEditModal").value = type;
   document.getElementById("districtSelectEditModal").value = district;
-  document.getElementById("wardSelectEditModal").value = ward;
+  districtSelectChange(districtField, wardField, () => {
+    document.getElementById("wardSelectEditModal").value = ward;
+  });
   document.getElementById("idEditModal").value = id;
 }
 

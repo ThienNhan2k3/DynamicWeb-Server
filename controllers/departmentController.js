@@ -1193,23 +1193,22 @@ controller.boardManagement = async (req, res) => {
     optionsBoardManagement.where = {
       [Op.or]: [
         {
-          '$AdsPlacement.Area.district$': {
+          "$AdsPlacement.Area.district$": {
             [Op.like]: `%${search}%`,
           },
         },
         {
-          '$AdsPlacement.Area.ward$': {
+          "$AdsPlacement.Area.ward$": {
             [Op.like]: `%${search}%`,
           },
         },
         {
-          '$AdsPlacement.address$': {
+          "$AdsPlacement.address$": {
             [Op.like]: `%${search}%`,
           },
         },
       ],
     };
-    
   }
   let district = req.query.district || "";
   console.log(district);
@@ -1268,8 +1267,6 @@ controller.boardManagement = async (req, res) => {
 controller.createBoard = async (req, res) => {
   console.log(req.body);
   const {
-    districtSelectCreateModal,
-    wardSelectCreateModal,
     boardTypeSelectCreateModal,
     heightCreateModal,
     weightCreateModal,
@@ -1304,11 +1301,7 @@ controller.createBoard = async (req, res) => {
   );
 
   let adPlacementId = await checkInput.findAdplacementByAddress(
-    addressCreateModal,
-    await checkInput.findAreaIdByWardAndDistrict(
-      wardSelectCreateModal,
-      districtSelectCreateModal
-    )
+    checkInput.getFirstPartOfAddress(addressCreateModal)
   );
   if (boardTypeid == null || adPlacementId == null) {
     createFailed = true;
@@ -1327,7 +1320,6 @@ controller.createBoard = async (req, res) => {
     return res.redirect("/department/boardManagement");
   }
   try {
-    console.log(boardTypeid, adPlacementId);
     const newBoard = await Board.create({
       size: heightCreateModal + "m x " + weightCreateModal + "m",
       quantity: quantityCreateModal + " trụ/bảng",
@@ -1525,4 +1517,661 @@ controller.deleteBoard = async (req, res) => {
     return res.send("Can not delete board!");
   }
 };
+
+controller.adTypeManagement = async (req, res) => {
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  const createErr = {
+    error: {
+      Name: req.flash("nameCreateModalError"),
+    },
+    value: {
+      Name: req.flash("nameCreateModal")[0],
+    },
+  };
+  const optionAdTypes = {
+    attributes: ["id", "type"],
+    include: [
+      {
+        model: AdsPlacement,
+        attributes: ["id", "address"],
+      },
+    ],
+  };
+  let search = req.query.search || "";
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message !== null && message.type === "delete") {
+    flag = true;
+  }
+  const AdTypes = await AdsType.findAll(optionAdTypes);
+  // Khởi tạo mảng để lưu trữ adPlacementsCount
+  const adPlacementsCounts = [];
+
+  for (const adType of AdTypes) {
+    const adPlacementsCount = await AdsPlacement.count({
+      where: {
+        AdsTypeId: adType.id,
+      },
+    });
+
+    adType.setDataValue("adPlacementsCount", adPlacementsCount);
+
+    // Lưu giá trị adPlacementsCount vào mảng
+    adPlacementsCounts.push(adPlacementsCount);
+  }
+
+  // Gán mảng adPlacementsCounts vào mỗi phần tử của AdTypes
+  AdTypes.forEach((adType, index) => {
+    adType.setDataValue("adPlacementsCounts", adPlacementsCounts[index]);
+  });
+
+  const currentUrl = req.url.slice(1);
+  const pagination = await getPagination(req, res, AdTypes, 5, page, 2, flag);
+  res.render("So/adTypeManagement.ejs", {
+    pagination,
+    AdTypes,
+    currentUrl,
+    createErr,
+    message,
+  });
+};
+
+controller.createAdType = async (req, res) => {
+  const { nameCreateModal } = req.body;
+  console.log(nameCreateModal);
+
+  let createFailed = false;
+  if (checkInput.isEmpty(nameCreateModal)) {
+    createFailed = true;
+    console.log("empty");
+    req.flash("nameCreateModalError", "Tên bị bỏ trống!");
+  }
+  if (await checkInput.isDuplicateAdType(nameCreateModal)) {
+    createFailed = true;
+    console.log("duplicate");
+
+    req.flash("nameCreateModalError", "Loại quảng cáo đã tồn tại!");
+  }
+  if (createFailed) {
+    req.flash("nameCreateModal", nameCreateModal);
+    return res.redirect("/department/adTypeManagement");
+  }
+  try {
+    await AdsType.create({
+      type: nameCreateModal,
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo thành công!",
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo thất bại",
+      })
+    );
+  }
+  return res.redirect("/department/adTypeManagement");
+};
+
+controller.editAdType = async (req, res) => {
+  const { idEditModal, nameEditModal } = req.body;
+  console.log(req.body);
+
+  if (await checkInput.isDuplicateAdType(idEditModal)) {
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật loại điểm quảng cáo thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
+  try {
+    await AdsType.update(
+      {
+        type: nameEditModal,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật loại điểm quảng cáo thành công",
+      })
+    );
+    return res.send("AdsType updated");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật thất bại",
+      })
+    );
+    return res.send("Can not update AdsType");
+  }
+};
+
+controller.deleteAdType = async (req, res) => {
+  const { adTypeId } = req.body;
+  try {
+    // Find AdsPlacements associated with the AdType
+    const adPlacements = await AdsPlacement.findAll({
+      where: {
+        AdsTypeId: adTypeId,
+      },
+    });
+
+    // Delete Boards associated with each AdsPlacement
+    for (const adPlacement of adPlacements) {
+      await Board.destroy({
+        where: {
+          AdsPlacementId: adPlacement.id,
+        },
+      });
+    }
+
+    // Delete AdsPlacements associated with the AdType
+    await AdsPlacement.destroy({
+      where: {
+        AdsTypeId: adTypeId,
+      },
+    });
+
+    await AdsType.destroy({
+      where: {
+        id: adTypeId,
+      },
+    });
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "success",
+        content: "Xóa loại quảng cáo thành công",
+      })
+    );
+
+    return res.send("AdType deleted");
+  } catch (err) {
+    console.error(err);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "danger",
+        content: "Xóa loại quảng cáo thất bại",
+      })
+    );
+
+    return res.send("Can not delete AdType");
+  }
+};
+
+module.exports = controller;
+
+controller.locationTypeManagement = async (req, res) => {
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  const createErr = {
+    error: {
+      Name: req.flash("nameCreateModalError"),
+    },
+    value: {
+      Name: req.flash("nameCreateModal")[0],
+    },
+  };
+  const optionLocationTypes = {
+    attributes: ["id", "locationType"],
+    include: [
+      {
+        model: AdsPlacement,
+        attributes: ["id", "address"],
+      },
+    ],
+  };
+  let search = req.query.search || "";
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message !== null && message.type === "delete") {
+    flag = true;
+  }
+  const LocationTypes = await LocationType.findAll(optionLocationTypes);
+  // Khởi tạo mảng để lưu trữ adPlacementsCount
+  const adPlacementsCounts = [];
+
+  for (const locationType of LocationTypes) {
+    const adPlacementsCount = await AdsPlacement.count({
+      where: {
+        LocationTypeId: locationType.id,
+      },
+    });
+
+    locationType.setDataValue("adPlacementsCount", adPlacementsCount);
+
+    // Lưu giá trị adPlacementsCount vào mảng
+    adPlacementsCounts.push(adPlacementsCount);
+  }
+
+  // Gán mảng adPlacementsCounts vào mỗi phần tử của LocationTypes
+  LocationTypes.forEach((locationType, index) => {
+    locationType.setDataValue("adPlacementsCounts", adPlacementsCounts[index]);
+  });
+
+  const currentUrl = req.url.slice(1);
+  const pagination = await getPagination(
+    req,
+    res,
+    LocationTypes,
+    5,
+    page,
+    2,
+    flag
+  );
+  res.render("So/locationTypeManagement.ejs", {
+    pagination,
+    LocationTypes,
+    currentUrl,
+    createErr,
+    message,
+  });
+};
+
+controller.createLocationType = async (req, res) => {
+  const { nameCreateModal } = req.body;
+  console.log(nameCreateModal);
+
+  let createFailed = false;
+  if (checkInput.isEmpty(nameCreateModal)) {
+    createFailed = true;
+    console.log("empty");
+    req.flash("nameCreateModalError", "Tên bị bỏ trống!");
+  }
+  if (await checkInput.isDuplicateLocationType(nameCreateModal)) {
+    createFailed = true;
+    console.log("duplicate");
+
+    req.flash("nameCreateModalError", "Loại địa điểm đã tồn tại!");
+  }
+  if (createFailed) {
+    req.flash("nameCreateModal", nameCreateModal);
+    return res.redirect("/department/locationTypeManagement");
+  }
+  try {
+    await LocationType.create({
+      locationType: nameCreateModal,
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo thành công!",
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo thất bại",
+      })
+    );
+  }
+  return res.redirect("/department/locationTypeManagement");
+};
+
+controller.editLocationType = async (req, res) => {
+  const { idEditModal, nameEditModal } = req.body;
+  console.log(req.body);
+
+  if (await checkInput.isDuplicateLocationType(nameEditModal)) {
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật loại địa điểm thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
+
+  try {
+    await LocationType.update(
+      {
+        locationType: nameEditModal,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật loại địa điểm thành công",
+      })
+    );
+
+    return res.send("LocationType updated");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật thất bại",
+      })
+    );
+
+    return res.send("Can not update LocationType");
+  }
+};
+
+controller.deleteLocationType = async (req, res) => {
+  const { locationTypeId } = req.body;
+
+  try {
+    // Find AdsPlacements associated with the LocationType
+    const adPlacements = await AdsPlacement.findAll({
+      where: {
+        LocationTypeId: locationTypeId,
+      },
+    });
+
+    // Delete Boards associated with each AdsPlacement
+    for (const adPlacement of adPlacements) {
+      await Board.destroy({
+        where: {
+          AdsPlacementId: adPlacement.id,
+        },
+      });
+    }
+
+    // Delete AdsPlacements associated with the LocationType
+    await AdsPlacement.destroy({
+      where: {
+        LocationTypeId: locationTypeId,
+      },
+    });
+
+    // Finally, delete the LocationType itself
+    await LocationType.destroy({
+      where: {
+        id: locationTypeId,
+      },
+    });
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "success",
+        content: "Xóa loại địa điểm thành công",
+      })
+    );
+
+    return res.send("LocationType deleted");
+  } catch (err) {
+    console.error(err);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "danger",
+        content: "Xóa loại địa điểm thất bại",
+      })
+    );
+
+    return res.send("Can not delete LocationType");
+  }
+};
+
+controller.boardTypeManagement = async (req, res) => {
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  const createErr = {
+    error: {
+      Name: req.flash("nameCreateModalError"),
+    },
+    value: {
+      Name: req.flash("nameCreateModal")[0],
+    },
+  };
+  const optionBoardTypes = {
+    attributes: ["id", "type"],
+    include: [
+      {
+        model: Board,
+        attributes: ["id", "size"],
+      },
+    ],
+  };
+  let search = req.query.search || "";
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message !== null && message.type === "delete") {
+    flag = true;
+  }
+  const BoardTypes = await BoardType.findAll(optionBoardTypes);
+  // Khởi tạo mảng để lưu trữ boardsCount
+  const boardsCounts = [];
+
+  for (const boardType of BoardTypes) {
+    const boardsCount = await Board.count({
+      where: {
+        BoardTypeId: boardType.id,
+      },
+    });
+
+    boardType.setDataValue("boardsCount", boardsCount);
+
+    // Lưu giá trị boardsCount vào mảng
+    boardsCounts.push(boardsCount);
+  }
+
+  // Gán mảng boardsCounts vào mỗi phần tử của BoardTypes
+  BoardTypes.forEach((boardType, index) => {
+    boardType.setDataValue("boardsCounts", boardsCounts[index]);
+  });
+
+  const currentUrl = req.url.slice(1);
+  const pagination = await getPagination(
+    req,
+    res,
+    BoardTypes,
+    5,
+    page,
+    2,
+    flag
+  );
+  res.render("So/boardTypeManagement.ejs", {
+    pagination,
+    BoardTypes,
+    currentUrl,
+    createErr,
+    message,
+  });
+};
+
+controller.createBoardType = async (req, res) => {
+  const { nameCreateModal } = req.body;
+  console.log(nameCreateModal);
+
+  let createFailed = false;
+  if (checkInput.isEmpty(nameCreateModal)) {
+    createFailed = true;
+    console.log("empty");
+    req.flash("nameCreateModalError", "Tên bị bỏ trống!");
+  }
+  if (await checkInput.isDuplicateBoardType(nameCreateModal)) {
+    createFailed = true;
+    console.log("duplicate");
+
+    req.flash("nameCreateModalError", "Loại biển quảng cáo đã tồn tại!");
+  }
+  if (createFailed) {
+    req.flash("nameCreateModal", nameCreateModal);
+    return res.redirect("/department/boardTypeManagement");
+  }
+  try {
+    await BoardType.create({
+      type: nameCreateModal,
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo thành công!",
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo thất bại",
+      })
+    );
+  }
+  return res.redirect("/department/boardTypeManagement");
+};
+
+controller.editBoardType = async (req, res) => {
+  const { idEditModal, nameEditModal } = req.body;
+  console.log(req.body);
+
+  if (await checkInput.isDuplicateBoardType(nameEditModal)) {
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật loại bảng quảng cáo thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
+
+  try {
+    await BoardType.update(
+      {
+        type: nameEditModal,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật loại bảng quảng cáo thành công",
+      })
+    );
+
+    return res.send("BoardType updated");
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật thất bại",
+      })
+    );
+
+    return res.send("Can not update BoardType");
+  }
+};
+
+controller.deleteBoardType = async (req, res) => {
+  const { boardTypeId } = req.body;
+
+  try {
+    // Delete Boards associated with the BoardType
+    await Board.destroy({
+      where: {
+        BoardTypeId: boardTypeId,
+      },
+    });
+
+    // Finally, delete the BoardType itself
+    await BoardType.destroy({
+      where: {
+        id: boardTypeId,
+      },
+    });
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "success",
+        content: "Xóa loại bảng quảng cáo thành công",
+      })
+    );
+
+    return res.send("BoardType deleted");
+  } catch (err) {
+    console.error(err);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "danger",
+        content: "Xóa loại bảng quảng cáo thất bại",
+      })
+    );
+
+    return res.send("Can not delete BoardType");
+  }
+};
+
 module.exports = controller;

@@ -161,7 +161,7 @@ main {
 }
 
 .add-button,
-.all { 
+.all {
   height: fit-content;
 }
 
@@ -244,6 +244,14 @@ main {
   width: 100%; /* Sử dụng chiều rộng 100% của phần tử cha */
   height: 1000px; /* Sử dụng chiều cao 100% của phần tử cha */
   border-radius: 2rem;
+  margin-bottom: 10px;
+}
+
+#mapbox_modal {
+  width: 100%; /* Sử dụng chiều rộng 100% của phần tử cha */
+  height: 600px; /* Sử dụng chiều cao 100% của phần tử cha */
+  border-radius: 2rem;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 

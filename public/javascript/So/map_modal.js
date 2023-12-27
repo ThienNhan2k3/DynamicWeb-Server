@@ -1,405 +1,98 @@
-// const sipulatedColor = "#40eb34";
-// const nonSipulatedColor = "#d3eb34";
-// const reportedColor = "#eb3434";
-// const selfReportedColor = "#848991";
-// const unclusteredRadius = 12;
+const sipulatedColorModal = "#40eb34";
+const nonSipulatedColorModal = "#d3eb34";
+const reportedColorModal = "#eb3434";
+const selfReportedColorModal = "#848991";
+const unclusteredRadiusModal = 12;
 
-// let selectedLocation;
-// let selectedBoard;
-// let adsData; //Ads data from selected location
+let selectedLocationModal;
+let selectedBoardModal;
+let adsDataModal; //Ads data from selected location
 
-// const sipulatedPopup = new mapboxgl.Popup({
-//   closeButton: false,
-//   closeOnClick: false,
-// });
-// const nonSipulatedPopup = new mapboxgl.Popup({
-//   closeButton: false,
-//   closeOnClick: false,
-// });
-// const reportedPopup = new mapboxgl.Popup({
-//   closeButton: false,
-//   closeOnClick: false,
-// });
+const sipulatedPopupModal = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false,
+});
+const nonSipulatedPopupModal = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false,
+});
+const reportedPopupModal = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false,
+});
 
-// const serverPath = "http://localhost:5000";
+const serverPathModal = "http://localhost:5000";
 
-// const inspectCluster = (e, layer) => {
-//   const features = map.queryRenderedFeatures(e.point, {
-//     layers: [`${layer}-cluster`],
-//   });
-//   const clusterId = features[0].properties.cluster_id;
-//   map.getSource(layer).getClusterExpansionZoom(clusterId, (err, zoom) => {
-//     if (err) return;
+const inspectClusterModal = (e, layer) => {
+  const features = modalMap.queryRenderedFeatures(e.point, {
+    layers: [`${layer}-cluster`],
+  });
+  const clusterId = features[0].properties.cluster_id;
+  modalMap.getSource(layer).getClusterExpansionZoom(clusterId, (err, zoom) => {
+    if (err) return;
 
-//     map.easeTo({
-//       center: features[0].geometry.coordinates,
-//       zoom: zoom,
-//     });
-//   });
-// };
+    modalMap.easeTo({
+      center: features[0].geometry.coordinates,
+      zoom: zoom,
+    });
+  });
+};
 
-// const mouseEnterEventUnclustered = (e, layer) => {
-//   let popup;
-//   if (layer == "sipulated") {
-//     popup = sipulatedPopup;
-//   } else if (layer == "nonSipulated") {
-//     popup = nonSipulatedPopup;
-//   } else if (layer == "reported") {
-//     popup = reportedPopup;
-//   } else if (layer == "selfReported") {
-//     popup = selfReportedPopup;
-//   }
+const mouseEnterEventUnclusteredModal = (e, layer) => {
+  let popup;
+  if (layer == "sipulated") {
+    popup = sipulatedPopup;
+  } else if (layer == "nonSipulated") {
+    popup = nonSipulatedPopup;
+  } else if (layer == "reported") {
+    popup = reportedPopup;
+  } else if (layer == "selfReported") {
+    popup = selfReportedPopup;
+  }
 
-//   map.getCanvas().style.cursor = "pointer";
-//   const coordinates = e.features[0].geometry.coordinates.slice();
-//   const { id, address, adsType, area, locationType, status } =
-//     e.features[0].properties;
+  modalMap.getCanvas().style.cursor = "pointer";
+  const coordinates = e.features[0].geometry.coordinates.slice();
+  const { id, address, adsType, area, locationType, status } =
+    e.features[0].properties;
 
-//   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-//     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-//   }
+  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
 
-//   const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
-//   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
-// };
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap);
+};
 
-// const mouseLeaveEventUnclustered = (layer) => {
-//   let popup;
-//   if (layer == "sipulated") {
-//     popup = sipulatedPopup;
-//   } else if (layer == "nonSipulated") {
-//     popup = nonSipulatedPopup;
-//   } else if (layer == "reported") {
-//     popup = reportedPopup;
-//   } else if (layer == "selfReported") {
-//     popup = selfReportedPopup;
-//   }
+const mouseLeaveEventUnclusteredModal = (layer) => {
+  let popup;
+  if (layer == "sipulated") {
+    popup = sipulatedPopup;
+  } else if (layer == "nonSipulated") {
+    popup = nonSipulatedPopup;
+  } else if (layer == "reported") {
+    popup = reportedPopup;
+  } else if (layer == "selfReported") {
+    popup = selfReportedPopup;
+  }
 
-//   map.getCanvas().style.cursor = "";
-//   popup.remove();
-// };
+  modalMap.getCanvas().style.cursor = "";
+  popup.remove();
+};
 
-// const searchFunc = async (e) => {
-//   e.preventDefault();
-
-//   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-//   const query = locationInput.value;
-//   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
-//   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
-//     query
-//   )}&pretty=1&no_annotations=1`;
-
-//   const respond = await fetch(requestUrl);
-//   try {
-//     if (!respond.ok) {
-//       throw new Error("Network response was not ok");
-//     }
-//     const data = await respond.json();
-//     console.log(data);
-//     const geometry = data.results[0].geometry;
-//     map.flyTo({ center: geometry });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
-// const toggleEvent = (e, targetLayer) => {
-//   const layers = [
-//     `${targetLayer}-cluster`,
-//     `${targetLayer}-count`,
-//     `${targetLayer}-unclustered`,
-//     `${targetLayer}-label`,
-//   ];
-
-//   if (e.target.checked) {
-//     layers.forEach((layer) => {
-//       map.setLayoutProperty(layer, "visibility", "visible");
-//     });
-//   } else {
-//     layers.forEach((layer) => {
-//       map.setLayoutProperty(layer, "visibility", "none");
-//     });
-//   }
-// };
-
-// const getInfoOnclickUnclustered = async (e) => {
-//   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
-//   const target = e.features[0];
-//   const fetchedData = await fetch(
-//     `${serverPath}/citizen/get-ads/${e.features[0].properties.id}`
-//   );
-//   const data = await fetchedData.json();
-//   adsData = JSON.parse(data);
-
-//   const HTMLid = document.querySelector("#board-id");
-//   const HTMLnumber = document.querySelector("#num-ads");
-//   const HTMLtitle = document.querySelector("#board-title");
-//   const HTMLaddr = document.querySelector("#board-address");
-//   const HTMLsize = document.querySelector("#board-size");
-//   const HTMLqty = document.querySelector("#board-quantity");
-//   const HTMLform = document.querySelector("#board-form");
-//   const HTMLclassification = document.querySelector("#board-classification");
-//   const HTMLthumbnail = document.querySelector("#board-thumbnail");
-//   const HTMLpagination = document.querySelector("#board-pagination");
-//   const HTMLboardContract = document.querySelector("#board-contract");
-
-//   if (adsData.length == 0) {
-//     HTMLid.innerHTML = "Chưa có thông tin";
-//     HTMLnumber.innerHTML = `<p>Địa điểm này có 0 quảng cáo</p>`;
-//     HTMLtitle.innerHTML = `Chưa có thông tin <span class="ms-2 badge bg-secondary" id="board-status">Chưa có thông tin</span></a>`;
-//     HTMLaddr.innerHTML = target.properties.address;
-//     HTMLsize.innerHTML = "Chưa có thông tin";
-//     HTMLqty.innerHTML = "Chưa có thông tin";
-//     HTMLform.innerHTML = target.properties.adsType;
-//     HTMLclassification.innerHTML = target.properties.locationType;
-//     HTMLthumbnail.src = "";
-//     HTMLboardContract.setAttribute("data-bs-content", ``);
-//     const popover = new bootstrap.Popover(HTMLboardContract);
-//     popover.update();
-//   } else {
-//     HTMLid.innerHTML = adsData[0].id;
-//     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
-//     HTMLtitle.innerHTML = `${
-//       adsData[0].BoardType.type
-//     }<span class="ms-2 badge ${
-//       adsData[0].status == "Đã cấp phép"
-//         ? "bg-success"
-//         : adsData[0].status == "Chưa cấp phép"
-//         ? "bg-warning"
-//         : adsData[0].status == "Bị báo cáo"
-//         ? "bg-danger"
-//         : "bg-dark"
-//     }" id="board-status">${
-//       adsData[0].status != undefined ? adsData[0].status : "Chưa có quảng cáo"
-//     }</span></a>`;
-//     HTMLaddr.innerHTML = adsData[0].AdsPlacement.address;
-//     HTMLsize.innerHTML = adsData[0].size;
-//     HTMLqty.innerHTML = adsData[0].quantity;
-//     HTMLform.innerHTML = adsData[0].AdsPlacement.AdsType.type;
-//     HTMLclassification.innerHTML =
-//       adsData[0].AdsPlacement.LocationType.locationType;
-//     HTMLthumbnail.src = adsData[0].image;
-//     HTMLboardContract.setAttribute(
-//       "data-bs-content",
-//       `Ngày hết hạn: ${
-//         adsData[0].end != undefined
-//           ? adsData[0].end.split("T")[0]
-//           : "Chưa có thông tin"
-//       }`
-//     );
-//     const popover = new bootstrap.Popover(HTMLboardContract);
-//     popover.update();
-//   }
-
-//   //Update pagination
-//   let paginationData = "";
-//   paginationData += `<li class="page-item disabled">
-//       <a class="page-link" href="#" aria-label="Previous">
-//         <span aria-hidden="true">&laquo;</span></a></li>`;
-//   for (let i = 0; i < adsData.length; i++) {
-//     if (i == 3) {
-//       break;
-//     }
-//     if (i == 0) {
-//       paginationData += `<li class="page-item active" aria-current="page"><a class="page-link" href="#">${
-//         i + 1
-//       }</a></li>`;
-//     } else {
-//       paginationData += `<li class="page-item" aria-current="page"><a class="page-link" href="#">${
-//         i + 1
-//       }</a></li>`;
-//     }
-//   }
-//   if (adsData.length <= 1) {
-//     paginationData += `<li class="page-item disabled">
-//         <a class="page-link" href="#" aria-label="Next">
-//           <span aria-hidden="true">&raquo;</span></a></li>`;
-//   } else {
-//     paginationData += `<a class="page-link" href="#" aria-label="Next">
-//         <span aria-hidden="true">&raquo;</span></a>`;
-//   }
-//   HTMLpagination.innerHTML = paginationData;
-//   //Pagination feature
-//   const pagePrev = document.querySelector('.page-link[aria-label="Previous"]');
-//   const pageNext = document.querySelector('.page-link[aria-label="Next"]');
-//   const pageItems = document.querySelectorAll(
-//     '.page-item[aria-current="page"]'
-//   );
-//   pageItems.forEach((item) => {
-//     item.addEventListener("click", (e) => {
-//       e.preventDefault();
-//       //Deactive previous
-//       const activeItem = document.querySelector(".page-item.active");
-//       activeItem.classList.remove("active");
-
-//       const page = e.target.innerText;
-//       HTMLid.innerHTML = adsData[page - 1].id;
-
-//       HTMLtitle.innerHTML = `${
-//         adsData[page - 1].BoardType.type
-//       }<span class="ms-2 badge ${
-//         adsData[page - 1].status == "Đã cấp phép"
-//           ? "bg-success"
-//           : adsData[page - 1].status == "Chưa cấp phép"
-//           ? "bg-warning"
-//           : adsData[page - 1].status == "Bị báo cáo"
-//           ? "bg-danger"
-//           : "bg-dark"
-//       }" id="board-status">${
-//         adsData[page - 1].status != ""
-//           ? adsData[page - 1].status
-//           : "Chưa có quảng cáo"
-//       }</span></a>`;
-//       HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
-//       HTMLsize.innerHTML = adsData[page - 1].size;
-//       HTMLqty.innerHTML = adsData[page - 1].quantity;
-//       HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
-//       HTMLclassification.innerHTML =
-//         adsData[page - 1].AdsPlacement.LocationType.locationType;
-//       HTMLthumbnail.src = adsData[page - 1].image;
-//       HTMLboardContract.setAttribute(
-//         "data-bs-content",
-//         `Ngày hết hạn: ${
-//           adsData[page - 1].end != ""
-//             ? adsData[page - 1].end.split("T")[0]
-//             : "Chưa có thông tin"
-//         }`
-//       );
-//       const popover = new bootstrap.Popover(HTMLboardContract);
-//       popover.update();
-//       //Set active
-//       e.target.parentNode.classList.add("active");
-//       //Set enable/disable for prev/next button
-//       pagePrev.parentNode.classList.remove("disabled");
-//       pageNext.parentNode.classList.remove("disabled");
-//       if (page == 1) {
-//         pagePrev.parentNode.classList.add("disabled");
-//       } else if (page == adsData.length) {
-//         pageNext.parentNode.classList.add("disabled");
-//       }
-//     });
-//   });
-//   pagePrev.addEventListener("click", (e) => {
-//     if (pagePrev.parentNode.classList.contains("disabled")) {
-//       return;
-//     }
-//     const activeItem = document.querySelector(".page-item.active");
-//     activeItem.classList.remove("active");
-
-//     const page = parseInt(activeItem.firstChild.innerText) - 1;
-
-//     HTMLid.innerHTML = adsData[page - 1].id;
-//     HTMLtitle.innerHTML = `${
-//       adsData[page - 1].BoardType.type
-//     }<span class="ms-2 badge ${
-//       adsData[page - 1].status == "Đã cấp phép"
-//         ? "bg-success"
-//         : adsData[page - 1].status == "Chưa cấp phép"
-//         ? "bg-warning"
-//         : adsData[page - 1].status == "Bị báo cáo"
-//         ? "bg-danger"
-//         : "bg-dark"
-//     }" id="board-status">${
-//       adsData[page - 1].status != ""
-//         ? adsData[page - 1].status
-//         : "Chưa có quảng cáo"
-//     }</span></a>`;
-//     HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
-//     HTMLsize.innerHTML = adsData[page - 1].size;
-//     HTMLqty.innerHTML = adsData[page - 1].quantity;
-//     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
-//     HTMLclassification.innerHTML =
-//       adsData[page - 1].AdsPlacement.LocationType.locationType;
-//     HTMLthumbnail.src = adsData[page - 1].image;
-//     HTMLboardContract.setAttribute(
-//       "data-bs-content",
-//       `Ngày hết hạn: ${
-//         adsData[page - 1].end != ""
-//           ? adsData[page - 1].end.split("T")[0]
-//           : "Chưa có thông tin"
-//       }`
-//     );
-//     const popover = new bootstrap.Popover(HTMLboardContract);
-//     popover.update();
-//     //Set active
-//     activeItem.previousSibling.classList.add("active");
-//     //Deactive prev button if reach the first page
-//     pageNext.parentNode.classList.remove("disabled");
-//     pagePrev.parentNode.classList.remove("disabled");
-//     if (page == 1) {
-//       pagePrev.parentNode.classList.add("disabled");
-//     }
-//   });
-//   pageNext.addEventListener("click", (e) => {
-//     if (pageNext.parentNode.classList.contains("disabled")) {
-//       return;
-//     }
-//     const activeItem = document.querySelector(".page-item.active");
-//     activeItem.classList.remove("active");
-
-//     const page = parseInt(activeItem.firstChild.innerText) + 1;
-//     HTMLid.innerHTML = adsData[page - 1].id;
-
-//     HTMLtitle.innerHTML = `${
-//       adsData[page - 1].BoardType.type
-//     }<span class="ms-2 badge ${
-//       adsData[page - 1].status == "Đã cấp phép"
-//         ? "bg-success"
-//         : adsData[page - 1].status == "Chưa cấp phép"
-//         ? "bg-warning"
-//         : adsData[page - 1].status == "Bị báo cáo"
-//         ? "bg-danger"
-//         : "bg-dark"
-//     }" id="board-status">${
-//       adsData[page - 1].status != ""
-//         ? adsData[page - 1].status
-//         : "Chưa có quảng cáo"
-//     }</span></a>`;
-//     HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
-//     HTMLsize.innerHTML = adsData[page - 1].size;
-//     HTMLqty.innerHTML = adsData[page - 1].quantity;
-//     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
-//     HTMLclassification.innerHTML =
-//       adsData[page - 1].AdsPlacement.LocationType.locationType;
-//     HTMLthumbnail.src = adsData[page - 1].image;
-//     HTMLboardContract.setAttribute(
-//       "data-bs-content",
-//       `Ngày hết hạn: ${
-//         adsData[page - 1].end != ""
-//           ? adsData[page - 1].end.split("T")[0]
-//           : "Chưa có thông tin"
-//       }`
-//     );
-//     const popover = new bootstrap.Popover(HTMLboardContract);
-//     popover.update();
-//     //Set active
-//     activeItem.nextSibling.classList.add("active");
-//     //Deactive next button if reach the last page
-//     pageNext.parentNode.classList.remove("disabled");
-
-//     pagePrev.parentNode.classList.remove("disabled");
-
-//     if (page == adsData.length) {
-//       pageNext.parentNode.classList.add("disabled");
-//     }
-//   });
-// };
-
-// mapboxgl.accessToken =
-//   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
-
-// Map navigation control
-const modal_map = new mapboxgl.Map({
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
+const modalMap = new mapboxgl.Map({
   container: "mapbox_modal",
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
   zoom: 12,
 });
-modal_map.addControl(new mapboxgl.NavigationControl());
-modal_map.addControl(new mapboxgl.FullscreenControl());
+// Map navigation control
+modalMap.addControl(new mapboxgl.NavigationControl());
+modalMap.addControl(new mapboxgl.FullscreenControl());
 
-modal_map.on("load", async () => {
+modalMap.on("load", async () => {
   //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
@@ -413,7 +106,7 @@ modal_map.on("load", async () => {
   const reported = await fetchedReportData.json();
 
   // Sipulated source data
-  modal_map.addSource("sipulated", {
+  modalMap.addSource("sipulated", {
     type: "geojson",
     data: JSON.parse(sipulated),
     cluster: true,
@@ -421,7 +114,7 @@ modal_map.on("load", async () => {
     clusterRadius: 20,
   });
   //Sipulated cluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-cluster",
     type: "circle",
     source: "sipulated",
@@ -433,7 +126,7 @@ modal_map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Sipulated count
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-count",
     type: "symbol",
     source: "sipulated",
@@ -447,7 +140,7 @@ modal_map.on("load", async () => {
     },
   });
   //Sipulated uncluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-unclustered",
     type: "circle",
     source: "sipulated",
@@ -461,7 +154,7 @@ modal_map.on("load", async () => {
     },
   });
   //Sipulated label
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-label",
     type: "symbol",
     source: "sipulated",
@@ -478,30 +171,26 @@ modal_map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  modal_map.on("click", "sipulated-cluster", (e) => {
-    inspectCluster(e, "sipulated");
+  modalMap.on("click", "sipulated-cluster", (e) => {
+    inspectClusterModal(e, "sipulated");
   });
   //Get info when user moves their mouse over the unclustered layer
 
-  modal_map.on("mouseenter", "sipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "sipulated");
+  modalMap.on("mouseenter", "sipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "sipulated");
   });
-  modal_map.on("mouseleave", "sipulated-unclustered", (e) => {
-    mouseLeaveEventUnclustered("sipulated");
+  modalMap.on("mouseleave", "sipulated-unclustered", (e) => {
+    mouseLeaveEventUnclusteredModal("sipulated");
   });
-  //Get unclustered info on click
-  modal_map.on("click", "sipulated-unclustered", async (e) => {
-    await getInfoOnclickUnclustered(e);
+  modalMap.on("mouseenter", "sipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
   });
-  modal_map.on("mouseenter", "sipulated-cluster", () => {
-    modal_map.getCanvas().style.cursor = "pointer";
-  });
-  modal_map.on("mouseleave", "sipulated-cluster", () => {
-    modal_map.getCanvas().style.cursor = "";
+  modalMap.on("mouseleave", "sipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
   });
 
   //Non sipulated section
-  modal_map.addSource("nonSipulated", {
+  modalMap.addSource("nonSipulated", {
     type: "geojson",
     data: JSON.parse(nonSipulated),
     cluster: true,
@@ -509,7 +198,7 @@ modal_map.on("load", async () => {
     clusterRadius: 15,
   });
   //Non sipulated cluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-cluster",
     type: "circle",
     source: "nonSipulated",
@@ -521,7 +210,7 @@ modal_map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Non sipulated count
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-count",
     type: "symbol",
     source: "nonSipulated",
@@ -535,7 +224,7 @@ modal_map.on("load", async () => {
     },
   });
   //Non sipulated uncluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-unclustered",
     type: "circle",
     source: "nonSipulated",
@@ -549,7 +238,7 @@ modal_map.on("load", async () => {
     },
   });
   //Non sipulated label
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-label",
     type: "symbol",
     source: "nonSipulated",
@@ -566,29 +255,25 @@ modal_map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  modal_map.on("click", "nonSipulated-cluster", (e) => {
-    inspectCluster(e, "nonSipulated");
+  modalMap.on("click", "nonSipulated-cluster", (e) => {
+    inspectClusterModal(e, "nonSipulated");
   });
   //Get info when user moves their mouse over the unclustered layer
 
-  modal_map.on("mouseenter", "nonSipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "nonSipulated");
+  modalMap.on("mouseenter", "nonSipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "nonSipulated");
   });
-  modal_map.on("mouseleave", "nonSipulated-unclustered", () => {
-    mouseLeaveEventUnclustered("nonSipulated");
+  modalMap.on("mouseleave", "nonSipulated-unclustered", () => {
+    mouseLeaveEventUnclusteredModal("nonSipulated");
   });
-  //Get infor onclick
-  modal_map.on("click", "nonSipulated-unclustered", async (e) => {
-    await getInfoOnclickUnclustered(e);
+  modalMap.on("mouseenter", "nonSipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
   });
-  modal_map.on("mouseenter", "nonSipulated-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  modal_map.on("mouseleave", "nonSipulated-cluster", () => {
-    map.getCanvas().style.cursor = "";
+  modalMap.on("mouseleave", "nonSipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
   });
   //Reported section
-  modal_map.addSource("reported", {
+  modalMap.addSource("reported", {
     type: "geojson",
     data: JSON.parse(reported),
     cluster: true,
@@ -596,7 +281,7 @@ modal_map.on("load", async () => {
     clusterRadius: 15,
   });
   //Reported cluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "reported-cluster",
     type: "circle",
     source: "reported",
@@ -608,7 +293,7 @@ modal_map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Reported count
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "reported-count",
     type: "symbol",
     source: "reported",
@@ -622,7 +307,7 @@ modal_map.on("load", async () => {
     },
   });
   //Reported uncluster
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "reported-unclustered",
     type: "circle",
     source: "reported",
@@ -636,7 +321,7 @@ modal_map.on("load", async () => {
     },
   });
   //Reported label
-  modal_map.addLayer({
+  modalMap.addLayer({
     id: "reported-label",
     type: "symbol",
     source: "reported",
@@ -653,38 +338,84 @@ modal_map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  modal_map.on("click", "reported-cluster", (e) => {
-    inspectCluster(e, "reported");
+  modalMap.on("click", "reported-cluster", (e) => {
+    inspectClusterModal(e, "reported");
   });
 
-  modal_map.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "reported");
+  modalMap.on("mouseenter", "reported-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "reported");
   });
-  modal_map.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered("reported");
+  modalMap.on("mouseleave", "reported-unclustered", () => {
+    mouseLeaveEventUnclusteredModal("reported");
   });
-  // Get info on click
-  modal_map.on("click", "reported-unclustered", async (e) => {
-    await getInfoOnclickUnclustered(e);
+
+  modalMap.on("mouseenter", "reported-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
   });
-  modal_map.on("mouseenter", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  modal_map.on("mouseleave", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "";
+  modalMap.on("mouseleave", "reported-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
   });
 });
 
-// function navigateToLocation(long, lat) {
-//   modal_map.flyTo({
-//     center: [parseFloat(long), parseFloat(lat)],
-//     zoom: 15,
-//   });
-// }
+function navigateToLocation(long, lat) {
+  map.flyTo({
+    center: [parseFloat(long), parseFloat(lat)],
+    zoom: 15,
+  });
+}
 
-const myModalEl = document.getElementById("createModal");
+const myModal = document.getElementById("createModal");
 //Resize map in the modal
-myModalEl.addEventListener("shown.bs.modal", (event) => {
-  // const mapDiv = document.getElementById("mapbox_modal");
-  modal_map.resize(); // Importance
+myModal.addEventListener("shown.bs.modal", (event) => {
+  modalMap.resize(); // Importance
 });
+
+//Dragable marker
+const dragMarker = new mapboxgl.Marker({
+  draggable: true,
+});
+
+//Find button handle
+const findBtn = document.querySelector("#find-location");
+findBtn.addEventListener("click", async (e) => {
+  const addr = document.querySelector("#addressCreateModal").value;
+  const ward = document.querySelector("#wardSelectCreateModal").value;
+  const district = document.querySelector("#districtSelectCreateModal").value;
+
+  //Make a request
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${addr}, ${ward}, ${district}`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  //Handle response
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    if (data.length == 0) {
+      //Handle case when no result
+    } else {
+      const geometry = data.results[0].geometry;
+      modalMap.flyTo({ center: geometry });
+      //Set the marker to the map
+      dragMarker.setLngLat(geometry).addTo(modalMap);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//Get lngLat of the marker
+function onDragEnd() {
+  const lngLat = dragMarker.getLngLat();
+  //Handle here
+  alert(lngLat);
+}
+
+dragMarker.on("dragend", onDragEnd);

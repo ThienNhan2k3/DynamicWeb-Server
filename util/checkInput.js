@@ -185,6 +185,24 @@ async function findBoardsTyoeIdByBoardType(boardType) {
   });
   return result ? result.id : null;
 }
+function getFirstPartOfAddress(address) {
+  // Use split to separate the string by commas
+  var addressArray = address.split(",");
+
+  // Get the first element and trim to remove whitespaces
+  var firstPart = addressArray[0].trim();
+
+  return firstPart;
+}
+async function findAdplacementByAddress(address) {
+  const result = await AdsPlacement.findOne({
+    where: {
+      address: address,
+    },
+    attributes: ["id"],
+  });
+  return result ? result.id : null;
+}
 
 async function findAdplacementByAddress(address, areaId) {
   const result = await AdsPlacement.findOne({
@@ -197,6 +215,35 @@ async function findAdplacementByAddress(address, areaId) {
   return result ? result.id : null;
 }
 
+async function isDuplicateAdType(name) {
+  const result = await AdsType.findOne({
+    where: {
+      type: name,
+    },
+    attributes: ["id"],
+  });
+  return result ? true : false;
+}
+
+async function isDuplicateLocationType(name) {
+  const result = await LocationType.findOne({
+    where: {
+      locationType: name,
+    },
+    attributes: ["id"],
+  });
+  return result ? true : false;
+}
+
+async function isDuplicateBoardType(name) {
+  const result = await BoardType.findOne({
+    where: {
+      type: name,
+    },
+    attributes: ["id"],
+  });
+  return result ? true : false;
+}
 module.exports = {
   isEmpty,
   isEmail,
@@ -214,4 +261,8 @@ module.exports = {
   findAdplacementByAddress,
   getFullAddressInfo,
   getDistrictFromAdress,
+  isDuplicateAdType,
+  isDuplicateLocationType,
+  isDuplicateBoardType,
+  getFirstPartOfAddress,
 };

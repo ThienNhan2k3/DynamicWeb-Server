@@ -39,4 +39,20 @@ router.get("/viewReport/:id", controller.detailReport);
 router.get("/areaManagement", controller.getAreas);
 router.post("/editArea", controller.postEditArea);
 router.post("/addArea", controller.postAddArea);
+
+// adTypeManagement
+router.get("/adTypeManagement", controller.adTypeManagement);
+router.post("/adTypeManagement", controller.createAdType);
+router.put("/adTypeManagement", controller.editAdType);
+router.delete("/adTypeManagement", controller.deleteAdType);
+//locationTypeManagement
+router.get("/locationTypeManagement", controller.locationTypeManagement);
+router.post("/locationTypeManagement", controller.createLocationType);
+router.put("/locationTypeManagement", controller.editLocationType);
+router.delete("/locationTypeManagement", controller.deleteLocationType);
+//boardTypeManagement
+router.get("/boardTypeManagement", controller.boardTypeManagement);
+router.post("/boardTypeManagement", controller.createBoardType);
+router.put("/boardTypeManagement", controller.editBoardType);
+router.delete("/boardTypeManagement", controller.deleteBoardType);
 module.exports = router;

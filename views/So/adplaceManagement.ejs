@@ -285,8 +285,7 @@
                           </select>
                         </div>
                         <div class="col-6 col-md-6">
-                          <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required
-                            disabled>
+                          <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required>
                             <option value="">Phường</option>
                           </select>
                         </div>
@@ -367,7 +366,7 @@
                         </div>
                       </div>
                       <div class="row">
-                        <div id="mapbox_modal" style="width:100%;height:200rem "></div>
+                        <div id="mapbox_modal"></div>
                       </div>
 
                       <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo điểm
@@ -421,7 +420,7 @@
                         <!-- Left column -->
                         <div class="col col-md-5.5 p-0 mb-3">
                           <div class="form-floating">
-                            <input type="address" id="addressEditModal" class="form-control" name="addressEditModal"
+                            <input type="text" id="addressEditModal" class="form-control" name="addressEditModal"
                               autocomplete="true" placeholder="">
                             <label for="addressEditModal" class="mb-2">Địa chỉ</label>
                           </div>
@@ -533,10 +532,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
   integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 <script src="/javascript/So/map.js"></script>
-<script src="/javascript/So/map_modal.js"></script>
 <script src="/javascript/toggleNavigation.js"></script>
 <script src="/javascript/So/adplaceManagement.js"></script>
-
+<script src="/javascript/So/map_modal.js"></script>
 
 
 <script>
@@ -549,9 +547,6 @@
     card.addEventListener('click', () => {
       event.stopPropagation();
       card.classList.add('clicked');
-      mainContent.classList.add("active-location-details");
-      mapDetailsNav.classList.add("active-location-details");
-      content.classList.add("active-location-details");
     });
   });
 
@@ -560,14 +555,7 @@
   document.body.addEventListener('click', (event) => {
     // Check if the clicked element is not a property-card or location-details
     if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#map') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
-      // Hide location-details
-      mapDetailsNav.classList.remove('active-location-details');
-      // Remove 'clicked' class from all property-cards
       propertyCards.forEach(c => c.classList.remove('clicked'));
-      // Remove other active classes
-      mainContent.classList.remove("active-location-details");
-      content.classList.remove("active-location-details");
-
     }
   });
 
@@ -591,8 +579,6 @@
         // Add class "clicked" to the clicked property-card
         card.classList.add('clicked');
 
-        // Show location-details;
-        mapDetailsNav.classList.add("active-location-details");
       });
     });
   });

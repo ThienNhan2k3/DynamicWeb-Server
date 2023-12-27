@@ -118,14 +118,13 @@ const handleClickEvent = (e) => {
   // console.log(e.features[0].properties)
 
   //Change the address of the address input field (the disabled field)
-  const addrInput = document.querySelector("#addr");
+  const addrInput = document.querySelector("#addressCreateModal");
   const address = `${e.features[0].properties.address}, ${
     JSON.parse(e.features[0].properties.area).ward
   }, ${JSON.parse(e.features[0].properties.area).district}`;
   addrInput.value = address;
 
   //Alert the ID of selected placement
-  alert(e.features[0].properties.id);
 };
 
 map.on("load", async () => {

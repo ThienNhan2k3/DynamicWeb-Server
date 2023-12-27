@@ -263,41 +263,19 @@
                                     <div class="modal-body">
                                         <form action="/department/boardManagement" method="POST">
                                             <fieldset class="container-fluid">
-                                                <div class="row fw-semibold fs-4 mb-2">Khu vực đặt và Loại bảng quảng
+                                                <div class="row fw-semibold fs-4 mb-2">Loại bảng quảng
                                                     cáo</div>
                                                 <div class="row g-md-3 g-2 mb-3">
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="districtSelectCreateModal" class="form-select"
-                                                            required id="districtSelectCreateModal"
-                                                            onchange="districtSelectChange(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))">
-                                                            <option value="">Quận/Huyện</option>
-                                                            <% for (let i=0; i < districts.length; i++){ %>
-                                                                <option value="<%= districts[i].district %>"
-                                                                    class="districts">
-                                                                    <%= districts[i].district %>
-                                                                </option>
-                                                                <% } %>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="wardSelectCreateModal" class="form-select"
-                                                            id="wardSelectCreateModal" required disabled>
-                                                            <option value="">Phường</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="boardTypeSelectCreateModal" class="form-select"
-                                                            id="boardTypeSelectCreateModal" required>
-                                                            <option value="">Loại bảng quảng cáo</option>
-                                                            <%for (let i=0; i < boardTypes.length; i++){ %>
-                                                                <option value="<%= boardTypes[i].type %>"
-                                                                    class="boardTypes">
-                                                                    <%= boardTypes[i].type %>
-                                                                </option>
-                                                                <% } %>
-
-                                                        </select>
-                                                    </div>
+                                                    <select name="boardTypeSelectCreateModal" class="form-select"
+                                                        id="boardTypeSelectCreateModal" required>
+                                                        <option value="">Loại bảng quảng cáo</option>
+                                                        <%for (let i=0; i < boardTypes.length; i++){ %>
+                                                            <option value="<%= boardTypes[i].type %>"
+                                                                class="boardTypes">
+                                                                <%= boardTypes[i].type %>
+                                                            </option>
+                                                            <% } %>
+                                                    </select>
                                                 </div>
                                                 <div class="row fw-semibold fs-4 mb-2">Kích thước bảng quảng cáo và Số
                                                     lượng trụ
@@ -387,19 +365,11 @@
                                                                             chỉ</label>
                                                         </div>
                                                     </div>
-                                                    
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col col-md-5.5 p-0 has-validation mb-3">
-                                                        <div class="form-floating">
-                                                            <input class="form-control" id="addr" type="text" placeholder="Địa diểm" disabled>
-                                                            <label for="addr" class="mb-2">Địa chỉ</label>
-                                                        </div>
-                                                    </div>
 
                                                 </div>
                                                 <div class="row">
-                                                    <div id="mapbox" style="width:100%;height:22rem"></div>
+                                                    <div id="mapbox"
+                                                        style="width:100%;height:45rem; border-radius: 20px"></div>
                                                 </div>
 
 
@@ -520,6 +490,11 @@
                                                             <label for="addressEditModal" class="mb-2">Địa
                                                                 chỉ</label>
                                                         </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div id="mapbox"
+                                                            style="width:100%;height:45rem; border-radius: 20px"></div>
                                                     </div>
 
                                                 </div>

@@ -94,7 +94,8 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
 
 function showEditAdplaceModal(button) {
   console.log("Button clicked"); // Check if the function is triggered
-
+  const districtField = document.querySelector("#districtSelectEditModal");
+  const wardField = document.querySelector("#wardSelectEditModal");
   const id = button.dataset.id;
   const adtype = button.dataset.adstype;
   const district = button.dataset.district;
@@ -108,11 +109,25 @@ function showEditAdplaceModal(button) {
   document.getElementById("adTypeSelectEditModal").value = adtype;
   document.getElementById("statusEditModal").value = status;
   document.getElementById("districtSelectEditModal").value = district;
-  document.getElementById("wardSelectEditModal").value = ward;
+  console.log(districtField.value);
+  districtSelectChange(districtField, wardField, () => {
+    document.getElementById("wardSelectEditModal").value = ward;
+  });
+
   document.getElementById("addressEditModal").value = address;
   document.getElementById("locationTypeSelectEditModal").value = locationType;
   document.getElementById("idEditModal").value = id;
 }
+
+//Open edit modal event
+// const editModal=document.querySelector('#editModal')
+// editModal.addEventListener('shown.bs.modal',async(e)=>{
+//   const districtField=document.querySelector('#districtSelectEditModal')
+//   const wardField=document.querySelector('#wardSelectEditModal')
+//   await districtSelectChange(districtField,wardField)
+//   wardField.value=
+// })
+
 function showDeleteAdplaceModal(btn) {
   const id = btn.dataset.id;
   console.log(id);
