@@ -1288,4 +1288,7 @@ controller.createBoard = async (req, res) => {
   }
   res.redirect("/department/boardManagement");
 };
+
+
+
 module.exports = controller;
