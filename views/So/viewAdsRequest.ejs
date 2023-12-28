@@ -94,7 +94,8 @@
               <th scope="col-2">Nội dung</th>
               <th scope="col">Công ty</th>
               <th scope="col">Bắt đầu</th>
-              <th scope="col">kết thúc</th>
+              <th scope="col">Kết thúc</th>
+              <th scope="col">Trạng thái</th>
               <th scope="col" style="text-align: center;">Chi tiết</th>
             </tr>
           </thead>
@@ -108,8 +109,23 @@
                   <td><%= pagination.rows[i].Company.name %></td>
                   <td><%= formatDate(pagination.rows[i].start) %></td>
                   <td><%= formatDate(pagination.rows[i].end) %></td>
+                  <td>
+                    <% if (pagination.rows[i].status === 'Bị từ chối') { %>
+                      <button class="btn btn-danger">
+                          <%= pagination.rows[i].status %>
+                      </button>
+                      <% } else if (pagination.rows[i].status === 'Cấp phép') { %>
+                      <button class="btn btn-success">
+                        <%= pagination.rows[i].status %>
+                      </button>
+                      <% } else { %>
+                      <button class="btn btn-warning">
+                        <%= pagination.rows[i].status %>
+                      </button>
+                      <% } %>
+                  </td>
                   <td class="text-center">
-                    <a href="/department/viewAdsRequest/<%= pagination.rows[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
+                    <a href="/department/viewAdsRequest/<%= pagination.rows[i].id %>?previousUrl=<%= currentUrl %>"><i class="fas fa-info-circle text-primary"></i></a>
                   </td>
                 </tr>
               <% } %>
