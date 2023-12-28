@@ -125,6 +125,13 @@
     left: 16px;
     overflow: visible;
   }
+
+  #map-filter-button{
+    position: absolute;
+    bottom: 16px;
+    left: 3.5rem;
+    overflow: visible;
+  }
   
   #map-view-button button {
     border-radius: 8px;

@@ -11,6 +11,16 @@ let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
 
+//Full geojson
+let sipulated;
+let nonSipulated;
+let reported;
+
+//filtered geojson
+let filterSipulated;
+let filterNonSipulated;
+let filterReported;
+
 const sipulatedPopup = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
@@ -50,8 +60,6 @@ const mouseEnterEventUnclustered = (e, layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
   }
 
   map.getCanvas().style.cursor = "pointer";
@@ -413,43 +421,55 @@ map.on("load", async () => {
     `${serverPath}/citizen/get-nonsipulated`
   );
   const fetchedReportData = await fetch(`${serverPath}/citizen/get-report`);
-  let sipulated = await fetchedsipulatedData.json();
-  let nonSipulated = await fetchedNonSipulatedData.json();
-  let reported = await fetchedReportData.json();
+  sipulated = await fetchedsipulatedData.json();
+  nonSipulated = await fetchedNonSipulatedData.json();
+  reported = await fetchedReportData.json();
 
   sipulated = JSON.parse(sipulated);
   nonSipulated = JSON.parse(nonSipulated);
   reported = JSON.parse(reported);
 
+  filterSipulated = Object.assign({}, sipulated);
+  filterNonSipulated = Object.assign({}, nonSipulated);
+  filterReported = Object.assign({}, reported);
+  console.log(reported);
+
   // Sort for placement that belongs to specified area
   if (accountType == "Quan") {
-    sipulated.features = sipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterSipulated.features = sipulated.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
 
-    nonSipulated.features = nonSipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterNonSipulated.features = nonSipulated.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
 
-    reported.features = reported.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterReported.features = reported.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
+    console.log(reported);
   } else if (accountType == "Phuong") {
-    sipulated.features = sipulated.features.filter((p) => {
+    filterSipulated.features = sipulated.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
       );
     });
 
-    nonSipulated.features = nonSipulated.features.filter((p) => {
+    filterNonSipulated.features = nonSipulated.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
       );
     });
 
-    reported.features = reported.features.filter((p) => {
+    filterReported.features = reported.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
@@ -460,7 +480,7 @@ map.on("load", async () => {
   // Sipulated source data
   map.addSource("sipulated", {
     type: "geojson",
-    data: sipulated,
+    data: filterSipulated,
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 20,
@@ -548,7 +568,7 @@ map.on("load", async () => {
   //Non sipulated section
   map.addSource("nonSipulated", {
     type: "geojson",
-    data: nonSipulated,
+    data: filterNonSipulated,
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 15,
@@ -635,7 +655,7 @@ map.on("load", async () => {
   //Reported section
   map.addSource("reported", {
     type: "geojson",
-    data: reported,
+    data: filterReported,
     cluster: true,
     clusterMaxZoom: 15,
     clusterRadius: 15,
@@ -765,4 +785,51 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
   selectedBoard = adsData[page - 1];
   console.log(selectedBoard);
   alert(selectedBoard.id);
+});
+
+//Update map when select specified ward
+const filterSelect = document.querySelector("#filterSelect");
+filterSelect.addEventListener("change", (e) => {
+  // e.preventDefault();
+  console.log("CHanged");
+  const selectedWardsHTML = filterSelect.selectedOptions;
+  let selectedWard = [];
+  for (let i = 0; i < selectedWardsHTML.length; i++) {
+    selectedWard.push(selectedWardsHTML[i].label);
+  }
+
+  //Refilter
+  console.log(reported);
+
+  filterSipulated.features = sipulated.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  filterNonSipulated.features = nonSipulated.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  filterReported.features = reported.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  //Change data and rerender map
+  map.getSource("sipulated").setData(filterSipulated);
+  map.getSource("nonSipulated").setData(filterNonSipulated);
+  map.getSource("reported").setData(filterReported);
 });

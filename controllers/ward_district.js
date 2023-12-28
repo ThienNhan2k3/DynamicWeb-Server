@@ -25,11 +25,18 @@ controller.home = async (req, res) => {
     ],
   });
 
+  const wards=await models.Area.findAll({
+    attributes:['ward'],
+    where:{district:account.Area.district}
+  })
+  const wardArr=wards.map((area)=>{return area.dataValues.ward})
+  // console.log(wardArr)
   return res.render("PhuongQuan/home.ejs", {
     tab: "Trang chủ",
     selectedId: req.session.selectedAdsplacementId,
     area: account.Area,
     type: account.type,
+    wards:wardArr
   });
 };
 
