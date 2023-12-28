@@ -82,7 +82,7 @@ const mouseLeaveEventUnclusteredModal = (layer) => {
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
 const modalMap = new mapboxgl.Map({
-  container: "mapbox_modal",
+  container: "mapboxModal",
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
@@ -418,4 +418,4 @@ function onDragEnd() {
   alert(lngLat);
 }
 
-dragMarker.on("dragend", onDragEnd);
+dragMarker.on('dragend',onDragEnd)
