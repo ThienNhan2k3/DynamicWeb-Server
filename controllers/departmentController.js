@@ -219,7 +219,7 @@ controller.createAccount = async (req, res) => {
     loginFailed = true;
     req.flash("usernameCreateModalError", "Tên đăng nhập đã tồn tại!");
   }
-  //Birthday 
+  //Birthday
   const birthDay = new Date(birthDayCreateModal);
   const yearToMilliseconds = 1000 * 60 * 60 * 24 * 365;
   if (birthDay == "Invalid Date") {
@@ -227,7 +227,10 @@ controller.createAccount = async (req, res) => {
     req.flash("birthDayCreateModalError", "Ngày sinh không thể để trống!");
   } else if (birthDay > new Date()) {
     loginFailed = true;
-    req.flash("birthDayCreateModalError", "Ngày sinh lớn hơn thời gian hiện tại!");
+    req.flash(
+      "birthDayCreateModalError",
+      "Ngày sinh lớn hơn thời gian hiện tại!"
+    );
   } else if (Date.now() - birthDay.getTime() - 0 * yearToMilliseconds < 0) {
     loginFailed = true;
     req.flash("birthDayCreateModalError", "Chưa đủ tuổi thành niên");
@@ -528,18 +531,30 @@ controller.detailRequest = async (req, res) => {
       id,
     },
   });
-  return res.render("So/acceptOrDenyAdsRequest.ejs", { permitRequest, previousUrl });
+  return res.render("So/acceptOrDenyAdsRequest.ejs", {
+    permitRequest,
+    previousUrl,
+  });
 };
 
 controller.acceptOrDenyAdsRequest = async (req, res) => {
-  const {status, id, previousUrl} = req.body;
+  const { status, id, previousUrl } = req.body;
   try {
-    await PermitRequest.update({
-      status
-    }, {where: {id}})
-    return res.json({status: "success", redirect: `${req.baseUrl}/${previousUrl}`});
-  } catch(err) {
-    return res.json({status: "fail", redirect: `${req.baseUrl}/${previousUrl}`});
+    await PermitRequest.update(
+      {
+        status,
+      },
+      { where: { id } }
+    );
+    return res.json({
+      status: "success",
+      redirect: `${req.baseUrl}/${previousUrl}`,
+    });
+  } catch (err) {
+    return res.json({
+      status: "fail",
+      redirect: `${req.baseUrl}/${previousUrl}`,
+    });
   }
 };
 
@@ -730,7 +745,9 @@ controller.viewEditRequest = async (req, res) => {
   let ward = req.query.ward || "";
 
   let whereCondition = {};
-  let wards = [], currentDistrict = "", currentWard = "";
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
   if (district.trim() !== "") {
     wards = await Area.findAll({
       where: {
@@ -802,24 +819,31 @@ controller.viewEditRequest = async (req, res) => {
     currentDistrict,
     currentWard,
   });
-}
+};
 
 controller.acceptOrDenyEditRequest = async (req, res) => {
-  const {boardRequestId, size, quantity, boardTypeId, boardId, status} = req.body;
+  const { boardRequestId, size, quantity, boardTypeId, boardId, status } =
+    req.body;
   try {
-    await BoardRequest.update({
-      size,
-      quantity,
-      requestStatus: status
-    }, {where: {id: boardRequestId}})
-    await Board.update({
-      BoardTypeId: boardTypeId,
-    }, {where: {id: boardId}})
-    return res.json({status: "Success"});
-  } catch(err) {
-    return res.json({status: "Fail"});
+    await BoardRequest.update(
+      {
+        size,
+        quantity,
+        requestStatus: status,
+      },
+      { where: { id: boardRequestId } }
+    );
+    await Board.update(
+      {
+        BoardTypeId: boardTypeId,
+      },
+      { where: { id: boardId } }
+    );
+    return res.json({ status: "Success" });
+  } catch (err) {
+    return res.json({ status: "Fail" });
   }
-}
+};
 
 const getLocationTypeName = async (adsPlacement) => {
   try {
@@ -1458,12 +1482,15 @@ controller.createBoard = async (req, res) => {
     boardTypeSelectCreateModal
   );
 
-  let adPlacementId = await checkInput.findAdplacementByAddress(
-    checkInput.getFirstPartOfAddress(addressCreateModal)
+  let adPlacementId = await checkInput.findAdplacementByOnlyAddress(
+    await checkInput.getFirstPartOfAddress(addressCreateModal)
   );
+
+  console.log(adPlacementId);
   if (boardTypeid == null || adPlacementId == null) {
     createFailed = true;
   }
+
   if (createFailed) {
     req.flash("addressCreateModal", addressCreateModal);
 

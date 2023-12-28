@@ -344,6 +344,33 @@
 
 
 
+                                                    <div class="row fw-semibold fs-4 mb-2">Khu vực muốn đặt bảng quảng
+                                                        cáo
+                                                    </div>
+                                                    <div class="row g-md-3 g-2 mb-3">
+                                                        <div class="col-6 col-md-6">
+                                                            <select name="districtSelectCreateModal" class="form-select"
+                                                                required id="districtSelectCreateModal" onchange="districtSelectChangeAndFlyTo(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))
+                                                                ">
+                                                                <option value="">Quận/Huyện</option>
+                                                                <% for (let i=0; i < districts.length; i++){ %>
+                                                                    <option value="<%= districts[i].district %>"
+                                                                        class="districts">
+                                                                        <%= districts[i].district %>
+                                                                    </option>
+                                                                    <% } %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-6 col-md-6">
+                                                            <select name="wardSelectCreateModal" class="form-select"
+                                                                id="wardSelectCreateModal"
+                                                                onchange="wardSelectChangeAndFlyTo(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))"
+                                                                required disabled>
+                                                                <option value="">Phường</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
                                                     <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo muốn
                                                         đặt
                                                     </div>

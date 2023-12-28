@@ -6,6 +6,7 @@ const { LocationType } = require("../models");
 const { BoardType } = require("../models");
 const { Op } = require("sequelize");
 
+
 function isEmpty(input) {
   if (input) {
     return input.trim().length === 0;
@@ -191,10 +192,10 @@ function getFirstPartOfAddress(address) {
 
   // Get the first element and trim to remove whitespaces
   var firstPart = addressArray[0].trim();
-
+  console.log(firstPart);
   return firstPart;
 }
-async function findAdplacementByAddress(address) {
+async function findAdplacementByOnlyAddress(address) {
   const result = await AdsPlacement.findOne({
     where: {
       address: address,
@@ -259,6 +260,7 @@ module.exports = {
   findAdsTypeIdByAdsType,
   findBoardsTyoeIdByBoardType,
   findAdplacementByAddress,
+  findAdplacementByOnlyAddress,
   getFullAddressInfo,
   getDistrictFromAdress,
   isDuplicateAdType,
