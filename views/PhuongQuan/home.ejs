@@ -18,13 +18,35 @@
     />
     <link rel="stylesheet" href="style.css" />
 
+    <!-- Select -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css"
+      integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
     <!-- Font awesome -->
     <script
       src="https://kit.fontawesome.com/5990078b0a.js"
       crossorigin="anonymous"
     ></script>
     <link rel="stylesheet" href="/css/PhuongQuan/style.css" />
-    <link rel="stylesheet" href="/css/toggleNavigation.css">
+    <link rel="stylesheet" href="/css/toggleNavigation.css" />
   </head>
 
   <body>
@@ -33,11 +55,11 @@
     <!-- Navbar content -->
     <%- include("./subPartials/navbar.ejs") %>
     <!-- Data -->
-    <div id="account-ward" style="display: none;"><%= area.ward %></div>
-    <div id="account-district" style="display: none;"><%= area.district %></div>
-    <div id="account-type" style="display: none;"><%= type %></div>
+    <div id="account-ward" style="display: none"><%= area.ward %></div>
+    <div id="account-district" style="display: none"><%= area.district %></div>
+    <div id="account-type" style="display: none"><%= type %></div>
     <!-- Main content -->
-    
+
     <main class="dynamic-container map-container">
       <div class="tab-content h-100 pb-3">
         <div
@@ -124,6 +146,22 @@
                     </li>
                   </ul>
                 </div>
+                <% if (type=="Quan") { %>
+                <div id="map-filter-button">
+                  <select
+                    class="selectpicker"
+                    multiple
+                    aria-label="size 3 select example"
+                    name="selectedOptions"
+                    id="filterSelect"
+                    style="z-index: 100"
+                  >
+                  <% wards.forEach((ward)=>{ %>
+                    <option selected value="<%=ward%>"><%= ward%></option>
+                  <%})%>
+                  </select>
+                </div>
+                <% } %>
               </div>
               <div class="col-4 h-100 px-4" id="map-details">
                 <h6>Tìm địa điểm</h6>
@@ -271,8 +309,8 @@
     <%- include("../partials/footer.ejs") %>
 
     <!-- Modals -->
-    <%- include("./subPartials/form-add-permit-request.ejs") %>
-    <%- include("./subPartials/form-add-permit-request-new-board.ejs") %>
+    <%- include("./subPartials/form-add-permit-request.ejs") %> <%-
+    include("./subPartials/form-add-permit-request-new-board.ejs") %>
   </body>
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -283,6 +321,28 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
     crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"
+  ></script>
+
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"
+    integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
   ></script>
   <script src="/javascript/toggleNavigation.js"></script>
   <script src="/javascript/PhuongQuan/map.js"></script>
