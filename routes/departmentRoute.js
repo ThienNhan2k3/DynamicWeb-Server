@@ -22,11 +22,13 @@ router.get("/boardManagement", controller.boardManagement);
 router.post("/boardManagement", controller.createBoard);
 router.put("/boardManagement", controller.editBoard);
 router.delete("/boardManagement", controller.deleteBoard);
-/*-------------------- ViewAdsRequest --------------------*/
-router.get("/viewAdsRequest", controller.viewAdsRequests);
-router.get("/viewAdsRequest/:id", controller.acceptOrDenyAdsRequest);
 
-/*-------------------- ViewAdsRequest --------------------*/
+//View AdsRequests
+router.get("/viewAdsRequest", controller.viewAdsRequests);
+router.get("/viewAdsRequest/:id", controller.detailRequest);
+router.post("/acceptOrDenyAdsRequest", controller.acceptOrDenyAdsRequest);
+
+// View Reports
 router.get("/viewReport", controller.viewReports);
 router.post("/viewReport/api/statisticReport", controller.statisticReport);
 router.get(
@@ -34,6 +36,10 @@ router.get(
   controller.getWaitingAndProcessedReport
 );
 router.get("/viewReport/:id", controller.detailReport);
+
+// Accept or deny edit requests
+router.get("/acceptOrDenyEditRequest", controller.viewEditRequest);
+router.post("/acceptOrDenyEditRequest", controller.acceptOrDenyEditRequest);
 
 // Area management
 router.get("/areaManagement", controller.getAreas);

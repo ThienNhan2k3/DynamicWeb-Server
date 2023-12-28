@@ -107,8 +107,8 @@
   </div>
 
   <div class="row justify-content-end w-75 mt-3">
-      <button type="button" class="btn btn-danger col-auto me-3 px-4 py-2">Từ chối</button>
-      <button type="button" class="btn btn-success col-auto px-4 py-2">Chấp nhận</button>
+      <button type="button" class="btn btn-danger col-auto me-3 px-4 py-2" data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="deny-btn" onclick="acceptOrDenyAdsRequest(event)">Từ chối</button>
+      <button type="button" class="btn btn-success col-auto px-4 py-2" data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="accept-btn" onclick="acceptOrDenyAdsRequest(event)">Chấp nhận</button>
   </div>
   
     </main>
@@ -116,6 +116,35 @@
     <%- include("../partials/footer.ejs") %>
 
     <script src="/javascript/toggleNavigation.js"></script>
+    <script>
+       function acceptOrDenyAdsRequest(e) {
+
+        console.log(e.target);
+        let data = {
+          id: e.target.dataset.id,
+          previousUrl: e.target.dataset.previousUrl,
+        };
+        if (e.target.matches("#accept-btn")) {
+          data.status = "Cấp phép";
+        } else {
+          data.status = "Bị từ chối";
+        }
+        fetch("/department/acceptOrDenyAdsRequest", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(data)
+        }).then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (data.status === 'success') {
+            location.href = data.redirect;
+          }
+        })
+        .catch(err => {console.log(err)});
+      }
+    </script>
   </body>
 
 
