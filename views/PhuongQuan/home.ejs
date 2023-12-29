@@ -149,7 +149,7 @@
                 <% if (type=="Quan") { %>
                 <div id="map-filter-button">
                   <select
-                    class="selectpicker"
+                    class="selectpicker dropup"
                     multiple
                     aria-label="size 3 select example"
                     name="selectedOptions"
@@ -157,6 +157,8 @@
                     style="z-index: 100"
                     data-selected-text-format="count"
                     data-count-selected-text="{0} phường được chọn"
+                    data-dropup-auto="false"
+                    data-actions-box="true"
                   >
                     <% wards.forEach((ward)=>{ %>
                     <option selected value="<%=ward%>"><%= ward%></option>
