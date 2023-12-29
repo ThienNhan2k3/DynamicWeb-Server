@@ -34,7 +34,7 @@ module.exports = {
           createdAt: "2023-11-21T04:14:54",
         },
         {
-          id: 2,
+          id: 3,
           name: "Công ty nước giải khát clorua",
           phone: "0987654321",
           address: "40 Nguyễn Trãi",
