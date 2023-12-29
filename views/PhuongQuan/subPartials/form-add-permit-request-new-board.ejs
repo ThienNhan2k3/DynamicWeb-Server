@@ -5,6 +5,7 @@
       aria-hidden="true"
       aria-labelledby="permitRequestAndCreateBoardModal"
       tabindex="-1"
+      data-bs-backdrop="static" data-bs-keyboard="false"
     >
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -108,11 +109,12 @@
       </div>
     </div>
     <div
-      class="modal fade"
+      class="modal"
       id="permissionReport-sub"
       aria-hidden="true"
       aria-labelledby="permissionReport-sub"
       tabindex="-1"
+      data-bs-backdrop="static" data-bs-keyboard="false"
     >
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -129,6 +131,7 @@
                 class="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onclick="closeModal()"
               ></button>
             </div>
           </div>

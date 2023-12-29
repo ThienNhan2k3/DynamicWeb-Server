@@ -45,7 +45,6 @@ controller.addPermitRequest = async (req, res) => {
   if (boardId == -1) {
     let { adsPlacementId, boardTypeId, boardSize, boardQuantity } = req.body;
     //Create new board
-    adsPlacementId = 2;
     try {
       let newBoard = await models.Board.create({
         size: boardSize,
