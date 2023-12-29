@@ -3,7 +3,13 @@ function showAddPermitRequestModal(formId, btn) {
 }
 
 function showAddBoardModal(btn) {
-  document.querySelector("#permitRequestAndCreateBoardModal #adsPlacementId").value = btn.dataset.id;
+  document.querySelector("#createBoardForm #adsPlacementIdEdit").value = btn.dataset.id;
+}
+
+function closeModal() {
+  $('.modal').modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
 }
 
 function checkValidFirstForm(e) {

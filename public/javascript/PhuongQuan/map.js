@@ -142,7 +142,11 @@ const getInfoOnclickUnclustered = async (e) => {
   );
   const data = await fetchedData.json();
   adsData = JSON.parse(data);
+  const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
+  HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
+  HTMLaddBoardBtn.style.display = 'block';
 
+  const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
   const HTMLnumber = document.querySelector("#num-ads");
   const HTMLtitle = document.querySelector("#board-title");
@@ -154,8 +158,10 @@ const getInfoOnclickUnclustered = async (e) => {
   const HTMLthumbnail = document.querySelector("#board-thumbnail");
   const HTMLpagination = document.querySelector("#board-pagination");
   const HTMLboardContract = document.querySelector("#board-contract");
+  const HTMLaddPermitRequestBtn = document.querySelector("#createPermissionButton-half");
 
   if (adsData.length == 0) {
+    HTMLdetails.style.display = 'none';
     HTMLid.innerHTML = "Chưa có thông tin";
     HTMLnumber.innerHTML = `<p>Địa điểm này có 0 quảng cáo</p>`;
     HTMLtitle.innerHTML = `Chưa có thông tin <span class="ms-2 badge bg-secondary" id="board-status">Chưa có thông tin</span></a>`;
@@ -169,8 +175,13 @@ const getInfoOnclickUnclustered = async (e) => {
     const popover = new bootstrap.Popover(HTMLboardContract);
     popover.update();
   } else {
+    HTMLdetails.style.display = 'block';
+    console.log('Status', adsData[0].status);
+    HTMLaddPermitRequestBtn.style.display = (adsData[0].status != "") ? 'none' : 'block';
     HTMLid.innerHTML = adsData[0].id;
-    console.log(adsData[0].status)
+
+    HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
+
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
       adsData[0].BoardType.type
@@ -247,6 +258,8 @@ const getInfoOnclickUnclustered = async (e) => {
 
       const page = e.target.innerText;
       HTMLid.innerHTML = adsData[page - 1].id;
+      HTMLaddPermitRequestBtn.dataset.id = adsData[page - 1].id;
+      HTMLaddPermitRequestBtn.style.display = (adsData[page - 1].status != "") ? 'none' : 'block';
 
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
@@ -796,7 +809,7 @@ locationInput.addEventListener("keypress", (e) => {
 const createPermissionButtonHalf = document.querySelector(
   "#createPermissionButton-half"
 );
-
+ 
 createPermissionButtonHalf.addEventListener("click", (e) => {
   let page =
     document.querySelector(".page-item.active") != null
@@ -807,8 +820,6 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
     return;
   }
   selectedBoard = adsData[page - 1];
-  console.log(selectedBoard);
-  alert(selectedBoard.id);
 });
 
 //Update map when select specified ward
