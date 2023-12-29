@@ -66,12 +66,12 @@ const mouseEnterEventUnclustered = (e, layer) => {
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
-
+  const areaObj = JSON.parse(area);
   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
 };
 
@@ -137,6 +137,7 @@ const toggleEvent = (e, targetLayer) => {
 const getInfoOnclickUnclustered = async (e) => {
   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
   const target = e.features[0];
+  const areaObjTarget = JSON.parse(target.properties.area);
   const fetchedData = await fetch(
     `${serverPath}/citizen/get-ads/${e.features[0].properties.id}`
   );
@@ -144,7 +145,7 @@ const getInfoOnclickUnclustered = async (e) => {
   adsData = JSON.parse(data);
   const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
   HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
-  HTMLaddBoardBtn.style.display = 'block';
+  HTMLaddBoardBtn.style.display = "block";
 
   const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
@@ -158,14 +159,16 @@ const getInfoOnclickUnclustered = async (e) => {
   const HTMLthumbnail = document.querySelector("#board-thumbnail");
   const HTMLpagination = document.querySelector("#board-pagination");
   const HTMLboardContract = document.querySelector("#board-contract");
-  const HTMLaddPermitRequestBtn = document.querySelector("#createPermissionButton-half");
+  const HTMLaddPermitRequestBtn = document.querySelector(
+    "#createPermissionButton-half"
+  );
 
   if (adsData.length == 0) {
-    HTMLdetails.style.display = 'none';
+    HTMLdetails.style.display = "none";
     HTMLid.innerHTML = "Chưa có thông tin";
     HTMLnumber.innerHTML = `<p>Địa điểm này có 0 quảng cáo</p>`;
     HTMLtitle.innerHTML = `Chưa có thông tin <span class="ms-2 badge bg-secondary" id="board-status">Chưa có thông tin</span></a>`;
-    HTMLaddr.innerHTML = target.properties.address;
+    HTMLaddr.innerHTML = `${target.properties.address}, ${areaObjTarget.ward}, ${areaObjTarget.district}`;
     HTMLsize.innerHTML = "Chưa có thông tin";
     HTMLqty.innerHTML = "Chưa có thông tin";
     HTMLform.innerHTML = target.properties.adsType;
@@ -175,9 +178,10 @@ const getInfoOnclickUnclustered = async (e) => {
     const popover = new bootstrap.Popover(HTMLboardContract);
     popover.update();
   } else {
-    HTMLdetails.style.display = 'block';
-    console.log('Status', adsData[0].status);
-    HTMLaddPermitRequestBtn.style.display = (adsData[0].status != "") ? 'none' : 'block';
+    HTMLdetails.style.display = "block";
+    console.log("Status", adsData[0].status);
+    HTMLaddPermitRequestBtn.style.display =
+      adsData[0].status != "" ? "none" : "block";
     HTMLid.innerHTML = adsData[0].id;
 
     HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
@@ -196,7 +200,7 @@ const getInfoOnclickUnclustered = async (e) => {
     }" id="board-status">${
       adsData[0].status != "" ? adsData[0].status : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[0].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[0].AdsPlacement.address}, ${adsData[0].AdsPlacement.Area.ward}, ${adsData[0].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[0].size;
     HTMLqty.innerHTML = adsData[0].quantity;
     HTMLform.innerHTML = adsData[0].AdsPlacement.AdsType.type;
@@ -259,7 +263,8 @@ const getInfoOnclickUnclustered = async (e) => {
       const page = e.target.innerText;
       HTMLid.innerHTML = adsData[page - 1].id;
       HTMLaddPermitRequestBtn.dataset.id = adsData[page - 1].id;
-      HTMLaddPermitRequestBtn.style.display = (adsData[page - 1].status != "") ? 'none' : 'block';
+      HTMLaddPermitRequestBtn.style.display =
+        adsData[page - 1].status != "" ? "none" : "block";
 
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
@@ -276,7 +281,9 @@ const getInfoOnclickUnclustered = async (e) => {
           ? adsData[page - 1].status
           : "Chưa có quảng cáo"
       }</span></a>`;
-      HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+      HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+        adsData[page - 1].AdsPlacement.Area.ward
+      }, ${adsData[page - 1].AdsPlacement.Area.district}`;
       HTMLsize.innerHTML = adsData[page - 1].size;
       HTMLqty.innerHTML = adsData[page - 1].quantity;
       HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -330,7 +337,9 @@ const getInfoOnclickUnclustered = async (e) => {
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+      adsData[page - 1].AdsPlacement.Area.ward
+    }, ${adsData[page - 1].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -381,7 +390,9 @@ const getInfoOnclickUnclustered = async (e) => {
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+      adsData[page - 1].AdsPlacement.Area.ward
+    }, ${adsData[page - 1].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -411,7 +422,7 @@ const getInfoOnclickUnclustered = async (e) => {
   });
 };
 
-const initLngLat=async()=>{
+const initLngLat = async () => {
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
   const query = `${accountDistrict} ${accountWard} Hồ Chí Minh`;
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
@@ -431,7 +442,7 @@ const initLngLat=async()=>{
   } catch (err) {
     console.log(err);
   }
-}
+};
 //Map generation
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
@@ -449,7 +460,7 @@ map.addControl(new mapboxgl.FullscreenControl());
 
 map.on("load", async () => {
   //Set default lnglat
-  await initLngLat()
+  await initLngLat();
   //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
@@ -809,7 +820,7 @@ locationInput.addEventListener("keypress", (e) => {
 const createPermissionButtonHalf = document.querySelector(
   "#createPermissionButton-half"
 );
- 
+
 createPermissionButtonHalf.addEventListener("click", (e) => {
   let page =
     document.querySelector(".page-item.active") != null
@@ -868,4 +879,3 @@ filterSelect.addEventListener("change", (e) => {
   map.getSource("nonSipulated").setData(filterNonSipulated);
   map.getSource("reported").setData(filterReported);
 });
-

@@ -17,7 +17,7 @@ const getSipulated = async (req, res, next) => {
       status: "Đã quy hoạch",
       id: {
         [Sequelize.Op.notIn]: Sequelize.literal(
-          "(SELECT AdsPlacementId FROM reports)"
+          "(SELECT AdsPlacementId FROM reports WHERE status!='Đã xử lý')"
         ),
       },
     },
@@ -68,7 +68,7 @@ const getNonSipulated = async (req, res, next) => {
       status: "Chưa quy hoạch",
       id: {
         [Sequelize.Op.notIn]: Sequelize.literal(
-          "(SELECT AdsPlacementId FROM reports)"
+          "(SELECT AdsPlacementId FROM reports WHERE status!='Đã xử lý')"
         ),
       },
     },
@@ -119,6 +119,9 @@ const getReport = async (req, res, next) => {
       AdsPlacementId: {
         [Sequelize.Op.not]: null,
       },
+      status:{
+        [Sequelize.Op.not]:'Đã xử lý'
+      }
     },
     include: [
       {
@@ -199,6 +202,10 @@ const getAds = async (req, res, next) => {
             model: AdsType,
             required: true,
           },
+          {
+            model:Area,
+            required:true
+          }
         ],
       },
     ],
