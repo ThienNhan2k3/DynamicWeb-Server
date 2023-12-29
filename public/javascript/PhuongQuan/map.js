@@ -833,3 +833,10 @@ filterSelect.addEventListener("change", (e) => {
   map.getSource("nonSipulated").setData(filterNonSipulated);
   map.getSource("reported").setData(filterReported);
 });
+
+//Change display of the select ward section
+$('filterSelect').selectpicker.on('change.bs.select',(e)=>{
+  const selectedCount=$(this).val().length
+  const newText=selectedCount+' phường được chọn để xử lý'
+  $(this).next('.filter-option-inner-inner').html(newText)
+})

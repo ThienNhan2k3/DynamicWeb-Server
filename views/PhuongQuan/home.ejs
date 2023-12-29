@@ -155,6 +155,8 @@
                     name="selectedOptions"
                     id="filterSelect"
                     style="z-index: 100"
+                    data-selected-text-format="count"
+                    data-count-selected-text="{0} phường được chọn"
                   >
                   <% wards.forEach((ward)=>{ %>
                     <option selected value="<%=ward%>"><%= ward%></option>
