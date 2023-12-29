@@ -170,6 +170,7 @@ const getInfoOnclickUnclustered = async (e) => {
     popover.update();
   } else {
     HTMLid.innerHTML = adsData[0].id;
+    console.log(adsData[0].status)
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
       adsData[0].BoardType.type
@@ -182,7 +183,7 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-danger"
         : "bg-dark"
     }" id="board-status">${
-      adsData[0].status != undefined ? adsData[0].status : "Chưa có quảng cáo"
+      adsData[0].status != "" ? adsData[0].status : "Chưa có quảng cáo"
     }</span></a>`;
     HTMLaddr.innerHTML = adsData[0].AdsPlacement.address;
     HTMLsize.innerHTML = adsData[0].size;
@@ -397,6 +398,27 @@ const getInfoOnclickUnclustered = async (e) => {
   });
 };
 
+const initLngLat=async()=>{
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${accountDistrict} ${accountWard} Hồ Chí Minh`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    const geometry = data.results[0].geometry;
+    map.flyTo({ center: geometry });
+  } catch (err) {
+    console.log(err);
+  }
+}
 //Map generation
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
@@ -405,7 +427,7 @@ const map = new mapboxgl.Map({
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
-  zoom: 12,
+  zoom: 17,
 });
 
 // Map navigation control
@@ -413,6 +435,8 @@ map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new mapboxgl.FullscreenControl());
 
 map.on("load", async () => {
+  //Set default lnglat
+  await initLngLat()
   //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
@@ -834,9 +858,3 @@ filterSelect.addEventListener("change", (e) => {
   map.getSource("reported").setData(filterReported);
 });
 
-//Change display of the select ward section
-$('filterSelect').selectpicker.on('change.bs.select',(e)=>{
-  const selectedCount=$(this).val().length
-  const newText=selectedCount+' phường được chọn để xử lý'
-  $(this).next('.filter-option-inner-inner').html(newText)
-})

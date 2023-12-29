@@ -12,10 +12,10 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await queryInterface.sequelize.query('SELECT * FROM companies')
-    await queryInterface.sequelize.query('SELECT * FROM boards');
-    await queryInterface.sequelize.query('SELECT * FROM reporttypes');
-    await queryInterface.sequelize.query('SELECT * FROM accounts');
+    await queryInterface.sequelize.query("SELECT * FROM companies");
+    await queryInterface.sequelize.query("SELECT * FROM boards");
+    await queryInterface.sequelize.query("SELECT * FROM reporttypes");
+    await queryInterface.sequelize.query("SELECT * FROM accounts");
 
     await queryInterface.bulkInsert(
       "permitRequests",
@@ -23,8 +23,7 @@ module.exports = {
         {
           id: 1,
           content: "Quảng cáo sản phẩm nông nghiệp",
-          image:
-            "https://cdn.brvn.vn/editor/2020/04/quangcaopanobillboardngoaitroi30_1585971255.jpg",
+          image: "bien-1.jpg",
           start: "2023-11-11 00:00:00",
           end: "2023-11-11 00:00:00",
           status: "Bị báo cáo",
@@ -37,8 +36,7 @@ module.exports = {
         {
           id: 2,
           content: "Quảng cáo nước giải khát",
-          image:
-            "https://cdn.brvn.vn/editor/2020/04/quangcaopanobillboardngoaitroi30_1585971255.jpg",
+          image: "bien-1.jpg",
           start: "2023-11-11 00:00:00",
           end: "2023-11-11 00:00:00",
           status: "Chưa cấp phép",
@@ -51,8 +49,7 @@ module.exports = {
         {
           id: 3,
           content: "Quảng cáo máy tính",
-          image:
-            "https://cdn.brvn.vn/editor/2020/04/quangcaopanobillboardngoaitroi30_1585971255.jpg",
+          image: "bien-1.jpg",
           start: "2023-11-11 00:00:00",
           end: "2023-11-11 00:00:00",
           status: "Chưa cấp phép",
@@ -65,8 +62,7 @@ module.exports = {
         {
           id: 4,
           content: "Quảng cáo máy tính",
-          image:
-            "https://cdn.brvn.vn/editor/2020/04/quangcaopanobillboardngoaitroi30_1585971255.jpg",
+          image: "bien-1.jpg",
           start: "2023-11-11 00:00:00",
           end: "2023-11-11 00:00:00",
           status: "Chưa cấp phép",
@@ -79,8 +75,7 @@ module.exports = {
         {
           id: 5,
           content: "Quảng cáo sản phẩm công nghiệp",
-          image:
-            "https://cdn.brvn.vn/editor/2020/04/quangcaopanobillboardngoaitroi30_1585971255.jpg",
+          image: "bien-1.jpg",
           start: "2023-11-11 00:00:00",
           end: "2023-11-11 00:00:00",
           status: "Chưa cấp phép",
@@ -89,7 +84,150 @@ module.exports = {
           AccountId: 2,
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
-        }
+        },
+        {
+          id: 6,
+          content: "Quảng cáo đồ gia dụng",
+          image: "bien-1.jpg",
+          start: "2023-11-11 00:00:00",
+          end: "2023-11-11 00:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 1,
+          BoardId: 2,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 6,
+          content: "Quảng cáo sản phẩm làm đẹp",
+          image: "bien-3.jpg",
+          start: "2023-11-12 08:30:00",
+          end: "2023-11-12 18:00:00",
+          status: "Bị báo cáo",
+          CompanyId: 2,
+          BoardId: 3,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 7,
+          content: "Quảng cáo đồ điện tử",
+          image: "bien-5.jpg",
+          start: "2023-11-13 10:00:00",
+          end: "2023-11-13 20:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 5,
+          BoardId: 1,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 8,
+          content: "Quảng cáo thực phẩm sạch",
+          image: "bien-2.jpg",
+          start: "2023-11-14 12:00:00",
+          end: "2023-11-14 22:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 1,
+          BoardId: 4,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 9,
+          content: "Quảng cáo thời trang",
+          image: "bien-4.jpg",
+          start: "2023-11-15 14:30:00",
+          end: "2023-11-15 23:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 4,
+          BoardId: 5,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 10,
+          content: "Quảng cáo dịch vụ du lịch",
+          image: "bien-7.jpg",
+          start: "2023-11-16 16:00:00",
+          end: "2023-11-16 01:00:00",
+          status: "Đã cấp phép",
+          CompanyId: 3,
+          BoardId: 2,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 11,
+          content: "Quảng cáo đồ chơi trẻ em",
+          image: "bien-1.jpg",
+          start: "2023-11-17 18:30:00",
+          end: "2023-11-17 03:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 2,
+          BoardId: 3,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 12,
+          content: "Quảng cáo xe máy mới",
+          image: "bien-6.jpg",
+          start: "2023-11-18 20:00:00",
+          end: "2023-11-18 04:30:00",
+          status: "Bị báo cáo",
+          CompanyId: 5,
+          BoardId: 1,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 13,
+          content: "Quảng cáo thực phẩm hữu cơ",
+          image: "bien-3.jpg",
+          start: "2023-11-19 22:30:00",
+          end: "2023-11-19 06:00:00",
+          status: "Đã cấp phép",
+          CompanyId: 1,
+          BoardId: 4,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 14,
+          content: "Quảng cáo sách mới",
+          image: "bien-2.jpg",
+          start: "2023-11-20 01:00:00",
+          end: "2023-11-20 08:30:00",
+          status: "Chưa cấp phép",
+          CompanyId: 4,
+          BoardId: 5,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 15,
+          content: "Quảng cáo điện thoại di động",
+          image: "bien-7.jpg",
+          start: "2023-11-21 03:30:00",
+          end: "2023-11-21 10:00:00",
+          status: "Chưa cấp phép",
+          CompanyId: 3,
+          BoardId: 2,
+          AccountId: 2,
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54",
+        },
       ],
       {}
     );
