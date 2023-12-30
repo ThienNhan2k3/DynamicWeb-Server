@@ -32,7 +32,37 @@ module.exports = {
           email: "test2@test.com",
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54",
+        },
+        {
+          id: 3,
+          name: "Công ty nước giải khát clorua",
+          phone: "0987654321",
+          address: "40 Nguyễn Trãi",
+          email: "xyz@company.com",
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54"
+        },
+        {
+          id: 4,
+          name: "Công ty DEF",
+          phone: "0934567890",
+          address: "456 Lê Thị Riêng",
+          email: "def@company.com",
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54"
+        },
+        {
+          id:5,
+          name: "Công ty Cao thủ hành gà",
+          phone: "0934567890",
+          address: "1 Lê Thị Riêng",
+          email: "def@company.com",
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54"
         }
+        
+
+        
       ],
       {}
     );

@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="/css/So/style.css">
     <link rel="stylesheet" href="/css/So/table.css">
     <link rel="stylesheet" href="/css/toggleNavigation.css">
+
+    <!-- DataTable -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   </head>
 
   <body>
@@ -26,7 +30,7 @@
   <!-- Main content -->
   <main class="dynamic-container">
     <!-- Danh sách thay đổi thông tin điểm đặt QC chờ duyệt -->
-    <div class="container-fluid pt-4 pe-4 text-center">
+    <div class="container-fluid pt-4 pe-4 text-left">
       <div class="row justify-content-center table-responsive">
         <div class="container row bg-secondary text-white">
           <div class="col text-center">
@@ -72,22 +76,10 @@
           </tbody>
         </table>
       </div>
-      <!-- Table pagination -->
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-          <li class="page-item">
-            <a class="page-link" href="#">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-      </nav>
     </div>
 
     <!-- Danh sách thay đổi thông tin bảng QC chờ duyệt -->
-    <div class="container-fluid pt-4 pe-4 text-center">
+    <div class="container-fluid pt-4 pe-4 text-left">
       <div class="row justify-content-center table-responsive">
         <div class="container row bg-secondary text-white">
           <div class="col text-center">
@@ -131,22 +123,10 @@
           </tbody>
         </table>
       </div>
-      <!-- Table pagination -->
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-          <li class="page-item">
-            <a class="page-link" href="#">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-      </nav>
     </div>
 
     <!-- Danh sách cấp phép bảng QC chờ duyệt -->
-    <div class="container-fluid pt-4 pe-4 text-center">
+    <div class="container-fluid pt-4 pe-4 text-left">
       <div class="row justify-content-center table-responsive">
         <div class="container row bg-secondary text-white">
           <div class="col text-center">
@@ -157,7 +137,7 @@
           <thead>
             <tr>
               <th scope="col">ID</th>
-              <th scope="col">ID Bảng</th>
+              <th scope="col">ID Bảng QC</th>
               <th scope="col">Nội dung</th>
               <th scope="col">Công ty</th>
               <th scope="col">Tình trạng</th>
@@ -187,17 +167,6 @@
         </table>
       </div>
       <!-- Table pagination -->
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-          <li class="page-item">
-            <a class="page-link" href="#">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-      </nav>
     </div>
   </main>
   <!-- Footer -->
@@ -205,7 +174,13 @@
 
   <!-- Modals -->
   <%- include("./subPartials/cancel-request-confirm-modal.ejs") %>
+  <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
   </body>
+
+  <!-- DataTable -->
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -217,6 +192,7 @@
     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
     crossorigin="anonymous"
   ></script>
+  <script src="/javascript/PhuongQuan/table.js"></script>
   <script src="/javascript/toggleNavigation.js"></script>
   <script src="/javascript/PhuongQuan/my-requests.js"></script>
 </html>

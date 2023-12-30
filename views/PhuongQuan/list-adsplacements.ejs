@@ -12,11 +12,23 @@
       crossorigin="anonymous"
     />
 
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css"
+    integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
     <!-- Font awesome -->
     <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/So/style.css">
     <link rel="stylesheet" href="/css/So/table.css">
     <link rel="stylesheet" href="/css/toggleNavigation.css">
+
+    <!-- DataTable -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   </head>
 
   <body>
@@ -27,70 +39,53 @@
   <main class="dynamic-container">
     <!--Ward sorting area  -->
     <% if (role == 'Quận') { %>
-    <div class="container-fluid w-30">
-      <form action=""  >
-        <div class="row align-items-center gx-1">
-          <div class="col-2 ">
-            <div class="input-group input-group-sm ">
-              <span class="input-group-text" id="inputGroup-sizing-sm">Phường xử lý</span>
-              <!--<input type="text" class="form-control" name="search" id="search" aria-describedby="inputGroup-sizing-sm">-->
-              <select class="form-select" id="selectedArea" name="selectedArea" onchange="this.form.submit()">
-                <option value="all">Tất cả</option>
-                <% myArea.forEach(area => { %>
-                  <option value="<%= area.id %>"><%= area.ward %></option>
-                <% }); %>
-              </select>
-            </div>            
-          </div>
-        </div>
-      </form>
-    </div>
+      <%- include("./subPartials/ward-filter.ejs") %> 
     <% } %>
     <!-- Table area -->
-    <div class="container-fluid pt-4 pe-4 text-center table-responsive">
+    <div class="container-fluid pt-4 pe-4 text-left table-responsive">
         <div class="row justify-content-center">
             <div class="container row bg-secondary text-white ">
                 <div class="col text-center">
                     <p class="fs-2 text-center py-2 m-0">Danh sách điểm đặt quảng cáo</p> 
+                </div>
             </div>
-            </div>
-            <table class="table table-striped">
-                <thead>
-                
+            <table id="adsplacementTable" class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Địa chỉ</th>
+                  <th scope="col">Khu vực</th>
+                  <th scope="col">Loại vị trí</th>
+                  <th scope="col">Hình thức</th>
+                  <th scope="col">Hình ảnh</th>
+                  <th scope="col">Tình trạng</th>
+                  <th scope="col">Chức năng</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% adsPlacements.forEach(place => { %>
                   <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Địa chỉ</th>
-                    <th scope="col">Khu vực</th>
-                    <th scope="col">Loại vị trí</th>
-                    <th scope="col">Hình thức</th>
-                    <th scope="col">Hình ảnh</th>
-                    <th scope="col">Tình trạng</th>
-                    <th scope="col">Chức năng</th>
+                    <td><%= place.id %></td>
+                    <td><%= place.address %></td>
+                    <td><%= place.Area.ward %> <%= place.Area.district %></td>
+                    <td><%= place.LocationType.locationType %></td>
+                    <td><%= place.AdsType.type %></td>
+                    <td>Link</td>
+                    <td><%= place.status %></td>
+                    <td>
+                        <a href="./list-boards/<%= place.id %>"><i class="fa-solid fa-magnifying-glass"></i></a>
+                        <a href="" data-bs-toggle="modal" data-bs-target="#locationChange" onclick="showEditAdsplacementModal(this)" data-id="<%= place.id %>" data-address="<%= place.address %>" data-area="<%= place.Area.id %>" data-ads-type="<%= place.AdsType.id %>" data-location-type="<%= place.LocationType.id %>" data-status="<%= place.status %>">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  <% adsPlacements.forEach(place => { %>
-                    <tr>
-                      <td><%= place.id %></td>
-                      <td><%= place.address %></td>
-                      <td><%= place.Area.ward %> <%= place.Area.district %></td>
-                      <td><%= place.LocationType.locationType %></td>
-                      <td><%= place.AdsType.type %></td>
-                      <td>Link</td>
-                      <td><%= place.status %></td>
-                      <td>
-                          <a href="./list-boards/<%= place.id %>"><i class="fa-solid fa-magnifying-glass"></i></a>
-                          <a href="" data-bs-toggle="modal" data-bs-target="#locationChange" onclick="showEditAdsplacementModal(this)" data-id="<%= place.id %>" data-address="<%= place.address %>" data-area="<%= place.Area.id %>" data-ads-type="<%= place.AdsType.id %>" data-location-type="<%= place.LocationType.id %>" data-status="<%= place.status %>">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                          </a>
-                      </td>
-                    </tr>
-                  <% }); %>
-                </tbody>
-              </table>
+                <% }); %>
+              </tbody>
+            </table>
+            
         </div>
         <!-- Table pagination -->
-        <nav aria-label="Page navigation example">
+        <!-- <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-end">
             <li class="page-item"><a class="page-link" href="#">Previous</a></li>
             <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -98,7 +93,7 @@
             <li class="page-item"><a class="page-link" href="#">3</a></li>
             <li class="page-item"><a class="page-link" href="#">Next</a></li>
           </ul>
-        </nav>
+        </nav> -->
     </div>
   </main> 
   <!-- Footer -->
@@ -106,8 +101,13 @@
 
   <!-- Modals -->
   <%- include("./subPartials/form-change-adsplacement-details.ejs") %>
+  <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
   </body>
 
+  <!-- DataTable -->
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -119,8 +119,15 @@
     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
     crossorigin="anonymous"
   ></script>
+  <script src="/javascript/PhuongQuan/table.js"></script>
   <script src="/javascript/PhuongQuan/list-adsplacements.js"></script>
-  <script src="/javascript/PhuongQuan/ward-filter.js"></script>
   <script src="/javascript/toggleNavigation.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"
+    integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="/javascript/PhuongQuan/ward-filter.js"></script>
 
 </html>

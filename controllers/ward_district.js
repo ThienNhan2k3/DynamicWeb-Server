@@ -25,6 +25,8 @@ controller.home = async (req, res) => {
     ],
   });
 
+  res.locals.message = req.flash("Message")[0];
+
   const wards=await models.Area.findAll({
     attributes:['ward'],
     where:{district:account.Area.district}
@@ -33,10 +35,10 @@ controller.home = async (req, res) => {
   // console.log(wardArr)
   return res.render("PhuongQuan/home.ejs", {
     tab: "Trang chủ",
-    selectedId: req.session.selectedAdsplacementId,
     area: account.Area,
     type: account.type,
-    wards:wardArr
+    wards:wardArr,
+    path:"/home"
   });
 };
 
@@ -45,7 +47,6 @@ controller.addPermitRequest = async (req, res) => {
   if (boardId == -1) {
     let { adsPlacementId, boardTypeId, boardSize, boardQuantity } = req.body;
     //Create new board
-    adsPlacementId = 2;
     try {
       let newBoard = await models.Board.create({
         size: boardSize,
@@ -55,8 +56,12 @@ controller.addPermitRequest = async (req, res) => {
       });
       boardId = newBoard.id;
     } catch (error) {
-      res.send("Có lỗi xảy ra!");
-      console.error(error);
+      req.flash('Message', {
+        title: 'Tạo bảng QC mới thất bại',
+        message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+        status: 'fail',
+      });
+      return res.json({redirect: 'back'});
     }
   }
   let { companyId } = req.body;
@@ -72,8 +77,12 @@ controller.addPermitRequest = async (req, res) => {
       });
       companyId = newCompany.id;
     } catch (error) {
-      res.send("Có lỗi xảy ra!");
-      console.error(error);
+      req.flash('Message', {
+        title: 'Tạo công ty mới thất bại',
+        message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+        status: 'fail',
+      });
+      return res.json({redirect: 'back'});
     }
   }
 
@@ -90,7 +99,7 @@ controller.addPermitRequest = async (req, res) => {
       imageUrl = path.join(",");
       imageUrl = imageUrl.replace(/\\/g, "/");
     }
-    await models.PermitRequest.create({
+    let request = await models.PermitRequest.create({
       content: content,
       image: imageUrl,
       start: startDate,
@@ -100,11 +109,19 @@ controller.addPermitRequest = async (req, res) => {
       CompanyId: companyId,
       AccountId: req.session.accountId,
     });
-    res.redirect("back");
+    req.flash('Message', {
+      title: 'Tạo yêu cầu thành công',
+      message: 'Yêu cầu cấp phép QC của bạn đã được gửi và đang chờ xét duyệt (ID: ' + request.id + ')',
+      status: 'succeed',
+    });
   } catch (error) {
-    res.send("Có lỗi xảy ra!");
-    console.error(error);
+    req.flash('Message', {
+      title: 'Tạo yêu cầu cấp phép QC thất bại',
+      message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+      status: 'fail',
+    });
   }
+  return res.json({redirect: 'back'});
 };
 
 controller.showListAdsplacements = async (req, res) => {
@@ -126,11 +143,12 @@ controller.showListAdsplacements = async (req, res) => {
     options.include[0].where.ward = req.session.accountWard;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
-    if (selectedArea.trim() != "" && selectedArea != "all") {
+    if (selectedArea != "") {
       options.where.areaId = selectedArea;
-    } else {
-      options.include[0].where.district = req.session.accountDistrict;
-    }
+    } 
+    // else {
+    //   options.include[0].where.district = req.session.accountDistrict;
+    // }
   }
 
   let { rows, count } = await models.AdsPlacement.findAndCountAll(options);
@@ -149,10 +167,12 @@ controller.showListAdsplacements = async (req, res) => {
     order: [["ward", "ASC"]],
   });
 
+  res.locals.message = req.flash("Message")[0];
+
   return res.render("PhuongQuan/list-adsplacements.ejs", {
     tab: "Danh sách điểm đặt quảng cáo",
     adsPlacements: rows,
-    selectedId: req.session.selectedAdsplacementId,
+    path:"/list-adsplacements"
   });
 };
 
@@ -160,7 +180,7 @@ controller.editAdsplacement = async (req, res) => {
   let { adsplacementId, address, adsTypeId, locationTypeId, status, reason } =
     req.body;
   try {
-    await models.AdsPlacementRequest.create({
+    let request = await models.AdsPlacementRequest.create({
       AdsPlacementId: adsplacementId,
       address: address,
       AdsTypeId: adsTypeId,
@@ -170,38 +190,77 @@ controller.editAdsplacement = async (req, res) => {
       AccountId: req.session.accountId,
       requestStatus: "Chờ phê duyệt",
     });
-    res.redirect("./list-adsplacements");
+    req.flash('Message', {
+      title: 'Gửi yêu cầu thành công',
+      message: 'Yêu cầu thay đổi điểm đặt QC của bạn đã được gửi và đang chờ xét duyệt (ID: ' + request.id + ')',
+      status: 'succeed',
+    });
   } catch (error) {
-    res.send("Gửi yêu cầu thất bại!");
-    console.error(error);
+    req.flash('Message', {
+      title: 'Gửi yêu cầu thất bại',
+      message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+      status: 'fail',
+    });
   }
+  res.redirect('back');
 };
 
 controller.showListBoards = async (req, res) => {
   let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
 
-  req.session.selectedAdsplacementId = id;
-
-  res.locals.adsplacement = await models.AdsPlacement.findOne({
-    include: [{ model: models.Area }],
-    where: { id: id },
-  });
-
-  let { rows, count } = await models.Board.findAndCountAll({
+  let options = {
     include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
       {
         model: models.PermitRequest,
         required: true,
       },
       { model: models.BoardType },
     ],
-    where: { adsPlacementId: id },
-  });
+    where: {}
+  };
 
+  if (id != -1) {
+    options.where.adsPlacementId = id;
+  }
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.session.accountType == "Phuong") {
+    options.include[0].include[0].where.ward = req.session.accountWard;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.include[0].where.areaId = selectedArea;
+    }
+  }
+
+  let { rows, count } = await models.Board.findAndCountAll(options);
   let permitedRows = rows;
 
-  let emptyBoards = await models.Board.findAll({
+  options = {
     include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
       {
         model: models.PermitRequest,
         required: false,
@@ -211,7 +270,6 @@ controller.showListBoards = async (req, res) => {
     ],
     where: {
       [Op.and]: [
-        { adsPlacementId: id },
         {
           id: {
             [Op.notIn]: Sequelize.literal(
@@ -221,26 +279,46 @@ controller.showListBoards = async (req, res) => {
         },
       ],
     },
-  });
+  };
+
+  if (id != -1) options.where[Op.and].push({adsPlacementId: id});
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.session.accountType == "Phuong") {
+    options.include[0].include[0].where.ward = req.session.accountWard;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.include[0].where.areaId = selectedArea;
+    }
+  }
+
+  let emptyBoards = await models.Board.findAll(options);
 
   //Adding options for select forms
   res.locals.boardTypes = await models.BoardType.findAll();
   res.locals.companies = await models.Company.findAll();
   res.locals.adsTypes = await models.AdsType.findAll();
+  res.locals.myArea = await models.Area.findAll({
+    where: { district: req.session.accountDistrict },
+    order: [["ward", "ASC"]],
+  });
+
+  res.locals.message = req.flash("Message")[0];
 
   return res.render("PhuongQuan/list-boards", {
-    selectedId: id,
     tab: "Danh sách bảng quảng cáo",
-    selectedId: req.session.selectedAdsplacementId,
     permitedBoards: permitedRows,
     emptyBoards: emptyBoards,
+    path:"/list-boards"
   });
 };
 
 controller.editBoard = async (req, res) => {
   let { boardId, quantity, size, boardTypeId, reason } = req.body;
   try {
-    await models.BoardRequest.create({
+    let request = await models.BoardRequest.create({
       BoardId: boardId,
       size: size,
       quantity: quantity,
@@ -249,11 +327,19 @@ controller.editBoard = async (req, res) => {
       AccountId: req.session.accountId,
       requestStatus: "Chờ phê duyệt",
     });
-    res.redirect("./list-boards/" + req.session.selectedAdsplacementId);
+    req.flash('Message', {
+      title: 'Gửi yêu cầu thành công',
+      message: 'Yêu cầu thay đổi bảng quảng cáo của bạn đã được gửi và đang chờ xét duyệt (ID: ' + request.id + ')',
+      status: 'succeed',
+    });
   } catch (error) {
-    res.send("Gửi yêu cầu thất bại!");
-    console.error(error);
+    req.flash('Message', {
+      title: 'Gửi yêu cầu thất bại',
+      message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+      status: 'fail',
+    });
   }
+  res.redirect('back');
 };
 
 controller.showMyRequests = async (req, res) => {
@@ -280,9 +366,12 @@ controller.showMyRequests = async (req, res) => {
     order: [["id", "ASC"]],
   });
 
+  res.locals.message = req.flash("Message")[0];
+
   return res.render("PhuongQuan/my-requests.ejs", {
     tab: "Yêu cầu của tôi",
     selectedId: req.session.selectedAdsplacementId,
+    path:"/my-requests"
   });
 };
 
@@ -292,18 +381,36 @@ controller.deleteRequest = async (req, res) => {
   try {
     if (tableName == "BoardRequest") {
       await models.BoardRequest.destroy({ where: { id: requestId } });
+      req.flash('Message', {
+        title: 'Xoá yêu cầu thành công',
+        message: 'Đã xoá yêu cầu thay đổi bảng QC (ID: ' + requestId + ')',
+        status: 'succeed',
+      });
     }
     if (tableName == "AdsPlacementRequest") {
       await models.AdsPlacementRequest.destroy({ where: { id: requestId } });
+      req.flash('Message', {
+        title: 'Xoá yêu cầu thành công',
+        message: 'Đã xoá yêu cầu thay đổi điểm đặt QC (ID: ' + requestId + ')',
+        status: 'succeed',
+      });
     }
     if (tableName == "PermitRequest") {
       await models.PermitRequest.destroy({ where: { id: requestId } });
+      req.flash('Message', {
+        title: 'Xoá yêu cầu thành công',
+        message: 'Đã xoá yêu cầu cấp phép bảng QC (ID: ' + requestId + ')',
+        status: 'succeed',
+      });
     }
-    res.redirect("back");
   } catch (error) {
-    res.send("Huỷ yêu cầu thất bại!");
-    console.error(error);
+    req.flash('Message', {
+      title: 'Xoá yêu cầu thất bại',
+      message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+      status: 'fail',
+    });
   }
+  res.redirect("back");
 };
 
 controller.showListReports = async (req, res) => {
@@ -331,11 +438,8 @@ controller.showListReports = async (req, res) => {
     options.include[0].include[0].where.ward = req.session.accountWard;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
-    if (selectedArea.trim() != "" && selectedArea != "all") {
+    if (selectedArea != "") {
       options.include[0].where.areaId = selectedArea;
-    } else {
-      options.include[0].include[0].where.district =
-        req.session.accountDistrict;
     }
   }
 
@@ -348,7 +452,7 @@ controller.showListReports = async (req, res) => {
 
   return res.render("PhuongQuan/list-reports.ejs", {
     tab: "Danh sách báo cáo",
-    selectedId: req.session.selectedAdsplacementId,
+    path:"/list-reports"
   });
 };
 
@@ -363,9 +467,11 @@ controller.showReportDetails = async (req, res) => {
     where: { id },
   });
 
+  res.locals.message = req.flash("Message")[0];
+
   return res.render("PhuongQuan/view-report-details.ejs", {
     tab: "Chi tiết báo cáo",
-    selectedId: req.session.selectedAdsplacementId,
+    path:"/list-reports"
   });
 };
 
@@ -416,11 +522,19 @@ controller.updateReportDetails = async (req, res) => {
         },
       ],
     });
-    res.redirect("back");
+    req.flash('Message', {
+      title: 'Cập nhật báo cáo thành công',
+      message: 'Xử lý báo cáo của bạn đã được cập nhật trên hệ thống',
+      status: 'succeed',
+    });
   } catch (error) {
-    res.send("Xử lý báo cáo thất bại!");
-    console.error(error);
+    req.flash('Message', {
+      title: 'Cập nhật báo cáo thất bại',
+      message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
+      status: 'fail',
+    });
   }
+  res.redirect("back");
 };
 
 module.exports = controller;

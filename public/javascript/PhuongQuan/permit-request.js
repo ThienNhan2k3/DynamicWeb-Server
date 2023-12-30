@@ -3,7 +3,13 @@ function showAddPermitRequestModal(formId, btn) {
 }
 
 function showAddBoardModal(btn) {
-  document.querySelector("#permitRequestAndCreateBoardModal #adsPlacementId").value = btn.dataset.id;
+  document.querySelector("#createBoardForm #adsPlacementIdEdit").value = btn.dataset.id;
+}
+
+function closeModal() {
+  $('.modal').modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
 }
 
 function checkValidFirstForm(e) {
@@ -23,13 +29,16 @@ async function submit2Forms(url) {
   formData.append("boardQuantity", document.querySelector('#boardQuantityEdit').value);
   formData.append("content", document.querySelector('#createBoardForm #contentEdit').value);
 
-  await fetch(url,
+  const response = await fetch(url,
     {
         body: formData,
-        method: "post"
+        method: "post",
+        redirect: 'follow'
     });
-
-  location.reload()
+    const data = await response.json()
+    if (data.redirect) {
+      location.reload();
+    }
 }
 
 function updateCompanyInfo(e, formId) {
