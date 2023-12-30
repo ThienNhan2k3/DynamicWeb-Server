@@ -57,8 +57,11 @@
 
       <div class="container row mt-3">
         <div class="row gx-5 gy-2">
-          <h3 class="col-md-3 col-xl-2 col-5 fs-5">Bảng quảng cáo:</h3>
-          <p class="col-md-9 col-xl-10 col-7"><%= permitRequest.Board.BoardType.type %></p>
+          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Bảng quảng cáo:</h3>
+          <p class="col-7 col-md-5 col-xl-6"><%= permitRequest.Board.BoardType.type %></p>
+
+          <h3 class="col-5 col-md-2 fs-5 p-md-0">Trạng thái:</h3>
+          <p class="col-7 col-md-2 p-md-0"><%= permitRequest.status %></p>
         </div>
         <div class="row gx-5 gy-2">
           <h3 class="col-md-3 col-xl-2 col-5 fs-5">Điểm đặt tương ứng:</h3>
@@ -107,8 +110,18 @@
   </div>
 
   <div class="row justify-content-end w-75 mt-3">
+    <% if (permitRequest.status === 'Bị từ chối') { %>
+      <button type="button" class="btn btn-danger col-auto me-3 px-4 py-2" disabled data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="deny-btn" onclick="acceptOrDenyAdsRequest(event)">Từ chối</button>
+    <% } else { %>
       <button type="button" class="btn btn-danger col-auto me-3 px-4 py-2" data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="deny-btn" onclick="acceptOrDenyAdsRequest(event)">Từ chối</button>
+    <% } %>
+
+    <% if (permitRequest.status === 'Cấp phép') { %>
+      <button type="button" class="btn btn-success col-auto px-4 py-2" disabled data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="accept-btn" onclick="acceptOrDenyAdsRequest(event)">Chấp nhận</button>
+    <% } else { %>
       <button type="button" class="btn btn-success col-auto px-4 py-2" data-id="<%= permitRequest.id %>" data-previous-url="<%= previousUrl %>" id="accept-btn" onclick="acceptOrDenyAdsRequest(event)">Chấp nhận</button>
+    <% } %>
+
   </div>
   
     </main>

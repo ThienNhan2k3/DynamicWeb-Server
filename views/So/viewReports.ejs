@@ -175,7 +175,7 @@
                   <td><%= pagination.rows[i].email %></td>
                   <td><%= pagination.rows[i].phone %></td>
                   <td colspan="2"><%= pagination.rows[i].AdsPlacement.address %>, <%= pagination.rows[i].AdsPlacement.Area.ward %>, <%= pagination.rows[i].AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</td>
-                  <td colspan="2"><%= pagination.rows[i].reportContent %></td>
+                  <td colspan="2"><%- pagination.rows[i].reportContent %></td>
                   <td class="text-center">
                       <a href="viewReport/<%= pagination.rows[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
                   </td>

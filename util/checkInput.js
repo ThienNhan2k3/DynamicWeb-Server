@@ -13,6 +13,19 @@ function isEmpty(input) {
   return true;
 }
 
+
+async function phoneExists(phone) {
+  const account = await Account.findOne({
+    where: {
+      phone,
+    },
+  });
+  if (account) {
+    return true;
+  }
+  return false;
+}
+
 function isEmail(email) {
   const emailRegExp = new RegExp(
     "^[a-zA-z0-9!@#$%^*()&_-~]+@[a-zA-z0-9!@#$%^*()&_-~]+\\.[a-z]{2,}$"
@@ -265,4 +278,5 @@ module.exports = {
   isDuplicateLocationType,
   isDuplicateBoardType,
   getFirstPartOfAddress,
+  phoneExists,
 };
