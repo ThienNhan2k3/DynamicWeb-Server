@@ -29,13 +29,16 @@ async function submit2Forms(url) {
   formData.append("boardQuantity", document.querySelector('#boardQuantityEdit').value);
   formData.append("content", document.querySelector('#createBoardForm #contentEdit').value);
 
-  await fetch(url,
+  const response = await fetch(url,
     {
         body: formData,
-        method: "post"
+        method: "post",
+        redirect: 'follow'
     });
-
-  location.reload()
+    const data = await response.json()
+    if (data.redirect) {
+      location.reload();
+    }
 }
 
 function updateCompanyInfo(e, formId) {

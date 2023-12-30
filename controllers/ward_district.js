@@ -26,7 +26,6 @@ controller.home = async (req, res) => {
   });
 
   res.locals.message = req.flash("Message")[0];
-  console.log('Message:', res.locals.message);
 
   const wards=await models.Area.findAll({
     attributes:['ward'],
@@ -62,7 +61,7 @@ controller.addPermitRequest = async (req, res) => {
         message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
         status: 'fail',
       });
-      return res.redirect('back');
+      return res.json({redirect: 'back'});
     }
   }
   let { companyId } = req.body;
@@ -83,7 +82,7 @@ controller.addPermitRequest = async (req, res) => {
         message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
         status: 'fail',
       });
-      return res.redirect('back');
+      return res.json({redirect: 'back'});
     }
   }
 
@@ -122,7 +121,7 @@ controller.addPermitRequest = async (req, res) => {
       status: 'fail',
     });
   }
-  res.redirect("back");
+  return res.json({redirect: 'back'});
 };
 
 controller.showListAdsplacements = async (req, res) => {
