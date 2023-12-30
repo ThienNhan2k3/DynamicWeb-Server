@@ -285,55 +285,28 @@
                           </select>
                         </div>
                         <div class="col-6 col-md-6">
-                          <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required>
+                          <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required
+                            disabled>
                             <option value="">Phường</option>
                           </select>
                         </div>
                       </div>
 
-                      <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo và số lượng biển</div>
-                      <div class="row g-md-3 g-2 mb-3">
-                        <!-- Left column -->
-                        <div class="col col-md-5.5 p-0 has-validation mb-3">
-                          <div class="form-floating is-invalid">
-                            <input type="address" id="addressCreateModal" <% if(createErr.error.address.length>
-                            0){
-                            %>
-                            class="form-control is-invalid"
-                            <% } else {%>
-                              class="form-control"
-                              <% } %>
-                                value="<%= createErr.value.address %>"
-                                  name="addressCreateModal"
-                                  autocomplete="true"
-                                  placeholder="">
-                                  <label for="addressCreateModal" class="mb-2">Địa chỉ</label>
-                          </div>
-                        </div>
-
-                        <div class="col-md-1"></div><!-- Empty column for spacing -->
-
-                        <!-- Right column -->
-                        <div class="col col-md-5.5 p-0 has-validation">
-                          <div class="form-floating is-invalid">
-                            <input type="numBoard" id="numBoardCreateModal" <% if(createErr.error.numBoard.length>
-                            0){ %>
-                            class="form-control is-invalid"
-                            <% } else {%>
-                              class="form-control"
-                              <% } %>
-                                value="<%= createErr.value.numBoard %>"
-                                  name="numBoardCreateModal"
-                                  autocomplete="true"
-                                  placeholder="">
-                                  <label for="numBoardCreateModal" class="mb-2">Số lượng biển</label>
-                          </div>
-                          <% if(createErr.error.numBoard.length> 0) { %>
-                            <div class="invalid-feedback">
-                              <%= console.log(createErr) %>
-                            </div>
+                      <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo</div>
+                      <div class="col col-md-5.5 p-0 has-validation mb-3">
+                        <div class="form-floating is-invalid">
+                          <input type="address" id="addressCreateModal" <% if(createErr.error.address.length>
+                          0){
+                          %>
+                          class="form-control is-invalid"
+                          <% } else {%>
+                            class="form-control"
                             <% } %>
-
+                              value="<%= createErr.value.address %>"
+                                name="addressCreateModal"
+                                autocomplete="true"
+                                placeholder="">
+                                <label for="addressCreateModal" class="mb-2">Địa chỉ</label>
                         </div>
                       </div>
 
@@ -365,8 +338,14 @@
                           </select>
                         </div>
                       </div>
-                      <div class="row">
-                        <div id="mapbox_modal"></div>
+                      <div class="row mb-3">
+                        <button class="mt-4 btn btn-success w-100" id="find-location">
+                          Tìm trên bảng đồ
+                        </button>
+                      </div>
+
+                      <div class="row g-md-3 g-2">
+                        <div class="col" id="mapboxModal" style="width:100%;height:25rem"></div>
                       </div>
 
                       <button type="submit" class="mt-4 btn btn-success w-100" id="registerButton">Tạo điểm
@@ -420,7 +399,7 @@
                         <!-- Left column -->
                         <div class="col col-md-5.5 p-0 mb-3">
                           <div class="form-floating">
-                            <input type="text" id="addressEditModal" class="form-control" name="addressEditModal"
+                            <input type="address" id="addressEditModal" class="form-control" name="addressEditModal"
                               autocomplete="true" placeholder="">
                             <label for="addressEditModal" class="mb-2">Địa chỉ</label>
                           </div>
@@ -494,7 +473,7 @@
                 </div>
 
                 <!-- Modal body -->
-                <div class="modal-body" style="white-space: nowrap;">
+                <div class="modal-body">
                   Bạn có chắc chắn rằng bạn muốn xóa điểm quảng cáo này không ?
                   <input type="hidden" value="" name="adplaceId" id="idDeleteModal">
 
@@ -532,9 +511,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
   integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 <script src="/javascript/So/map.js"></script>
+<script src="/javascript/So/map_modal.js"></script>
 <script src="/javascript/toggleNavigation.js"></script>
 <script src="/javascript/So/adplaceManagement.js"></script>
-<script src="/javascript/So/map_modal.js"></script>
+
 
 
 <script>
@@ -547,6 +527,9 @@
     card.addEventListener('click', () => {
       event.stopPropagation();
       card.classList.add('clicked');
+      mainContent.classList.add("active-location-details");
+      mapDetailsNav.classList.add("active-location-details");
+      content.classList.add("active-location-details");
     });
   });
 
@@ -555,7 +538,14 @@
   document.body.addEventListener('click', (event) => {
     // Check if the clicked element is not a property-card or location-details
     if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#map') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
+      // Hide location-details
+      mapDetailsNav.classList.remove('active-location-details');
+      // Remove 'clicked' class from all property-cards
       propertyCards.forEach(c => c.classList.remove('clicked'));
+      // Remove other active classes
+      mainContent.classList.remove("active-location-details");
+      content.classList.remove("active-location-details");
+
     }
   });
 
@@ -579,6 +569,8 @@
         // Add class "clicked" to the clicked property-card
         card.classList.add('clicked');
 
+        // Show location-details;
+        mapDetailsNav.classList.add("active-location-details");
       });
     });
   });

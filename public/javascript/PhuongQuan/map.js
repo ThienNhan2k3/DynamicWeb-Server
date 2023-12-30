@@ -11,6 +11,16 @@ let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
 
+//Full geojson
+let sipulated;
+let nonSipulated;
+let reported;
+
+//filtered geojson
+let filterSipulated;
+let filterNonSipulated;
+let filterReported;
+
 const sipulatedPopup = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
@@ -50,20 +60,18 @@ const mouseEnterEventUnclustered = (e, layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
   }
 
   map.getCanvas().style.cursor = "pointer";
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
-
+  const areaObj = JSON.parse(area);
   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
 };
 
@@ -129,12 +137,17 @@ const toggleEvent = (e, targetLayer) => {
 const getInfoOnclickUnclustered = async (e) => {
   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
   const target = e.features[0];
+  const areaObjTarget = JSON.parse(target.properties.area);
   const fetchedData = await fetch(
     `${serverPath}/citizen/get-ads/${e.features[0].properties.id}`
   );
   const data = await fetchedData.json();
   adsData = JSON.parse(data);
+  const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
+  HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
+  HTMLaddBoardBtn.style.display = "block";
 
+  const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
   const HTMLnumber = document.querySelector("#num-ads");
   const HTMLtitle = document.querySelector("#board-title");
@@ -146,12 +159,16 @@ const getInfoOnclickUnclustered = async (e) => {
   const HTMLthumbnail = document.querySelector("#board-thumbnail");
   const HTMLpagination = document.querySelector("#board-pagination");
   const HTMLboardContract = document.querySelector("#board-contract");
+  const HTMLaddPermitRequestBtn = document.querySelector(
+    "#createPermissionButton-half"
+  );
 
   if (adsData.length == 0) {
+    HTMLdetails.style.display = "none";
     HTMLid.innerHTML = "Chưa có thông tin";
     HTMLnumber.innerHTML = `<p>Địa điểm này có 0 quảng cáo</p>`;
     HTMLtitle.innerHTML = `Chưa có thông tin <span class="ms-2 badge bg-secondary" id="board-status">Chưa có thông tin</span></a>`;
-    HTMLaddr.innerHTML = target.properties.address;
+    HTMLaddr.innerHTML = `${target.properties.address}, ${areaObjTarget.ward}, ${areaObjTarget.district}`;
     HTMLsize.innerHTML = "Chưa có thông tin";
     HTMLqty.innerHTML = "Chưa có thông tin";
     HTMLform.innerHTML = target.properties.adsType;
@@ -161,7 +178,14 @@ const getInfoOnclickUnclustered = async (e) => {
     const popover = new bootstrap.Popover(HTMLboardContract);
     popover.update();
   } else {
+    HTMLdetails.style.display = "block";
+    console.log("Status", adsData[0].status);
+    HTMLaddPermitRequestBtn.style.display =
+      adsData[0].status != "" ? "none" : "block";
     HTMLid.innerHTML = adsData[0].id;
+
+    HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
+
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
       adsData[0].BoardType.type
@@ -174,9 +198,9 @@ const getInfoOnclickUnclustered = async (e) => {
         ? "bg-danger"
         : "bg-dark"
     }" id="board-status">${
-      adsData[0].status != undefined ? adsData[0].status : "Chưa có quảng cáo"
+      adsData[0].status != "" ? adsData[0].status : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[0].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[0].AdsPlacement.address}, ${adsData[0].AdsPlacement.Area.ward}, ${adsData[0].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[0].size;
     HTMLqty.innerHTML = adsData[0].quantity;
     HTMLform.innerHTML = adsData[0].AdsPlacement.AdsType.type;
@@ -219,8 +243,8 @@ const getInfoOnclickUnclustered = async (e) => {
       <a class="page-link" href="#" aria-label="Next">
         <span aria-hidden="true">&raquo;</span></a></li>`;
   } else {
-    paginationData += `<a class="page-link" href="#" aria-label="Next">
-      <span aria-hidden="true">&raquo;</span></a>`;
+    paginationData += `<li class="page-item "><a class="page-link" href="#" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span></a></li>`;
   }
   HTMLpagination.innerHTML = paginationData;
   //Pagination feature
@@ -238,6 +262,9 @@ const getInfoOnclickUnclustered = async (e) => {
 
       const page = e.target.innerText;
       HTMLid.innerHTML = adsData[page - 1].id;
+      HTMLaddPermitRequestBtn.dataset.id = adsData[page - 1].id;
+      HTMLaddPermitRequestBtn.style.display =
+        adsData[page - 1].status != "" ? "none" : "block";
 
       HTMLtitle.innerHTML = `${
         adsData[page - 1].BoardType.type
@@ -254,7 +281,9 @@ const getInfoOnclickUnclustered = async (e) => {
           ? adsData[page - 1].status
           : "Chưa có quảng cáo"
       }</span></a>`;
-      HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+      HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+        adsData[page - 1].AdsPlacement.Area.ward
+      }, ${adsData[page - 1].AdsPlacement.Area.district}`;
       HTMLsize.innerHTML = adsData[page - 1].size;
       HTMLqty.innerHTML = adsData[page - 1].quantity;
       HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -308,7 +337,9 @@ const getInfoOnclickUnclustered = async (e) => {
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+      adsData[page - 1].AdsPlacement.Area.ward
+    }, ${adsData[page - 1].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -359,7 +390,9 @@ const getInfoOnclickUnclustered = async (e) => {
         ? adsData[page - 1].status
         : "Chưa có quảng cáo"
     }</span></a>`;
-    HTMLaddr.innerHTML = adsData[page - 1].AdsPlacement.address;
+    HTMLaddr.innerHTML = `${adsData[page - 1].AdsPlacement.address}, ${
+      adsData[page - 1].AdsPlacement.Area.ward
+    }, ${adsData[page - 1].AdsPlacement.Area.district}`;
     HTMLsize.innerHTML = adsData[page - 1].size;
     HTMLqty.innerHTML = adsData[page - 1].quantity;
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
@@ -389,6 +422,27 @@ const getInfoOnclickUnclustered = async (e) => {
   });
 };
 
+const initLngLat = async () => {
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${accountDistrict} ${accountWard} Hồ Chí Minh`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    const geometry = data.results[0].geometry;
+    map.flyTo({ center: geometry });
+  } catch (err) {
+    console.log(err);
+  }
+};
 //Map generation
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
@@ -397,7 +451,7 @@ const map = new mapboxgl.Map({
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
-  zoom: 12,
+  zoom: 17,
 });
 
 // Map navigation control
@@ -405,6 +459,8 @@ map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new mapboxgl.FullscreenControl());
 
 map.on("load", async () => {
+  //Set default lnglat
+  await initLngLat();
   //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
@@ -413,43 +469,55 @@ map.on("load", async () => {
     `${serverPath}/citizen/get-nonsipulated`
   );
   const fetchedReportData = await fetch(`${serverPath}/citizen/get-report`);
-  let sipulated = await fetchedsipulatedData.json();
-  let nonSipulated = await fetchedNonSipulatedData.json();
-  let reported = await fetchedReportData.json();
+  sipulated = await fetchedsipulatedData.json();
+  nonSipulated = await fetchedNonSipulatedData.json();
+  reported = await fetchedReportData.json();
 
   sipulated = JSON.parse(sipulated);
   nonSipulated = JSON.parse(nonSipulated);
   reported = JSON.parse(reported);
 
+  filterSipulated = Object.assign({}, sipulated);
+  filterNonSipulated = Object.assign({}, nonSipulated);
+  filterReported = Object.assign({}, reported);
+  console.log(reported);
+
   // Sort for placement that belongs to specified area
   if (accountType == "Quan") {
-    sipulated.features = sipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterSipulated.features = sipulated.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
 
-    nonSipulated.features = nonSipulated.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterNonSipulated.features = nonSipulated.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
 
-    reported.features = reported.features.filter((p) => {
-      return p.properties.area.district == accountDistrict;
-    });
+    filterReported.features = reported.features
+      .filter((p) => {
+        return p.properties.area.district == accountDistrict;
+      })
+      .slice();
+    console.log(reported);
   } else if (accountType == "Phuong") {
-    sipulated.features = sipulated.features.filter((p) => {
+    filterSipulated.features = sipulated.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
       );
     });
 
-    nonSipulated.features = nonSipulated.features.filter((p) => {
+    filterNonSipulated.features = nonSipulated.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
       );
     });
 
-    reported.features = reported.features.filter((p) => {
+    filterReported.features = reported.features.filter((p) => {
       return (
         p.properties.area.district == accountDistrict &&
         p.properties.area.ward == accountWard
@@ -460,9 +528,9 @@ map.on("load", async () => {
   // Sipulated source data
   map.addSource("sipulated", {
     type: "geojson",
-    data: sipulated,
+    data: filterSipulated,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 20,
   });
   //Sipulated cluster
@@ -548,9 +616,9 @@ map.on("load", async () => {
   //Non sipulated section
   map.addSource("nonSipulated", {
     type: "geojson",
-    data: nonSipulated,
+    data: filterNonSipulated,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 15,
   });
   //Non sipulated cluster
@@ -635,9 +703,9 @@ map.on("load", async () => {
   //Reported section
   map.addSource("reported", {
     type: "geojson",
-    data: reported,
+    data: filterReported,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 15,
   });
   //Reported cluster
@@ -763,6 +831,51 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
     return;
   }
   selectedBoard = adsData[page - 1];
-  console.log(selectedBoard);
-  alert(selectedBoard.id);
+});
+
+//Update map when select specified ward
+const filterSelect = document.querySelector("#filterSelect");
+filterSelect.addEventListener("change", (e) => {
+  // e.preventDefault();
+  console.log("CHanged");
+  const selectedWardsHTML = filterSelect.selectedOptions;
+  let selectedWard = [];
+  for (let i = 0; i < selectedWardsHTML.length; i++) {
+    selectedWard.push(selectedWardsHTML[i].label);
+  }
+
+  //Refilter
+  console.log(reported);
+
+  filterSipulated.features = sipulated.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  filterNonSipulated.features = nonSipulated.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  filterReported.features = reported.features
+    .filter((p) => {
+      return (
+        p.properties.area.district == accountDistrict &&
+        selectedWard.includes(p.properties.area.ward)
+      );
+    })
+    .slice();
+
+  //Change data and rerender map
+  map.getSource("sipulated").setData(filterSipulated);
+  map.getSource("nonSipulated").setData(filterNonSipulated);
+  map.getSource("reported").setData(filterReported);
 });

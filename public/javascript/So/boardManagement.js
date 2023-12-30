@@ -1,3 +1,74 @@
+const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+
+// Utility function to check if a value is a number
+function isNumber(value) {
+  return typeof value === "number" && !isNaN(value);
+}
+
+// Function to get latitude and longitude from a district
+async function getLatLongFromDistrict(district, apiKey) {
+  const address = `${district}, Ho Chi Minh City, Vietnam`;
+  const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const { lat, lng: lon } = data.results[0].geometry;
+
+    if (isNumber(lat) && isNumber(lon)) {
+      return { lat, lon };
+    }
+  }
+
+  return false;
+}
+
+async function getLatLongFromWard(ward, district, apiKey) {
+  const address = `${ward}, ${district}, Ho Chi Minh City, Vietnam`;
+  const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const { lat, lng: lon } = data.results[0].geometry;
+
+    if (isNumber(lat) && isNumber(lon)) {
+      return { lat, lon };
+    }
+  }
+
+  return false;
+}
+
+async function districtSelectChangeAndFlyTo(
+  districtSelect,
+  wardSelect,
+  callback
+) {
+  console.log("laksdmlda");
+  districtSelectChange(districtSelect, wardSelect, callback);
+  const { lat, lon } = await getLatLongFromDistrict(
+    districtSelect.value,
+    apiKey
+  );
+  navigateToLocation(lon, lat);
+}
+
+async function wardSelectChangeAndFlyTo(districtSelect, wardSelect, callback) {
+  const { lat, lon } = await getLatLongFromWard(
+    wardSelect.value,
+    districtSelect.value,
+    apiKey
+  );
+  navigateToLocation(lon, lat);
+}
+
 function districtSelectChange(districtSelect, wardSelect, callback) {
   // Kiểm tra xem quận đã được chọn chưa
   if (districtSelect.value === "") {
@@ -40,7 +111,6 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
 }
 
 function showEditBoardModal(button) {
-  console.log("button clicked");
   const districtField = document.querySelector("#districtSelectEditModal");
   const wardField = document.querySelector("#wardSelectEditModal");
   const id = button.dataset.id;
@@ -50,24 +120,24 @@ function showEditBoardModal(button) {
   const type = button.dataset.type;
   const district = button.dataset.district;
   const ward = button.dataset.ward;
-  console.log(id, size, quantity, address, type, district, ward);
   const dimensionsArray = size.split("x");
 
   const height = parseInt(dimensionsArray[0].trim());
   const width = parseInt(dimensionsArray[1].trim());
 
-  console.log(id, height, width, quantity, address, type, district, ward);
-
   document.getElementById("heightEditModal").value = height;
   document.getElementById("weightEditModal").value = width;
   document.getElementById("quantityEditModal").value = quantity.split(" ")[0];
-  document.getElementById("addressEditModal").value = address;
+  document.getElementById("addressEditModal").value =
+    address + ", " + ward + ", " + district;
   document.getElementById("boardTypeSelectEditModal").value = type;
   document.getElementById("districtSelectEditModal").value = district;
   districtSelectChange(districtField, wardField, () => {
     document.getElementById("wardSelectEditModal").value = ward;
   });
   document.getElementById("idEditModal").value = id;
+  document.getElementById("addressEditSend").value =
+    address + ", " + ward + ", " + district;
 }
 
 const confirmEditButton = document.getElementById("confirm-edit-button");

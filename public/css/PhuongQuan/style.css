@@ -86,13 +86,6 @@
     height: 40px;
   }
   
-  /* #map {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-  } */
-  
   .map-container{
       position:relative;
       margin-left:0;
@@ -123,6 +116,13 @@
     position: absolute;
     bottom: 16px;
     left: 16px;
+    overflow: visible;
+  }
+
+  #map-filter-button{
+    position: absolute;
+    bottom: 16px;
+    left: 3.5rem;
     overflow: visible;
   }
   

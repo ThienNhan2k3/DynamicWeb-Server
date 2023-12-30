@@ -241,7 +241,6 @@ const postChangePassword = async (req, res) => {
 const changeInfor = (req, res) => {
   return res.render("changeInfor.ejs", {
     tab: "Chỉnh sửa thông tin",
-    selectedId: req.session.selectedAdsplacementId,
   });
 }
 
