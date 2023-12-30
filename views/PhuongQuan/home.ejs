@@ -317,8 +317,9 @@
     <%- include("../partials/footer.ejs") %>
 
     <!-- Modals -->
-    <%- include("./subPartials/form-add-permit-request.ejs") %> <%-
-    include("./subPartials/form-add-permit-request-new-board.ejs") %>
+    <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
+    <%- include("./subPartials/form-add-permit-request.ejs") %>
+    <%- include("./subPartials/form-add-permit-request-new-board.ejs") %>
   </body>
 
   <script

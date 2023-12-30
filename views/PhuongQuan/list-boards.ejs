@@ -93,7 +93,7 @@
           <thead>
             <tr>
               <th scope="col">ID Điểm đặt</th>
-              <th scope="col">ID</th>
+              <th scope="col">ID Bảng QC</th>
               <th scope="col">Kích thước</th>
               <th scope="col">Số lượng</th>
               <th scope="col">Loại bảng</th>
@@ -126,6 +126,7 @@
   <!-- Modals -->
   <%- include("./subPartials/form-change-board-details.ejs") %>
   <%- include("./subPartials/form-add-permit-request.ejs") %>
+  <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
   </body>
 
   <!-- DataTable -->
