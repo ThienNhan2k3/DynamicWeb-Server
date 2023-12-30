@@ -1015,64 +1015,46 @@ controller.adplaceManagement = async (req, res) => {
     deleteMsg,
     message,
     status,
+    search,
   });
 };
 
 controller.createAdplace = async (req, res) => {
-  const {
+  let {
     districtSelectCreateModal,
     wardSelectCreateModal,
     addressCreateModal,
-    numBoardCreateModal,
     locationTypeSelectCreateModal,
     adTypeSelectCreateModal,
+    lngCreateModal,
+    latCreateModal,
   } = req.body;
 
   let createFailed = false;
 
-  if (
-    !checkInput.isNumber(numBoardCreateModal) ||
-    checkInput.isEmpty(numBoardCreateModal)
-  ) {
-    req.flash("numBoardCreateModalError", "Số lượng biển không hợp lệ.");
-    createFailed = true;
-  }
+  addressCreateModal = checkInput.getFirstPartOfAddress(addressCreateModal);
+
   let fullAddress = await checkInput.getFullAddressInfo(
     addressCreateModal,
     apiKey
   );
-  const district = await checkInput.getDistrictFromAdress(fullAddress);
-  if (district !== districtSelectCreateModal) {
-    req.flash("addressCreateModalError", "Địa chỉ không hợp lệ.");
-    createFailed = true;
-  }
   if (checkInput.isEmpty(addressCreateModal)) {
     req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
     createFailed = true;
   }
 
-  let address = await checkInput.getLatLongFromAddress(
-    addressCreateModal +
-      "," +
-      wardSelectCreateModal +
-      "," +
-      districtSelectCreateModal,
-    apiKey
-  );
-
-  if (!address) {
-    req.flash("addressCreateModalError", "Địa điểm không hợp lệ.");
-    createFailed = true;
-  }
   if (await checkInput.isDuplicateAddress(addressCreateModal)) {
     req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
     createFailed = true;
   }
 
-  if (createFailed) {
-    req.flash("numBoardCreateModal", numBoardCreateModal);
-    req.flash("addressCreateModal", addressCreateModal);
+  if (await checkInput.isDuplicateLongLat(lngCreateModal, latCreateModal)) {
+    req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
+    createFailed = true;
+  }
 
+  if (createFailed) {
+    req.flash("addressCreateModal", addressCreateModal);
     req.flash(
       "message",
       JSON.stringify({
@@ -1096,24 +1078,40 @@ controller.createAdplace = async (req, res) => {
     adTypeSelectCreateModal
   );
 
-  console.log(areaId, locationTypeId, adTypeId, address);
   console.log("Bắt đầu khởi tạo AdsPlacement");
   try {
     const newAdsPlacement = await AdsPlacement.create({
       address: addressCreateModal,
       status: "Chưa quy hoạch",
-      long: address.lon,
-      lat: address.lat,
+      long: lngCreateModal,
+      lat: latCreateModal,
       AreaId: areaId,
       LocationTypeId: locationTypeId,
       AdsTypeId: adTypeId,
     });
     await newAdsPlacement.save();
     console.log("Kết thúc khởi tạo AdsPlacement");
-    req.flash("createMsgStatus", "success");
-    req.flash("createMsgContent", "Đăng ký thành công");
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo điểm quảng cáo thành công",
+      })
+    );
     return res.redirect("/department/adplaceManagement");
-  } catch (err) {}
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo điểm quảng cáo thất bại",
+      })
+    );
+    return res.redirect("/department/adplaceManagement");
+  }
 };
 
 controller.editAdplace = async (req, res) => {
@@ -1127,15 +1125,6 @@ controller.editAdplace = async (req, res) => {
     adTypeSelectEditModal,
     statusEditModal,
   } = req.body;
-  console.log(
-    idEditModal,
-    districtSelectEditModal,
-    wardSelectEditModal,
-    addressEditModal,
-    locationTypeSelectEditModal,
-    adTypeSelectEditModal,
-    statusEditModal
-  );
   let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
     locationTypeSelectEditModal
   );
@@ -1650,7 +1639,6 @@ controller.editBoard = async (req, res) => {
 
 controller.deleteBoard = async (req, res) => {
   const { boardId } = req.body;
-
 
   try {
     await Board.destroy({

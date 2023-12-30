@@ -138,6 +138,7 @@ function showEditBoardModal(button) {
   document.getElementById("idEditModal").value = id;
   document.getElementById("addressEditSend").value =
     address + ", " + ward + ", " + district;
+  
 }
 
 const confirmEditButton = document.getElementById("confirm-edit-button");

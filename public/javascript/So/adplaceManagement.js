@@ -92,7 +92,7 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
     .catch((err) => console.error(err));
 }
 
-function showEditAdplaceModal(button) {
+async function showEditAdplaceModal(button) {
   console.log("Button clicked"); // Check if the function is triggered
   const districtField = document.querySelector("#districtSelectEditModal");
   const wardField = document.querySelector("#wardSelectEditModal");
@@ -103,6 +103,8 @@ function showEditAdplaceModal(button) {
   const locationType = button.dataset.location;
   const address = button.dataset.address;
   const status = button.dataset.status;
+  const long = button.dataset.long;
+  const lat = button.dataset.lat;
 
   console.log(ward);
   // Update the content of the editModal form with the retrieved data
@@ -117,6 +119,13 @@ function showEditAdplaceModal(button) {
   document.getElementById("addressEditModal").value = address;
   document.getElementById("locationTypeSelectEditModal").value = locationType;
   document.getElementById("idEditModal").value = id;
+
+  document.getElementById("lngEditModal").value = long;
+  document.getElementById("latEditModal").value = lat;
+  //Set the marker to the map
+  modalMap_edit.flyTo({ center: [long, lat] });
+
+  dragMarker_edit.setLngLat([long, lat]).addTo(modalMap_edit);
 }
 
 //Open edit modal event

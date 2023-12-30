@@ -384,7 +384,8 @@ findBtn.addEventListener("click", async (e) => {
 
   //Make a request
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  const query = `${addr}, ${ward}, ${district}`;
+  const query = `${addr}, ${ward}, ${district}, Hồ Chí Minh, Việt Nam`;
+  console.log(query);
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
     query
@@ -403,6 +404,11 @@ findBtn.addEventListener("click", async (e) => {
     } else {
       const geometry = data.results[0].geometry;
       modalMap.flyTo({ center: geometry });
+      const { lat, lng } = geometry;
+      console.log(lat, lng);
+      console.log(geometry);
+      document.getElementById("lngCreateModal").value = lng;
+      document.getElementById("latCreateModal").value = lat;
       //Set the marker to the map
       dragMarker.setLngLat(geometry).addTo(modalMap);
     }
@@ -414,8 +420,408 @@ findBtn.addEventListener("click", async (e) => {
 //Get lngLat of the marker
 function onDragEnd() {
   const lngLat = dragMarker.getLngLat();
-  //Handle here
-  alert(lngLat);
 }
 
-dragMarker.on('dragend',onDragEnd)
+dragMarker.on("dragend", onDragEnd);
+
+const inspectClusterModal_edit = (e, layer) => {
+  const features = modalMap_edit.queryRenderedFeatures(e.point, {
+    layers: [`${layer}-cluster`],
+  });
+  const clusterId = features[0].properties.cluster_id;
+  modalMap_edit
+    .getSource(layer)
+    .getClusterExpansionZoom(clusterId, (err, zoom) => {
+      if (err) return;
+
+      modalMap_edit.easeTo({
+        center: features[0].geometry.coordinates,
+        zoom: zoom,
+      });
+    });
+};
+
+const mouseEnterEventUnclusteredModal_edit = (e, layer) => {
+  let popup;
+  if (layer == "sipulated") {
+    popup = sipulatedPopup;
+  } else if (layer == "nonSipulated") {
+    popup = nonSipulatedPopup;
+  } else if (layer == "reported") {
+    popup = reportedPopup;
+  } else if (layer == "selfReported") {
+    popup = selfReportedPopup;
+  }
+
+  modalMap_edit.getCanvas().style.cursor = "pointer";
+  const coordinates = e.features[0].geometry.coordinates.slice();
+  const { id, address, adsType, area, locationType, status } =
+    e.features[0].properties;
+
+  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
+
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap_edit);
+};
+
+const mouseLeaveEventUnclusteredModal_edit = (layer) => {
+  let popup;
+  if (layer == "sipulated") {
+    popup = sipulatedPopup;
+  } else if (layer == "nonSipulated") {
+    popup = nonSipulatedPopup;
+  } else if (layer == "reported") {
+    popup = reportedPopup;
+  } else if (layer == "selfReported") {
+    popup = selfReportedPopup;
+  }
+
+  modalMap_edit.getCanvas().style.cursor = "";
+  popup.remove();
+};
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
+const modalMap_edit = new mapboxgl.Map({
+  container: "mapboxEditModal",
+
+  style: "mapbox://styles/mapbox/streets-v12",
+  center: [106.569958, 10.722345],
+  zoom: 12,
+});
+// Map navigation control
+modalMap_edit.addControl(new mapboxgl.NavigationControl());
+modalMap_edit.addControl(new mapboxgl.FullscreenControl());
+
+modalMap_edit.on("load", async () => {
+  //Fetched section
+  const fetchedsipulatedData = await fetch(
+    `${serverPath}/citizen/get-sipulated`
+  );
+  const fetchedNonSipulatedData = await fetch(
+    `${serverPath}/citizen/get-nonsipulated`
+  );
+  const fetchedReportData = await fetch(`${serverPath}/citizen/get-report`);
+  const sipulated = await fetchedsipulatedData.json();
+  const nonSipulated = await fetchedNonSipulatedData.json();
+  const reported = await fetchedReportData.json();
+
+  // Sipulated source data
+  modalMap_edit.addSource("sipulated", {
+    type: "geojson",
+    data: JSON.parse(sipulated),
+    cluster: true,
+    clusterMaxZoom: 15,
+    clusterRadius: 20,
+  });
+  //Sipulated cluster
+  modalMap_edit.addLayer({
+    id: "sipulated-cluster",
+    type: "circle",
+    source: "sipulated",
+    filter: ["has", "point_count"],
+    paint: {
+      "circle-color": sipulatedColor,
+      "circle-radius": ["step", ["get", "point_count"], 30, 4, 60, 8, 90],
+    },
+    layout: { visibility: "visible" },
+  });
+  //Sipulated count
+  modalMap_edit.addLayer({
+    id: "sipulated-count",
+    type: "symbol",
+    source: "sipulated",
+    filter: ["has", "point_count"],
+    layout: {
+      "text-field": "{point_count_abbreviated}",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+  });
+  //Sipulated uncluster
+  modalMap_edit.addLayer({
+    id: "sipulated-unclustered",
+    type: "circle",
+    source: "sipulated",
+    filter: ["!", ["has", "point_count"]],
+    layout: { visibility: "visible" },
+    paint: {
+      "circle-color": sipulatedColor,
+      "circle-radius": unclusteredRadius,
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#fff",
+    },
+  });
+  //Sipulated label
+  modalMap_edit.addLayer({
+    id: "sipulated-label",
+    type: "symbol",
+    source: "sipulated",
+    filter: ["!", ["has", "point_count"]],
+    layout: {
+      "text-field": "QC",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+    paint: {
+      "text-color": "#f2f7f4",
+    },
+  });
+  //Inspect a cluster on click
+  modalMap_edit.on("click", "sipulated-cluster", (e) => {
+    inspectClusterModal_edit(e, "sipulated");
+  });
+  //Get info when user moves their mouse over the unclustered layer
+
+  modalMap_edit.on("mouseenter", "sipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "sipulated");
+  });
+  modalMap_edit.on("mouseleave", "sipulated-unclustered", (e) => {
+    mouseLeaveEventUnclusteredModal_edit("sipulated");
+  });
+  modalMap_edit.on("mouseenter", "sipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
+  });
+  modalMap_edit.on("mouseleave", "sipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
+  });
+
+  //Non sipulated section
+  modalMap_edit.addSource("nonSipulated", {
+    type: "geojson",
+    data: JSON.parse(nonSipulated),
+    cluster: true,
+    clusterMaxZoom: 15,
+    clusterRadius: 15,
+  });
+  //Non sipulated cluster
+  modalMap_edit.addLayer({
+    id: "nonSipulated-cluster",
+    type: "circle",
+    source: "nonSipulated",
+    filter: ["has", "point_count"],
+    paint: {
+      "circle-color": nonSipulatedColor,
+      "circle-radius": ["step", ["get", "point_count"], 25, 4, 50, 8, 75],
+    },
+    layout: { visibility: "visible" },
+  });
+  //Non sipulated count
+  modalMap_edit.addLayer({
+    id: "nonSipulated-count",
+    type: "symbol",
+    source: "nonSipulated",
+    filter: ["has", "point_count"],
+    layout: {
+      "text-field": "{point_count_abbreviated}",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+  });
+  //Non sipulated uncluster
+  modalMap_edit.addLayer({
+    id: "nonSipulated-unclustered",
+    type: "circle",
+    source: "nonSipulated",
+    filter: ["!", ["has", "point_count"]],
+    layout: { visibility: "visible" },
+    paint: {
+      "circle-color": nonSipulatedColor,
+      "circle-radius": unclusteredRadius,
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#fff",
+    },
+  });
+  //Non sipulated label
+  modalMap_edit.addLayer({
+    id: "nonSipulated-label",
+    type: "symbol",
+    source: "nonSipulated",
+    filter: ["!", ["has", "point_count"]],
+    layout: {
+      "text-field": "QC",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+    paint: {
+      "text-color": "#f2f7f4",
+    },
+  });
+  //Inspect a cluster on click
+  modalMap_edit.on("click", "nonSipulated-cluster", (e) => {
+    inspectClusterModal_edit(e, "nonSipulated");
+  });
+  //Get info when user moves their mouse over the unclustered layer
+
+  modalMap_edit.on("mouseenter", "nonSipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "nonSipulated");
+  });
+  modalMap_edit.on("mouseleave", "nonSipulated-unclustered", () => {
+    mouseLeaveEventUnclusteredModal_edit("nonSipulated");
+  });
+  modalMap_edit.on("mouseenter", "nonSipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
+  });
+  modalMap_edit.on("mouseleave", "nonSipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
+  });
+  //Reported section
+  modalMap_edit.addSource("reported", {
+    type: "geojson",
+    data: JSON.parse(reported),
+    cluster: true,
+    clusterMaxZoom: 15,
+    clusterRadius: 15,
+  });
+  //Reported cluster
+  modalMap_edit.addLayer({
+    id: "reported-cluster",
+    type: "circle",
+    source: "reported",
+    filter: ["has", "point_count"],
+    paint: {
+      "circle-color": reportedColor,
+      "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
+    },
+    layout: { visibility: "visible" },
+  });
+  //Reported count
+  modalMap_edit.addLayer({
+    id: "reported-count",
+    type: "symbol",
+    source: "reported",
+    filter: ["has", "point_count"],
+    layout: {
+      "text-field": "{point_count_abbreviated}",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+  });
+  //Reported uncluster
+  modalMap_edit.addLayer({
+    id: "reported-unclustered",
+    type: "circle",
+    source: "reported",
+    filter: ["!", ["has", "point_count"]],
+    layout: { visibility: "visible" },
+    paint: {
+      "circle-color": reportedColor,
+      "circle-radius": unclusteredRadius,
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#fff",
+    },
+  });
+  //Reported label
+  modalMap_edit.addLayer({
+    id: "reported-label",
+    type: "symbol",
+    source: "reported",
+    filter: ["!", ["has", "point_count"]],
+    layout: {
+      "text-field": "QC",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12,
+      "text-allow-overlap": true,
+      visibility: "visible",
+    },
+    paint: {
+      "text-color": "#f2f7f4",
+    },
+  });
+  //Inspect a cluster on click
+  modalMap_edit.on("click", "reported-cluster", (e) => {
+    inspectClusterModal_edit(e, "reported");
+  });
+
+  modalMap_edit.on("mouseenter", "reported-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "reported");
+  });
+  modalMap_edit.on("mouseleave", "reported-unclustered", () => {
+    mouseLeaveEventUnclusteredModal_edit("reported");
+  });
+
+  modalMap_edit.on("mouseenter", "reported-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
+  });
+  modalMap_edit.on("mouseleave", "reported-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
+  });
+});
+
+function navigateToLocation_edit(long, lat) {
+  modalMap_edit.flyTo({
+    center: [parseFloat(long), parseFloat(lat)],
+    zoom: 15,
+  });
+}
+
+const myModal_edit = document.getElementById("editModal");
+//Resize map in the modal
+myModal_edit.addEventListener("shown.bs.modal", (event) => {
+  modalMap_edit.resize(); // Importance
+});
+
+//Dragable marker
+const dragMarker_edit = new mapboxgl.Marker({
+  draggable: true,
+});
+
+//Find button handle
+const findBtn_edit = document.querySelector("#find-location-edit");
+findBtn_edit.addEventListener("click", async (e) => {
+  const addr = document.querySelector("#addressEditModal").value;
+  const ward = document.querySelector("#wardSelectEditModal").value;
+  const district = document.querySelector("#districtSelectEditModal").value;
+
+  //Make a request
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${addr}, ${ward}, ${district}`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  //Handle response
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    if (data.length == 0) {
+      //Handle case when no result
+    } else {
+      const geometry = data.results[0].geometry;
+      modalMap_edit.flyTo({ center: geometry });
+      const { lat, lng } = geometry;
+      console.log(lat, lng);
+      console.log(geometry);
+      document.getElementById("lngEditModal").value = lng;
+      document.getElementById("latEditModal").value = lat;
+      //Set the marker to the map
+      dragMarker_edit.setLngLat(geometry).addTo(modalMap_edit);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//Get lngLat of the marker
+function onDragEnd_edit() {
+  const lngLat = dragMarker_edit.getLngLat();
+}
+
+dragMarker_edit.on("dragend", onDragEnd_edit);

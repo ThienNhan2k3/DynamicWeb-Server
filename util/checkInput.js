@@ -6,7 +6,6 @@ const { LocationType } = require("../models");
 const { BoardType } = require("../models");
 const { Op } = require("sequelize");
 
-
 function isEmpty(input) {
   if (input) {
     return input.trim().length === 0;
@@ -118,8 +117,6 @@ async function getDistrictFromAdress(address) {
   if (districtInfo && districtInfo[1] && districtInfo[2]) {
     const districtType = districtInfo[1].trim();
     const districtName = districtInfo[2].trim();
-    console.log("Loại quận/huyện là:", districtType);
-    console.log("Tên quận/huyện là:", districtName);
     return districtType + " " + districtName;
   } else {
     return null;
@@ -133,6 +130,16 @@ async function isDuplicateAddress(address) {
     },
   });
   return existingAdplace !== null; // Trả về true nếu đã tồn tại, ngược lại là false
+}
+
+async function isDuplicateLongLat(long, lat) {
+  const existingAdplace = await AdsPlacement.findOne({
+    where: {
+      long: long,
+      lat: lat,
+    },
+  });
+  return existingAdplace !== null;
 }
 
 async function findAreaIdByWardAndDistrict(ward, district) {
@@ -267,4 +274,5 @@ module.exports = {
   isDuplicateLocationType,
   isDuplicateBoardType,
   getFirstPartOfAddress,
+  isDuplicateLongLat,
 };
