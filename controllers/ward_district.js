@@ -36,7 +36,8 @@ controller.home = async (req, res) => {
     selectedId: req.session.selectedAdsplacementId,
     area: account.Area,
     type: account.type,
-    wards:wardArr
+    wards:wardArr,
+    path:"/home"
   });
 };
 
@@ -152,6 +153,7 @@ controller.showListAdsplacements = async (req, res) => {
     tab: "Danh sách điểm đặt quảng cáo",
     adsPlacements: rows,
     selectedId: req.session.selectedAdsplacementId,
+    path:"/list-adsplacements"
   });
 };
 
@@ -233,6 +235,7 @@ controller.showListBoards = async (req, res) => {
     selectedId: req.session.selectedAdsplacementId,
     permitedBoards: permitedRows,
     emptyBoards: emptyBoards,
+    path:"/list-boards"
   });
 };
 
@@ -282,6 +285,7 @@ controller.showMyRequests = async (req, res) => {
   return res.render("PhuongQuan/my-requests.ejs", {
     tab: "Yêu cầu của tôi",
     selectedId: req.session.selectedAdsplacementId,
+    path:"/my-requests"
   });
 };
 
@@ -348,6 +352,7 @@ controller.showListReports = async (req, res) => {
   return res.render("PhuongQuan/list-reports.ejs", {
     tab: "Danh sách báo cáo",
     selectedId: req.session.selectedAdsplacementId,
+    path:"/list-reports"
   });
 };
 
@@ -365,6 +370,7 @@ controller.showReportDetails = async (req, res) => {
   return res.render("PhuongQuan/view-report-details.ejs", {
     tab: "Chi tiết báo cáo",
     selectedId: req.session.selectedAdsplacementId,
+    path:"/list-reports"
   });
 };
 
