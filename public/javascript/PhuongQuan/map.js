@@ -530,7 +530,7 @@ map.on("load", async () => {
     type: "geojson",
     data: filterSipulated,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 20,
   });
   //Sipulated cluster
@@ -618,7 +618,7 @@ map.on("load", async () => {
     type: "geojson",
     data: filterNonSipulated,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 15,
   });
   //Non sipulated cluster
@@ -705,7 +705,7 @@ map.on("load", async () => {
     type: "geojson",
     data: filterReported,
     cluster: true,
-    clusterMaxZoom: 15,
+    clusterMaxZoom: 17,
     clusterRadius: 15,
   });
   //Reported cluster
