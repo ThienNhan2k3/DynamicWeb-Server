@@ -33,7 +33,6 @@ controller.home = async (req, res) => {
   // console.log(wardArr)
   return res.render("PhuongQuan/home.ejs", {
     tab: "Trang chủ",
-    selectedId: req.session.selectedAdsplacementId,
     area: account.Area,
     type: account.type,
     wards:wardArr,
@@ -126,11 +125,12 @@ controller.showListAdsplacements = async (req, res) => {
     options.include[0].where.ward = req.session.accountWard;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
-    if (selectedArea.trim() != "" && selectedArea != "all") {
+    if (selectedArea != "") {
       options.where.areaId = selectedArea;
-    } else {
-      options.include[0].where.district = req.session.accountDistrict;
-    }
+    } 
+    // else {
+    //   options.include[0].where.district = req.session.accountDistrict;
+    // }
   }
 
   let { rows, count } = await models.AdsPlacement.findAndCountAll(options);
@@ -152,7 +152,6 @@ controller.showListAdsplacements = async (req, res) => {
   return res.render("PhuongQuan/list-adsplacements.ejs", {
     tab: "Danh sách điểm đặt quảng cáo",
     adsPlacements: rows,
-    selectedId: req.session.selectedAdsplacementId,
     path:"/list-adsplacements"
   });
 };
@@ -181,28 +180,59 @@ controller.editAdsplacement = async (req, res) => {
 controller.showListBoards = async (req, res) => {
   let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
 
-  req.session.selectedAdsplacementId = id;
-
-  res.locals.adsplacement = await models.AdsPlacement.findOne({
-    include: [{ model: models.Area }],
-    where: { id: id },
-  });
-
-  let { rows, count } = await models.Board.findAndCountAll({
+  let options = {
     include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
       {
         model: models.PermitRequest,
         required: true,
       },
       { model: models.BoardType },
     ],
-    where: { adsPlacementId: id },
-  });
+    where: {}
+  };
 
+  if (id != -1) {
+    options.where.adsPlacementId = id;
+  }
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.session.accountType == "Phuong") {
+    options.include[0].include[0].where.ward = req.session.accountWard;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.include[0].where.areaId = selectedArea;
+    }
+  }
+
+  let { rows, count } = await models.Board.findAndCountAll(options);
   let permitedRows = rows;
 
-  let emptyBoards = await models.Board.findAll({
+  options = {
     include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
       {
         model: models.PermitRequest,
         required: false,
@@ -212,7 +242,6 @@ controller.showListBoards = async (req, res) => {
     ],
     where: {
       [Op.and]: [
-        { adsPlacementId: id },
         {
           id: {
             [Op.notIn]: Sequelize.literal(
@@ -222,17 +251,34 @@ controller.showListBoards = async (req, res) => {
         },
       ],
     },
-  });
+  };
+
+  if (id != -1) options.where[Op.and].push({adsPlacementId: id});
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.session.accountType == "Phuong") {
+    options.include[0].include[0].where.ward = req.session.accountWard;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.include[0].where.areaId = selectedArea;
+    }
+  }
+
+  let emptyBoards = await models.Board.findAll(options);
 
   //Adding options for select forms
   res.locals.boardTypes = await models.BoardType.findAll();
   res.locals.companies = await models.Company.findAll();
   res.locals.adsTypes = await models.AdsType.findAll();
+  res.locals.myArea = await models.Area.findAll({
+    where: { district: req.session.accountDistrict },
+    order: [["ward", "ASC"]],
+  });
 
   return res.render("PhuongQuan/list-boards", {
-    selectedId: id,
     tab: "Danh sách bảng quảng cáo",
-    selectedId: req.session.selectedAdsplacementId,
     permitedBoards: permitedRows,
     emptyBoards: emptyBoards,
     path:"/list-boards"
@@ -334,11 +380,8 @@ controller.showListReports = async (req, res) => {
     options.include[0].include[0].where.ward = req.session.accountWard;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
-    if (selectedArea.trim() != "" && selectedArea != "all") {
+    if (selectedArea != "") {
       options.include[0].where.areaId = selectedArea;
-    } else {
-      options.include[0].include[0].where.district =
-        req.session.accountDistrict;
     }
   }
 
@@ -351,7 +394,6 @@ controller.showListReports = async (req, res) => {
 
   return res.render("PhuongQuan/list-reports.ejs", {
     tab: "Danh sách báo cáo",
-    selectedId: req.session.selectedAdsplacementId,
     path:"/list-reports"
   });
 };
@@ -369,7 +411,6 @@ controller.showReportDetails = async (req, res) => {
 
   return res.render("PhuongQuan/view-report-details.ejs", {
     tab: "Chi tiết báo cáo",
-    selectedId: req.session.selectedAdsplacementId,
     path:"/list-reports"
   });
 };

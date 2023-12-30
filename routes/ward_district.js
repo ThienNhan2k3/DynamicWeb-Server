@@ -38,6 +38,7 @@ router.post("/home", title.role, upload.single("img"), controller.addPermitReque
 router.get("/list-adsplacements", title.role, controller.showListAdsplacements);
 router.post("/list-adsplacements", title.role, controller.editAdsplacement);
 router.get("/list-boards/:id", title.role, controller.showListBoards);
+router.get("/list-boards", title.role, controller.showListBoards);
 router.post("/list-boards", title.role, controller.editBoard);
 router.get("/my-requests", title.role, controller.showMyRequests);
 router.post("/my-requests", controller.deleteRequest);

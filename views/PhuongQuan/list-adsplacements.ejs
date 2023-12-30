@@ -12,6 +12,14 @@
       crossorigin="anonymous"
     />
 
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css"
+    integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
     <!-- Font awesome -->
     <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/So/style.css">
@@ -31,24 +39,7 @@
   <main class="dynamic-container">
     <!--Ward sorting area  -->
     <% if (role == 'Quận') { %>
-    <div class="container-fluid w-30">
-      <form action=""  >
-        <div class="row align-items-center gx-1">
-          <div class="col-2 ">
-            <div class="input-group input-group-sm ">
-              <span class="input-group-text" id="inputGroup-sizing-sm">Phường xử lý</span>
-              <!--<input type="text" class="form-control" name="search" id="search" aria-describedby="inputGroup-sizing-sm">-->
-              <select class="form-select" id="selectedArea" name="selectedArea" onchange="this.form.submit()">
-                <option value="all">Tất cả</option>
-                <% myArea.forEach(area => { %>
-                  <option value="<%= area.id %>"><%= area.ward %></option>
-                <% }); %>
-              </select>
-            </div>            
-          </div>
-        </div>
-      </form>
-    </div>
+      <%- include("./subPartials/ward-filter.ejs") %> 
     <% } %>
     <!-- Table area -->
     <div class="container-fluid pt-4 pe-4 text-left table-responsive">
@@ -112,7 +103,6 @@
   <%- include("./subPartials/form-change-adsplacement-details.ejs") %>
   </body>
 
-
   <!-- DataTable -->
   <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -130,7 +120,13 @@
   ></script>
   <script src="/javascript/PhuongQuan/table.js"></script>
   <script src="/javascript/PhuongQuan/list-adsplacements.js"></script>
-  <script src="/javascript/PhuongQuan/ward-filter.js"></script>
   <script src="/javascript/toggleNavigation.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"
+    integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="/javascript/PhuongQuan/ward-filter.js"></script>
 
 </html>
