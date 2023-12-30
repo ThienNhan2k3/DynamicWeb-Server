@@ -50,6 +50,15 @@ module.exports = {
           email: "def@company.com",
           updatedAt: "2023-11-21T04:14:54",
           createdAt: "2023-11-21T04:14:54"
+        },
+        {
+          id:5,
+          name: "Công ty Cao thủ hành gà",
+          phone: "0934567890",
+          address: "1 Lê Thị Riêng",
+          email: "def@company.com",
+          updatedAt: "2023-11-21T04:14:54",
+          createdAt: "2023-11-21T04:14:54"
         }
         
 
