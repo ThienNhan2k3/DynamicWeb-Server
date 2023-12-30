@@ -344,13 +344,14 @@
 
 
 
-                                                    <div class="row fw-semibold fs-4 mb-2">Khu vực muốn đặt bảng quảng
+                                                    <div class="row fw-semibold fs-4 mb-2">Lọc khu vực muốn đặt bảng
+                                                        quảng
                                                         cáo
                                                     </div>
-                                                    <div class="row g-md-3 g-2 mb-3">
+                                                    <div class="row g-md-1 g-2 mb-3">
                                                         <div class="col-6 col-md-6">
                                                             <select name="districtSelectCreateModal" class="form-select"
-                                                                required id="districtSelectCreateModal" onchange="districtSelectChangeAndFlyTo(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))
+                                                                id="districtSelectCreateModal" onchange="districtSelectChangeAndFlyTo(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))
                                                                 ">
                                                                 <option value="">Quận/Huyện</option>
                                                                 <% for (let i=0; i < districts.length; i++){ %>
@@ -365,7 +366,7 @@
                                                             <select name="wardSelectCreateModal" class="form-select"
                                                                 id="wardSelectCreateModal"
                                                                 onchange="wardSelectChangeAndFlyTo(document.getElementById('districtSelectCreateModal'), document.getElementById('wardSelectCreateModal'))"
-                                                                required disabled>
+                                                                disabled>
                                                                 <option value="">Phường</option>
                                                             </select>
                                                         </div>
@@ -375,6 +376,11 @@
                                                         đặt
                                                     </div>
                                                     <div class="row g-md-1 g-2 mb-3">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="address" id="addressCreateSend"
+                                                                class="form-control" name="addressCreateSend"
+                                                                autocomplete="true" placeholder="" hidden>
+                                                        </div>
                                                         <div class="form-floating is-invalid">
                                                             <input type="address" id="addressCreateModal" <%
                                                                 if(createErr.error.address.length>
@@ -387,7 +393,7 @@
                                                                     value="<%= createErr.value.address %>"
                                                                         name="addressCreateModal"
                                                                         autocomplete="true"
-                                                                        placeholder="">
+                                                                        placeholder="" disabled>
                                                                         <label for="addressCreateModal" class="mb-2">Địa
                                                                             chỉ</label>
                                                         </div>
@@ -430,38 +436,17 @@
                                             <fieldset class="container-fluid">
                                                 <input type="hidden" id="idEditModal" name="idEditModal">
 
-                                                <div class="row fw-semibold fs-4 mb-2">Khu vực đặt và Loại bảng quảng
-                                                    cáo</div>
+                                                <div class="row fw-semibold fs-4 mb-2">Loại bảng quảng cáo</div>
                                                 <div class="row g-md-3 g-2 mb-3">
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="districtSelectEditModal" class="form-select"
-                                                            required id="districtSelectEditModal"
-                                                            onchange="districtSelectChange(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
-                                                            <% for (let i=0; i < districts.length; i++){ %>
-                                                                <option value="<%= districts[i].district %>"
-                                                                    class="districts">
-                                                                    <%= districts[i].district %>
-                                                                </option>
-                                                                <% } %>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="wardSelectEditModal" class="form-select"
-                                                            id="wardSelectEditModal" required>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-6 col-md-4">
-                                                        <select name="boardTypeSelectEditModal" class="form-select"
-                                                            id="boardTypeSelectEditModal" required>
-                                                            <%for (let i=0; i < boardTypes.length; i++){ %>
-                                                                <option value="<%= boardTypes[i].type %>"
-                                                                    class="boardTypes">
-                                                                    <%= boardTypes[i].type %>
-                                                                </option>
-                                                                <% } %>
-
-                                                        </select>
-                                                    </div>
+                                                    <select name="boardTypeSelectEditModal" class="form-select"
+                                                        id="boardTypeSelectEditModal" required>
+                                                        <%for (let i=0; i < boardTypes.length; i++){ %>
+                                                            <option value="<%= boardTypes[i].type %>"
+                                                                class="boardTypes">
+                                                                <%= boardTypes[i].type %>
+                                                            </option>
+                                                            <% } %>
+                                                    </select>
                                                 </div>
                                                 <div class="row fw-semibold fs-4 mb-2">Kích thước bảng quảng cáo và Số
                                                     lượng trụ
@@ -503,24 +488,49 @@
                                                         </div>
 
                                                     </div>
-
-
-
-                                                    <div class="row fw-semibold fs-4 mb-2">Địa chỉ điểm quảng cáo muốn
-                                                        đặt
+                                                    <div class="row fw-semibold fs-4 mb-2">Lọc khu vực đặt
                                                     </div>
                                                     <div class="row g-md-1 g-2 mb-3">
+                                                        <div class="col-6 col-md-6">
+                                                            <select name="districtSelectEditModal" class="form-select"
+                                                                required id="districtSelectEditModal"
+                                                                onchange="districtSelectChange(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
+                                                                <% for (let i=0; i < districts.length; i++){ %>
+                                                                    <option value="<%= districts[i].district %>"
+                                                                        class="districts">
+                                                                        <%= districts[i].district %>
+                                                                    </option>
+                                                                    <% } %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-6 col-md-6">
+                                                            <select name="wardSelectEditModal" class="form-select"
+                                                                id="wardSelectEditModal" required>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row fw-semibold fs-4 mb-2">Thay đổi điểm quảng cáo muốn
+                                                        đặt
+                                                    </div>
+
+                                                    <div class="row g-md-1 g-2 mb-3">
+                                                        <div class="form-floating is-invalid">
+                                                            <input type="address" id="addressEditSend"
+                                                                class="form-control" name="addressEditSend"
+                                                                autocomplete="true" placeholder="" hidden>
+                                                        </div>
                                                         <div class="form-floating is-invalid">
                                                             <input type="address" id="addressEditModal"
                                                                 class="form-control" name="addressEditModal"
-                                                                autocomplete="true" placeholder="" required>
+                                                                autocomplete="true" placeholder="" disabled>
                                                             <label for="addressEditModal" class="mb-2">Địa
                                                                 chỉ</label>
                                                         </div>
                                                     </div>
 
                                                     <div class="row">
-                                                        <div id="mapbox"
+                                                        <div id="mapbox_edit"
                                                             style="width:100%;height:45rem; border-radius: 20px"></div>
                                                     </div>
 

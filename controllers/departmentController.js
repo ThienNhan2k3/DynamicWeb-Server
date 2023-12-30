@@ -1452,28 +1452,33 @@ controller.createBoard = async (req, res) => {
     boardTypeSelectCreateModal,
     heightCreateModal,
     weightCreateModal,
-    addressCreateModal,
+    addressCreateSend,
     quantityCreateModal,
   } = req.body;
 
   let createFailed = false;
   if (
     !checkInput.isNumber(heightCreateModal) ||
-    checkInput.isEmpty(heightCreateModal)
+    checkInput.isEmpty(heightCreateModal) ||
+    parseInt(heightCreateModal) == 0 ||
+    parseFloat(heightCreateModal) - parseInt(heightCreateModal) !== 0
   ) {
     req.flash("heightCreateModalError", "Chiều dài không hợp lệ");
     createFailed = true;
   }
   if (
     !checkInput.isNumber(weightCreateModal) ||
-    checkInput.isEmpty(weightCreateModal)
+    checkInput.isEmpty(weightCreateModal) ||
+    parseInt(weightCreateModal) == 0 ||
+    parseFloat(weightCreateModal) - parseInt(weightCreateModal) !== 0
   ) {
     req.flash("weightCreateModalError", "Chiều rộng không hợp lệ");
     createFailed = true;
   }
   if (
     !checkInput.isNumber(quantityCreateModal) ||
-    checkInput.isEmpty(quantityCreateModal)
+    checkInput.isEmpty(quantityCreateModal) ||
+    parseInt(quantityCreateModal) == 0
   ) {
     req.flash("quantityCreateModalError", "Số lượng trụ không hợp lệ");
     createFailed = true;
@@ -1483,16 +1488,15 @@ controller.createBoard = async (req, res) => {
   );
 
   let adPlacementId = await checkInput.findAdplacementByOnlyAddress(
-    await checkInput.getFirstPartOfAddress(addressCreateModal)
+    await checkInput.getFirstPartOfAddress(addressCreateSend)
   );
 
-  console.log(adPlacementId);
   if (boardTypeid == null || adPlacementId == null) {
     createFailed = true;
   }
 
   if (createFailed) {
-    req.flash("addressCreateModal", addressCreateModal);
+    req.flash("addressCreateModal", addressCreateSend);
 
     req.flash(
       "message",
@@ -1543,21 +1547,25 @@ controller.editBoard = async (req, res) => {
     heightEditModal,
     weightEditModal,
     quantityEditModal,
-    addressEditModal,
+    addressEditSend,
     idEditModal,
   } = req.body;
   console.log(req.body);
   let updateFailed = false;
   if (
     !checkInput.isNumber(heightEditModal) ||
-    checkInput.isEmpty(heightEditModal)
+    checkInput.isEmpty(heightEditModal) ||
+    parseInt(heightEditModal) == 0 ||
+    parseFloat(heightEditModal) - parseInt(heightEditModal) !== 0
   ) {
     req.flash("heightEditModalError", "Chiều dài không hợp lệ");
     updateFailed = true;
   }
   if (
     !checkInput.isNumber(weightEditModal) ||
-    checkInput.isEmpty(weightEditModal)
+    checkInput.isEmpty(weightEditModal) ||
+    parseInt(weightEditModal) == 0 ||
+    parseFloat(weightEditModal) - parseInt(weightEditModal) !== 0
   ) {
     req.flash("weightEditModalError", "Chiều rộng không hợp lệ");
     updateFailed = true;
@@ -1570,57 +1578,29 @@ controller.editBoard = async (req, res) => {
     req.flash("quantityEditModalError", "Số lần trụ không hợp lệ");
     updateFailed = true;
   }
-  if (checkInput.isEmpty(addressEditModal)) {
-    req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
-    updateFailed = true;
-  }
-
-  let address = await checkInput.getLatLongFromAddress(
-    addressEditModal +
-      "," +
-      wardSelectEditModal +
-      "," +
-      districtSelectEditModal,
-    apiKey
-  );
-
-  if (!address) {
-    req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
+  if (checkInput.isEmpty(addressEditSend)) {
+    req.flash("addressEditModal_sendError", "Địa điểm không hợp lệ.");
     updateFailed = true;
   }
 
   let fullAddress = await checkInput.getFullAddressInfo(
-    addressEditModal,
+    addressEditSend,
     apiKey
   );
-  const district = await checkInput.getDistrictFromAdress(fullAddress);
 
-  console.log(district);
-  console.log(districtSelectEditModal);
-
-  if (district !== districtSelectEditModal) {
-    req.flash("addressEditModalError", "Địa chỉ không hợp lệ.");
-    updateFailed = true;
-  }
-
-  if (checkInput.isEmpty(addressEditModal)) {
+  if (checkInput.isEmpty(addressEditSend)) {
     req.flash("addressEditModalError", "Địa điểm không hợp lệ.");
     updateFailed = true;
   }
 
-  const adPlacementId = await checkInput.findAdplacementByAddress(
-    addressEditModal,
-    await checkInput.findAreaIdByWardAndDistrict(
-      wardSelectEditModal,
-      districtSelectEditModal
-    )
+  const adPlacementId = await checkInput.findAdplacementByOnlyAddress(
+    await checkInput.getFirstPartOfAddress(addressEditSend)
   );
-  console.log(updateFailed);
   let boardTypeId = await checkInput.findBoardsTyoeIdByBoardType(
     boardTypeSelectEditModal
   );
   if (updateFailed) {
-    req.flash("addressEditModal", addressEditModal);
+    req.flash("addressEditModal_send", addressEditSend);
     req.flash(
       "message",
       JSON.stringify({
@@ -1645,7 +1625,6 @@ controller.editBoard = async (req, res) => {
         },
       }
     );
-    console.log("cập nhật tc");
     req.flash(
       "message",
       JSON.stringify({
@@ -1672,7 +1651,6 @@ controller.editBoard = async (req, res) => {
 controller.deleteBoard = async (req, res) => {
   const { boardId } = req.body;
 
-  console.log(req.body);
 
   try {
     await Board.destroy({
@@ -1766,18 +1744,14 @@ controller.adTypeManagement = async (req, res) => {
 
 controller.createAdType = async (req, res) => {
   const { nameCreateModal } = req.body;
-  console.log(nameCreateModal);
 
   let createFailed = false;
   if (checkInput.isEmpty(nameCreateModal)) {
     createFailed = true;
-    console.log("empty");
     req.flash("nameCreateModalError", "Tên bị bỏ trống!");
   }
   if (await checkInput.isDuplicateAdType(nameCreateModal)) {
     createFailed = true;
-    console.log("duplicate");
-
     req.flash("nameCreateModalError", "Loại quảng cáo đã tồn tại!");
   }
   if (createFailed) {
@@ -1812,7 +1786,6 @@ controller.createAdType = async (req, res) => {
 
 controller.editAdType = async (req, res) => {
   const { idEditModal, nameEditModal } = req.body;
-  console.log(req.body);
 
   if (await checkInput.isDuplicateAdType(idEditModal)) {
     req.flash(
@@ -1990,18 +1963,14 @@ controller.locationTypeManagement = async (req, res) => {
 
 controller.createLocationType = async (req, res) => {
   const { nameCreateModal } = req.body;
-  console.log(nameCreateModal);
 
   let createFailed = false;
   if (checkInput.isEmpty(nameCreateModal)) {
     createFailed = true;
-    console.log("empty");
     req.flash("nameCreateModalError", "Tên bị bỏ trống!");
   }
   if (await checkInput.isDuplicateLocationType(nameCreateModal)) {
     createFailed = true;
-    console.log("duplicate");
-
     req.flash("nameCreateModalError", "Loại địa điểm đã tồn tại!");
   }
   if (createFailed) {
@@ -2036,7 +2005,6 @@ controller.createLocationType = async (req, res) => {
 
 controller.editLocationType = async (req, res) => {
   const { idEditModal, nameEditModal } = req.body;
-  console.log(req.body);
 
   if (await checkInput.isDuplicateLocationType(nameEditModal)) {
     req.flash(
@@ -2218,18 +2186,14 @@ controller.boardTypeManagement = async (req, res) => {
 
 controller.createBoardType = async (req, res) => {
   const { nameCreateModal } = req.body;
-  console.log(nameCreateModal);
 
   let createFailed = false;
   if (checkInput.isEmpty(nameCreateModal)) {
     createFailed = true;
-    console.log("empty");
     req.flash("nameCreateModalError", "Tên bị bỏ trống!");
   }
   if (await checkInput.isDuplicateBoardType(nameCreateModal)) {
     createFailed = true;
-    console.log("duplicate");
-
     req.flash("nameCreateModalError", "Loại biển quảng cáo đã tồn tại!");
   }
   if (createFailed) {
@@ -2264,7 +2228,6 @@ controller.createBoardType = async (req, res) => {
 
 controller.editBoardType = async (req, res) => {
   const { idEditModal, nameEditModal } = req.body;
-  console.log(req.body);
 
   if (await checkInput.isDuplicateBoardType(nameEditModal)) {
     req.flash(

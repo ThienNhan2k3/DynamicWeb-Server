@@ -1,5 +1,4 @@
 const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-const checkInput = require("../util/checkInput");
 
 // Utility function to check if a value is a number
 function isNumber(value) {
@@ -112,7 +111,6 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
 }
 
 function showEditBoardModal(button) {
-  console.log("button clicked");
   const districtField = document.querySelector("#districtSelectEditModal");
   const wardField = document.querySelector("#wardSelectEditModal");
   const id = button.dataset.id;
@@ -122,24 +120,24 @@ function showEditBoardModal(button) {
   const type = button.dataset.type;
   const district = button.dataset.district;
   const ward = button.dataset.ward;
-  console.log(id, size, quantity, address, type, district, ward);
   const dimensionsArray = size.split("x");
 
   const height = parseInt(dimensionsArray[0].trim());
   const width = parseInt(dimensionsArray[1].trim());
 
-  console.log(id, height, width, quantity, address, type, district, ward);
-
   document.getElementById("heightEditModal").value = height;
   document.getElementById("weightEditModal").value = width;
   document.getElementById("quantityEditModal").value = quantity.split(" ")[0];
-  document.getElementById("addressEditModal").value = address;
+  document.getElementById("addressEditModal").value =
+    address + ", " + ward + ", " + district;
   document.getElementById("boardTypeSelectEditModal").value = type;
   document.getElementById("districtSelectEditModal").value = district;
   districtSelectChange(districtField, wardField, () => {
     document.getElementById("wardSelectEditModal").value = ward;
   });
   document.getElementById("idEditModal").value = id;
+  document.getElementById("addressEditSend").value =
+    address + ", " + ward + ", " + district;
 }
 
 const confirmEditButton = document.getElementById("confirm-edit-button");
