@@ -167,7 +167,6 @@ const postLogin = async (req, res) => {
   else if (req.user.type === 'Quan') {
       req.session.accountType = 'district';
       req.session.accountDistrict = req.user.Area.district;
-      req.session.selectedAdsplacementId = -1;
       res.redirect("/district/home");
   }
 
@@ -175,7 +174,6 @@ const postLogin = async (req, res) => {
       req.session.accountType = 'ward';
       req.session.accountWard = req.user.Area.ward;
       req.session.accountDistrict = req.user.Area.district;
-      req.session.selectedAdsplacementId = -1;
       res.redirect("/ward/home");
   }
 };

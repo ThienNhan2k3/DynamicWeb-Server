@@ -138,17 +138,13 @@ controller.showListAdsplacements = async (req, res) => {
   };
 
   options.include[0].where.district = req.session.accountDistrict;
-
-  if (req.session.accountType == "Phuong") {
-    options.include[0].where.ward = req.session.accountWard;
+  if (req.user.type == "Phuong") {
+    options.where.areaId = req.user.AreaId;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
     if (selectedArea != "") {
       options.where.areaId = selectedArea;
     } 
-    // else {
-    //   options.include[0].where.district = req.session.accountDistrict;
-    // }
   }
 
   let { rows, count } = await models.AdsPlacement.findAndCountAll(options);
@@ -236,8 +232,8 @@ controller.showListBoards = async (req, res) => {
 
   options.include[0].include[0].where.district = req.session.accountDistrict;
 
-  if (req.session.accountType == "Phuong") {
-    options.include[0].include[0].where.ward = req.session.accountWard;
+  if (req.user.type == "Phuong") {
+    options.include[0].where.areaId = req.user.AreaId;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
     if (selectedArea != "") {
@@ -285,8 +281,8 @@ controller.showListBoards = async (req, res) => {
 
   options.include[0].include[0].where.district = req.session.accountDistrict;
 
-  if (req.session.accountType == "Phuong") {
-    options.include[0].include[0].where.ward = req.session.accountWard;
+  if (req.user.type == "Phuong") {
+    options.include[0].where.areaId = req.user.AreaId;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
     if (selectedArea != "") {
@@ -434,8 +430,8 @@ controller.showListReports = async (req, res) => {
 
   options.include[0].include[0].where.district = req.session.accountDistrict;
 
-  if (req.session.accountType == "Phuong") {
-    options.include[0].include[0].where.ward = req.session.accountWard;
+  if (req.user.type == "Phuong") {
+    options.include[0].where.areaId = req.user.AreaId;
   } else {
     let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
     if (selectedArea != "") {
@@ -452,7 +448,7 @@ controller.showListReports = async (req, res) => {
 
   return res.render("PhuongQuan/list-reports.ejs", {
     tab: "Danh sách báo cáo",
-    path:"/list-reports"
+    path: "/list-reports"
   });
 };
 
