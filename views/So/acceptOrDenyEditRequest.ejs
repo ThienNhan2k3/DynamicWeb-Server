@@ -124,30 +124,25 @@
                         <button class="btn btn-warning">
                           <%= pagination.rows[i].requestStatus %>
                         </button>
-                        <% } else if (pagination.rows[i].requestStatus==='Từ chối' ) { %>
-                          <button class="btn btn-danger">
-                            <%= pagination.rows[i].requestStatus %>
-                          </button>
-                          <% } else { %>
-                            <button class="btn btn-success">
-                              <%= pagination.rows[i].requestStatus %>
-                            </button>
-                            <% } %>
+                      <% } else if (pagination.rows[i].requestStatus==='Từ chối' ) { %>
+                        <button class="btn btn-danger">
+                          <%= pagination.rows[i].requestStatus %>
+                        </button>
+                      <% } else { %>
+                        <button class="btn btn-success">
+                          <%= pagination.rows[i].requestStatus %>
+                        </button>
+                      <% } %>
                     </td>
                     <td>
-                      <% if (pagination.rows[i].requestStatus==='Chờ xác nhận' ) { %>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#boardRequest"
-                          data-quantity="<%= pagination.rows[i].quantity%>" data-size="<%= pagination.rows[i].size%>"
-                          data-board-id="<%= pagination.rows[i].Board.id %>"
-                          data-board-type="<%= pagination.rows[i].BoardType.type %>"
-                          data-board-type-id="<%= pagination.rows[i].BoardType.id %>"
-                          data-board-request-id="<%= pagination.rows[i].id %>"
-                          onclick="setDataToBoardRequestModal(event)">
-                          Xem chi tiết</button>
-                        <% } else { %>
-                          <button class="btn btn-primary" disabled>Xem chi tiết</button>
-                          <% } %>
-
+                      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#boardRequest"
+                        data-quantity="<%= pagination.rows[i].quantity%>" data-size="<%= pagination.rows[i].size%>"
+                        data-board-id="<%= pagination.rows[i].Board.id %>"
+                        data-board-type="<%= pagination.rows[i].BoardType.type %>"
+                        data-board-type-id="<%= pagination.rows[i].BoardType.id %>"
+                        data-board-request-id="<%= pagination.rows[i].id %>"
+                        onclick="setDataToBoardRequestModal(event)">
+                        Xem chi tiết</button>
                     </td>
                   </tr>
                   <% } %>

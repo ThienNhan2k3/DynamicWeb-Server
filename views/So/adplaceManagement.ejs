@@ -17,7 +17,6 @@
   <link rel="stylesheet" href="/css/toggleNavigation.css">
   <link rel="stylesheet" href="/css/alert.css">
   <link rel="stylesheet" href="/css/So/customDropbox.css">
-  <link rel="stylesheet" href="/css/So/passwordStrengthIndicator.css">
   <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
 </head>
 
@@ -159,6 +158,13 @@
                                 <p class="info-label">Trạng thái:</p>
                                 <p class="info-value">
                                   <%= pagination.rows[i].status %>
+                                </p>
+                              </div>
+
+                              <div class="property-info-item">
+                                <p class="info-label">Số lượng bảng:</p>
+                                <p class="info-value">
+                                  <%= pagination.rows[i].Boards.length %> bảng
                                 </p>
                               </div>
                             </div>

@@ -61,5 +61,9 @@ router.get("/boardTypeManagement", controller.boardTypeManagement);
 router.post("/boardTypeManagement", controller.createBoardType);
 router.put("/boardTypeManagement", controller.editBoardType);
 router.delete("/boardTypeManagement", controller.deleteBoardType);
-
+//reportTypeManagement
+router.get("/reportTypeManagement", controller.reportTypeManagement);
+router.post("/reportTypeManagement", controller.createReportType);
+router.put("/reportTypeManagement", controller.editReportType);
+router.delete("/reportTypeManagement", controller.deleteReportType);
 module.exports = router;

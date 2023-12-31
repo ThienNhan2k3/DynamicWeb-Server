@@ -36,10 +36,10 @@
           </ol>
           <div class="carousel-inner rounded" role="listbox">
               <div class="carousel-item active">
-                  <img src="./image/bienbao1.png" class="w-100 d-block" alt="First slide">
+                  <img src="<%= report.image %>" class="w-100 d-block" alt="First slide">
               </div>
               <div class="carousel-item">
-                  <img src="./image/bienbao2.png" class="w-100 d-block" alt="Second slide">
+                  <img src="<%= report.image %>" class="w-100 d-block" alt="Second slide">
               </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
@@ -75,15 +75,14 @@
         </div>
   
         <div class="row gx-5 gy-2">
-          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Cán bộ xử lý:</h3>
-          <p class="col-7 col-md-5 col-xl-6"><%= report.Account.lastName %> <%= report.Account.firstName %></p>
-  
-          <h3 class="col-5 col-md-2 fs-5 p-md-0">Email:</h3>
-          <p class="col-7 col-md-2 p-md-0"><%= report.Account.email %></p>
+          <h3 class="col-md-3 col-xl-2 col-5 fs-5">Cán bộ xử lý:</h3>
+          <p class="col-md-9 col-xl-10 col-7"><%= report.Account.lastName %> <%= report.Account.firstName %></p>
         </div>
-  
-        <div class="row gx-5 gy-2">
 
+        <div class="row gx-5 gy-2">
+          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Email:</h3>
+          <p class="col-7 col-md-5 col-xl-6"><%= report.Account.email %></p>
+  
           <h3 class="col-5 col-md-2 fs-5 p-md-0">Loại tài khoản:</h3>
           <p class="col-7 col-md-2 p-md-0"><%= report.Account.type %></p>
         </div>
@@ -95,7 +94,7 @@
   
         <div class="row gx-5 gy-2">
           <h3 class="col-md-3 col-xl-2 col-5 fs-5">Nội dung báo cáo:</h3>
-          <p class="col-md-9 col-xl-10 col-7"><%= report.reportContent %></p>
+          <span class="col-md-9 col-xl-10 col-7"><%- report.reportContent %></span>
         </div>
   
         <div class="row gx-5 gy-2">

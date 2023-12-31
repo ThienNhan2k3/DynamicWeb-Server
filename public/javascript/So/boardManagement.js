@@ -27,7 +27,7 @@ async function getLatLongFromDistrict(district, apiKey) {
 }
 
 async function getLatLongFromWard(ward, district, apiKey) {
-  const address = `${ward}, ${district}, Ho Chi Minh City, Vietnam`;
+  const address = `${ward}, ${district}, Hồ Chí Minh, Vietnam`;
   const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
     address
   )}&key=${apiKey}`;
@@ -66,6 +66,9 @@ async function wardSelectChangeAndFlyTo(districtSelect, wardSelect, callback) {
     districtSelect.value,
     apiKey
   );
+  if (callback) {
+    callback();
+  }
   navigateToLocation(lon, lat);
 }
 
@@ -138,7 +141,6 @@ function showEditBoardModal(button) {
   document.getElementById("idEditModal").value = id;
   document.getElementById("addressEditSend").value =
     address + ", " + ward + ", " + district;
-  
 }
 
 const confirmEditButton = document.getElementById("confirm-edit-button");

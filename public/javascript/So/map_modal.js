@@ -822,6 +822,8 @@ findBtn_edit.addEventListener("click", async (e) => {
 //Get lngLat of the marker
 function onDragEnd_edit() {
   const lngLat = dragMarker_edit.getLngLat();
+  document.getElementById("lngEditModal").value = lngLat.lng;
+  document.getElementById("latEditModal").value = lngLat.lat;
 }
 
 dragMarker_edit.on("dragend", onDragEnd_edit);

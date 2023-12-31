@@ -53,11 +53,11 @@
                             </form>
                         </div>
                         <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
-
                             <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="./boardManagement">
                                 All
                             </a>
                             <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
+
                                 <div class="dropdown">
                                     <button
                                         class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
@@ -492,8 +492,8 @@
                                                     <div class="row g-md-1 g-2 mb-3">
                                                         <div class="col-6 col-md-6">
                                                             <select name="districtSelectEditModal" class="form-select"
-                                                                required id="districtSelectEditModal"
-                                                                onchange="districtSelectChange(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
+                                                                id="districtSelectEditModal"
+                                                                onchange="districtSelectChangeAndFlyTo(document.getElementById('districtSelectEditModal'), document.getElementById('districtSelectEditModal'))">
                                                                 <% for (let i=0; i < districts.length; i++){ %>
                                                                     <option value="<%= districts[i].district %>"
                                                                         class="districts">
@@ -504,7 +504,8 @@
                                                         </div>
                                                         <div class="col-6 col-md-6">
                                                             <select name="wardSelectEditModal" class="form-select"
-                                                                id="wardSelectEditModal" required>
+                                                                id="wardSelectEditModal"
+                                                                onchange="wardSelectChangeAndFlyTo(document.getElementById('districtSelectEditModal'), document.getElementById('districtSelectEditModal'))">
                                                             </select>
                                                         </div>
                                                     </div>

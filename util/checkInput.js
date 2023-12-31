@@ -4,6 +4,7 @@ const { AdsType } = require("../models");
 const { Area } = require("../models");
 const { LocationType } = require("../models");
 const { BoardType } = require("../models");
+const { ReportType } = require("../models");
 const { Op } = require("sequelize");
 
 function isEmpty(input) {
@@ -11,6 +12,18 @@ function isEmpty(input) {
     return input.trim().length === 0;
   }
   return true;
+}
+
+async function phoneExists(phone) {
+  const account = await Account.findOne({
+    where: {
+      phone,
+    },
+  });
+  if (account) {
+    return true;
+  }
+  return false;
 }
 
 function isEmail(email) {
@@ -252,6 +265,16 @@ async function isDuplicateBoardType(name) {
   });
   return result ? true : false;
 }
+
+async function isDuplicateReportType(name) {
+  const result = await ReportType.findOne({
+    where: {
+      type: name,
+    },
+    attributes: ["id"],
+  });
+  return result ? true : false;
+}
 module.exports = {
   isEmpty,
   isEmail,
@@ -275,4 +298,6 @@ module.exports = {
   isDuplicateBoardType,
   getFirstPartOfAddress,
   isDuplicateLongLat,
+  phoneExists,
+  isDuplicateReportType,
 };

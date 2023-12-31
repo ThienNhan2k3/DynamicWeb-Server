@@ -985,6 +985,7 @@ controller.adplaceManagement = async (req, res) => {
     flag = true;
   }
   const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
+  console.log(adsPlacements);
   const adsTypes = await AdsType.findAll();
   const locationsType = await LocationType.findAll();
   const currentUrl = req.url.slice(1);
@@ -1124,19 +1125,13 @@ controller.editAdplace = async (req, res) => {
     locationTypeSelectEditModal,
     adTypeSelectEditModal,
     statusEditModal,
+    lngEditModal,
+    latEditModal,
   } = req.body;
+  console.log(req.body);
   let locationTypeId = await checkInput.findLocationTypeIdByLocationType(
     locationTypeSelectEditModal
   );
-  let fullAddress = await checkInput.getFullAddressInfo(
-    addressEditModal,
-    apiKey
-  );
-  const district = await checkInput.getDistrictFromAdress(fullAddress);
-  if (district !== districtSelectEditModal) {
-    req.flash("addressCreateModalError", "Địa chỉ không hợp lệ.");
-    editFailed = true;
-  }
   if (editFailed) {
     req.flash("addressCreateModal", addressEditModal);
 
@@ -1160,6 +1155,8 @@ controller.editAdplace = async (req, res) => {
         LocationTypeId: locationTypeId,
         AdsTypeId: adTypeId,
         status: statusEditModal,
+        long: lngEditModal,
+        lat: latEditModal,
       },
       {
         where: {
@@ -1382,7 +1379,6 @@ controller.boardManagement = async (req, res) => {
     };
   }
   let district = req.query.district || "";
-  console.log(district);
   let ward = req.query.ward || "";
   let wards = [],
     currentDistrict = "",
@@ -2307,6 +2303,217 @@ controller.deleteBoardType = async (req, res) => {
     );
 
     return res.send("Can not delete BoardType");
+  }
+};
+
+controller.reportTypeManagement = async (req, res) => {
+  let message = req.flash("message")[0];
+  message = message == null ? null : JSON.parse(message);
+  const createErr = {
+    error: {
+      Name: req.flash("nameCreateModalError"),
+    },
+    value: {
+      Name: req.flash("nameCreateModal")[0],
+    },
+  };
+  const optionReportTypes = {
+    attributes: ["id", "type"],
+    include: [
+      {
+        model: Report,
+        attributes: ["id"], // Thay thế bằng các thuộc tính của Report mà bạn muốn hiển thị
+      },
+    ],
+  };
+  let search = req.query.search || "";
+
+  let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  let flag = false;
+
+  if (message !== null && message.type === "delete") {
+    flag = true;
+  }
+  const ReportTypes = await ReportType.findAll(optionReportTypes);
+  // Khởi tạo mảng để lưu trữ reportsCount
+  const reportsCounts = [];
+
+  for (const reportType of ReportTypes) {
+    const reportsCount = await Report.count({
+      where: {
+        ReportTypeId: reportType.id,
+      },
+    });
+
+    reportType.setDataValue("reportsCount", reportsCount);
+
+    // Lưu giá trị reportsCount vào mảng
+    reportsCounts.push(reportsCount);
+  }
+
+  // Gán mảng reportsCounts vào mỗi phần tử của ReportTypes
+  ReportTypes.forEach((reportType, index) => {
+    reportType.setDataValue("reportsCounts", reportsCounts[index]);
+  });
+
+  const currentUrl = req.url.slice(1);
+  const pagination = await getPagination(
+    req,
+    res,
+    ReportTypes,
+    5,
+    page,
+    2,
+    flag
+  );
+
+  res.render("So/reportTypeManagement.ejs", {
+    pagination,
+    ReportTypes,
+    currentUrl,
+    createErr,
+    message,
+  });
+};
+// controller.createReportType
+controller.createReportType = async (req, res) => {
+  const { nameCreateModal } = req.body;
+
+  let createFailed = false;
+  if (checkInput.isEmpty(nameCreateModal)) {
+    createFailed = true;
+    req.flash("nameCreateModalError", "Tên bị bỏ trống!");
+  }
+  if (await checkInput.isDuplicateReportType(nameCreateModal)) {
+    createFailed = true;
+    req.flash("nameCreateModalError", "Loại báo cáo đã tồn tại!");
+  }
+  if (createFailed) {
+    req.flash("nameCreateModal", nameCreateModal);
+    return res.redirect("/department/reportTypeManagement");
+  }
+  try {
+    await ReportType.create({
+      type: nameCreateModal,
+    });
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "success",
+        content: "Tạo thành công!",
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "create",
+        status: "danger",
+        content: "Tạo thất bại",
+      })
+    );
+  }
+  return res.redirect("/department/reportTypeManagement");
+};
+
+// controller.editReportType
+controller.editReportType = async (req, res) => {
+  const { idEditModal, nameEditModal } = req.body;
+
+  if (await checkInput.isDuplicateReportType(nameEditModal)) {
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật loại báo cáo thất bại",
+      })
+    );
+    return res.send("Update Fail");
+  }
+
+  try {
+    await ReportType.update(
+      {
+        type: nameEditModal,
+      },
+      {
+        where: {
+          id: idEditModal,
+        },
+      }
+    );
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "success",
+        content: "Cập nhật loại báo cáo thành công",
+      })
+    );
+
+    return res.send("ReportType updated");
+  } catch (err) {
+    console.error(err);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "edit",
+        status: "danger",
+        content: "Cập nhật thất bại",
+      })
+    );
+
+    return res.send("Can not update ReportType");
+  }
+};
+
+// controller.deleteReportType
+controller.deleteReportType = async (req, res) => {
+  const { reportTypeId } = req.body;
+
+  try {
+    // Delete Reports associated with the ReportType
+    await Report.destroy({
+      where: {
+        ReportTypeId: reportTypeId,
+      },
+    });
+
+    // Finally, delete the ReportType itself
+    await ReportType.destroy({
+      where: {
+        id: reportTypeId,
+      },
+    });
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "success",
+        content: "Xóa loại báo cáo thành công",
+      })
+    );
+
+    return res.send("ReportType deleted");
+  } catch (err) {
+    console.error(err);
+
+    req.flash(
+      "message",
+      JSON.stringify({
+        type: "delete",
+        status: "danger",
+        content: "Xóa loại báo cáo thất bại",
+      })
+    );
+
+    return res.send("Can not delete ReportType");
   }
 };
 
