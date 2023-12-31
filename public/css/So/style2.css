@@ -212,6 +212,8 @@ main {
   height: 1000px; /* Sử dụng chiều cao 100% của phần tử cha */
   border-radius: 2rem;
   margin-bottom: 10px;
+  position: sticky;
+  top: 0;
 }
 
 #mapbox_modal {
