@@ -985,7 +985,6 @@ controller.adplaceManagement = async (req, res) => {
     flag = true;
   }
   const adsPlacements = await AdsPlacement.findAll(optionsAdsPlacement);
-  console.log(adsPlacements);
   const adsTypes = await AdsType.findAll();
   const locationsType = await LocationType.findAll();
   const currentUrl = req.url.slice(1);
@@ -1031,6 +1030,7 @@ controller.createAdplace = async (req, res) => {
     latCreateModal,
   } = req.body;
 
+  console.log(req.body);
   let createFailed = false;
 
   addressCreateModal = checkInput.getFirstPartOfAddress(addressCreateModal);
@@ -1052,6 +1052,13 @@ controller.createAdplace = async (req, res) => {
   if (await checkInput.isDuplicateLongLat(lngCreateModal, latCreateModal)) {
     req.flash("addressCreateModalError", "Địa điểm đặt được tạo.");
     createFailed = true;
+  }
+
+  if (lngCreateModal == "" && latCreateModal == "") {
+    const address = await checkInput.getLatLongFromAddress(fullAddress, apiKey);
+    console.log(address);
+    lngCreateModal = address.lon;
+    latCreateModal = address.lat;
   }
 
   if (createFailed) {
@@ -1146,11 +1153,14 @@ controller.editAdplace = async (req, res) => {
     return res.send("Update Fail");
   }
   let adTypeId = await checkInput.findAdsTypeIdByAdsType(adTypeSelectEditModal);
+  let areaId = await checkInput.findAreaIdByWardAndDistrict(
+    wardSelectEditModal,
+    districtSelectEditModal
+  );
   try {
     await AdsPlacement.update(
       {
-        district: districtSelectEditModal,
-        ward: wardSelectEditModal,
+        AreaId: areaId,
         address: addressEditModal,
         LocationTypeId: locationTypeId,
         AdsTypeId: adTypeId,

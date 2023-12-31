@@ -90,6 +90,7 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
       }
     })
     .catch((err) => console.error(err));
+  findLocation();
 }
 
 async function showEditAdplaceModal(button) {

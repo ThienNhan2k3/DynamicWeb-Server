@@ -375,16 +375,24 @@ const dragMarker = new mapboxgl.Marker({
   draggable: true,
 });
 
-//Find button handle
-const findBtn = document.querySelector("#find-location");
-findBtn.addEventListener("click", async (e) => {
+async function findLocation() {
   const addr = document.querySelector("#addressCreateModal").value;
   const ward = document.querySelector("#wardSelectCreateModal").value;
   const district = document.querySelector("#districtSelectCreateModal").value;
 
   //Make a request
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  const query = `${addr}, ${ward}, ${district}, Hồ Chí Minh, Việt Nam`;
+  let query;
+  if (addr !== "") {
+    query = addr;
+  }
+  if (ward !== "") {
+    query = query + ", " + ward;
+  }
+  if (district !== "") {
+    query = query + ", " + district;
+  }
+  query = query + ", Ho Chi Minh, Viet Nam";
   console.log(query);
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
@@ -415,6 +423,12 @@ findBtn.addEventListener("click", async (e) => {
   } catch (err) {
     console.log(err);
   }
+}
+
+//Find button handle
+const findBtn = document.querySelector("#find-location");
+findBtn.addEventListener("click", async (e) => {
+  findLocation();
 });
 
 //Get lngLat of the marker

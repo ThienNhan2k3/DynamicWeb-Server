@@ -294,7 +294,7 @@
                         </div>
                         <div class="col-6 col-md-6">
                           <select name="wardSelectCreateModal" class="form-select" id="wardSelectCreateModal" required
-                            disabled>
+                            onchange="findLocation()" disabled>
                             <option value="">Phường</option>
                           </select>
                         </div>
@@ -314,7 +314,7 @@
                             class="form-control"
                             <% } %>
                               value="<%= createErr.value.address %>"
-                                name="addressCreateModal"
+                                name="addressCreateModal" onchange="findLocation()"
                                 autocomplete="true"
                                 placeholder="">
                                 <label for="addressCreateModal" class="mb-2">Địa chỉ</label>

@@ -212,7 +212,6 @@ function getFirstPartOfAddress(address) {
 
   // Get the first element and trim to remove whitespaces
   var firstPart = addressArray[0].trim();
-  console.log(firstPart);
   return firstPart;
 }
 async function findAdplacementByOnlyAddress(address) {
