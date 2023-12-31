@@ -993,7 +993,7 @@ controller.adplaceManagement = async (req, res) => {
     req,
     res,
     adsPlacements,
-    5,
+    3,
     page,
     2,
     flag

@@ -11,8 +11,8 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
   <!-- Font awesome -->
-  <link rel="stylesheet" href="/css/So/style2.css">
   <link rel="stylesheet" href="/css/So/style.css">
+  <link rel="stylesheet" href="/css/So/style2.css">
   <link rel="stylesheet" href="/css/So/table.css">
   <link rel="stylesheet" href="/css/toggleNavigation.css">
   <link rel="stylesheet" href="/css/alert.css">
@@ -27,7 +27,7 @@
     <!-- Navbar content -->
     <%- include("./subPartials/navbar.ejs") %>
       <% if (message !=null){ %>
-        <div class="alert-container" id="create-alert-container">
+        <div class="alert-container " id="create-alert-container">
           <div class="alert alert-<%=message.status%> mb-0" role="alert" id="registerAlert">
             <i class="fa-regular fa-circle-check fa-2xl"></i>
             <span class="ms-3 fs-5">
@@ -39,12 +39,12 @@
         <% } %>
 
           <!-- Main content -->
-          <main class="container-fluid">
-            <div class="row" id="content">
+          <main class="container-fluid dynamic-container">
+            <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3" id="content">
               <div class="col-4">
                 <h2>Điểm quảng cáo tại Sài Gòn</h2>
-                <form action="adplaceManagement" method="GET">
-                  <div class="input-group flex-nowrap">
+                <form action="adplaceManagement" method="GET" id="search-bar">
+                  <div class="input-group w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
                     <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" <% if (search !=='' ) { %> value="<%= search %>" <% } %>
                         placeholder="Tìm kiếm theo địa chỉ" aria-label="find"
@@ -555,7 +555,7 @@
 
   document.body.addEventListener('click', (event) => {
     // Check if the clicked element is not a property-card or location-details
-    if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#map') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
+    if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#mapbox') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
       // Hide location-details
       // Remove 'clicked' class from all property-cards
       propertyCards.forEach(c => c.classList.remove('clicked'));
