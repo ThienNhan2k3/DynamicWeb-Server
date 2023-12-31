@@ -13,7 +13,7 @@ const fileStorage = multer.diskStorage({
       null,
       new Date().toISOString().replace(/:/g, "-") +
         "-" +
-        file.originalname.replace(" ", "-")
+        file.originalname.replace(/\s/g, "-")
     );
   },
 });
