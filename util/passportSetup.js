@@ -75,7 +75,7 @@ passport.use(strategy);
 
 const googleFacebookVerifyCallback = async (accessToken, refreshToken, profile, done) => {
     const email = profile.emails[0].value;
-    console.log("Email:" + email);
+    // console.log("Email:" + email);
     try {
         const account = await Account.findOne({
             where: {
