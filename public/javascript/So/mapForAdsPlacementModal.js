@@ -54,12 +54,12 @@ const mouseEnterEventUnclusteredModal = (e, layer) => {
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
-
+  const areaObj = JSON.parse(area);
   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap);
 };
 
@@ -86,7 +86,7 @@ const modalMap = new mapboxgl.Map({
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
-  zoom: 12,
+  zoom: 17,
 });
 // Map navigation control
 modalMap.addControl(new mapboxgl.NavigationControl());
@@ -357,12 +357,6 @@ modalMap.on("load", async () => {
   });
 });
 
-function navigateToLocation(long, lat) {
-  map.flyTo({
-    center: [parseFloat(long), parseFloat(lat)],
-    zoom: 15,
-  });
-}
 
 const myModal = document.getElementById("createModal");
 //Resize map in the modal

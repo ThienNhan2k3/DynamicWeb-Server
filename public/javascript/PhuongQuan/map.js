@@ -83,8 +83,6 @@ const mouseLeaveEventUnclustered = (layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
   }
 
   map.getCanvas().style.cursor = "";
@@ -480,7 +478,6 @@ map.on("load", async () => {
   filterSipulated = Object.assign({}, sipulated);
   filterNonSipulated = Object.assign({}, nonSipulated);
   filterReported = Object.assign({}, reported);
-  console.log(reported);
 
   // Sort for placement that belongs to specified area
   if (accountType == "Quan") {
@@ -837,7 +834,6 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
 const filterSelect = document.querySelector("#filterSelect");
 filterSelect.addEventListener("change", (e) => {
   // e.preventDefault();
-  console.log("CHanged");
   const selectedWardsHTML = filterSelect.selectedOptions;
   let selectedWard = [];
   for (let i = 0; i < selectedWardsHTML.length; i++) {
@@ -845,8 +841,6 @@ filterSelect.addEventListener("change", (e) => {
   }
 
   //Refilter
-  console.log(reported);
-
   filterSipulated.features = sipulated.features
     .filter((p) => {
       return (

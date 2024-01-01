@@ -88,12 +88,12 @@ const mouseEnterEventUnclustered = (e, layer) => {
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
-
+  const areaObj = JSON.parse(area);
   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
 };
 
