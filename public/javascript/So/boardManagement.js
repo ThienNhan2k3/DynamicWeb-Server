@@ -123,10 +123,15 @@ function showEditBoardModal(button) {
   const type = button.dataset.type;
   const district = button.dataset.district;
   const ward = button.dataset.ward;
+  const lat = button.dataset.lat;
+  const lon = button.dataset.lng;
   const dimensionsArray = size.split("x");
 
   const height = parseInt(dimensionsArray[0].trim());
   const width = parseInt(dimensionsArray[1].trim());
+
+  navigateToLocation_edit(lon, lat);
+  dragMarker.setLngLat({ lng: lon, lat: lat }).addTo(map_edit);
 
   document.getElementById("heightEditModal").value = height;
   document.getElementById("weightEditModal").value = width;
@@ -202,3 +207,13 @@ if (confirmDeleteButton) {
     location.reload();
   });
 }
+
+const dragMarker = new mapboxgl.Marker({
+  draggable: true,
+});
+
+function onDragEnd() {
+  const lngLat = dragMarker.getLngLat();
+}
+
+dragMarker.on("dragend", onDragEnd);

@@ -7,6 +7,7 @@ let adsData;
 let prevReportTableState = 0;
 let selectedLocation = undefined;
 let selectedBoard = undefined;
+
 const sipulatedPopup = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
@@ -498,6 +499,8 @@ const mouseLeaveEventUnclustered_edit = (layer) => {
 const handleClickEvent_edit = (e) => {
   //Use this to view all properties of a placement
   console.log(e.features[0].properties);
+  const coordinates = e.features[0].geometry.coordinates.slice();
+  dragMarker.setLngLat(coordinates).addTo(map_edit);
 
   //Change the address of the address input field (the disabled field)
   const addrInput = document.querySelector("#addressEditModal");

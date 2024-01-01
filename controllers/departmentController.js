@@ -1345,7 +1345,7 @@ controller.boardManagement = async (req, res) => {
       },
       {
         model: AdsPlacement,
-        attributes: ["id", "address", "areaId"],
+        attributes: ["id", "address", "areaId", "long", "lat"],
         where: {},
 
         include: [
