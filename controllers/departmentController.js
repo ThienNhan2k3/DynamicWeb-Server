@@ -639,7 +639,7 @@ controller.detailReport = async (req, res) => {
       id,
     },
   });
-  console.log(report);
+  report.image = report.image.split(', ');
   return res.render("So/detailReport.ejs", {
     report,
   });

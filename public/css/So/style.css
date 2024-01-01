@@ -25,12 +25,11 @@ a {
     top: 61px;
     margin-left: -300px;
     background-color: #ffffff;
-    transition: 0.4s;
     border-right:2px solid black;
 }
 
 .sidenav-link {
-    font-size: 1.25em;
+    font-size: 1.15rem;
 }
 
 .sidenav-link:active,
@@ -49,8 +48,8 @@ a {
     background-color: #ffffff26;
 }
 
-.dynamic-container {
-    transition: 0.8s;
+.dynamic-container, .sidenavbar {
+    transition: all 0.4s linear;
 }
 
 
@@ -80,9 +79,10 @@ a {
 }
 
 .nav-item img {
-    width: 40px;
-    height: 40px;
+    width: 37px;
+    height: 37px;
 }
+
 
 /* Hamburger menu animation*/
 .navbar-toggler {
