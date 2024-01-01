@@ -1,78 +1,44 @@
-const sipulatedColor = "#40eb34";
-const nonSipulatedColor = "#d3eb34";
-const reportedColor = "#eb3434";
-const selfReportedColor = "#848991";
-const unclusteredRadius = 12;
-let adsData;
-let prevReportTableState = 0;
-let selectedLocation = undefined;
-let selectedBoard = undefined;
-const sipulatedPopup = new mapboxgl.Popup({
+const sipulatedColorModal = "#40eb34";
+const nonSipulatedColorModal = "#d3eb34";
+const reportedColorModal = "#eb3434";
+const selfReportedColorModal = "#848991";
+const unclusteredRadiusModal = 12;
+
+let selectedLocationModal;
+let selectedBoardModal;
+let adsDataModal; //Ads data from selected location
+
+const sipulatedPopupModal = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
 });
-const nonSipulatedPopup = new mapboxgl.Popup({
+const nonSipulatedPopupModal = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
 });
-const reportedPopup = new mapboxgl.Popup({
+const reportedPopupModal = new mapboxgl.Popup({
   closeButton: false,
   closeOnClick: false,
 });
-const selfReportedPopup = new mapboxgl.Popup({
-  closeButton: false,
-  closeOnClick: false,
-});
-const serverPath = "http://localhost:5000";
 
-const myModalEl = document.getElementById("createModal");
-//Resize map in the modal
-myModalEl.addEventListener("shown.bs.modal", (event) => {
-  const mapDiv = document.getElementById("mapbox");
-  map.resize(); // Importance
-});
+const serverPathModal = "http://localhost:5000";
 
-// Mapbox generation
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicGpsZW9uYXJkMzciLCJhIjoic2YyV2luUSJ9.lPoix24JhyR8sljAwjHg9A";
-
-const map = new mapboxgl.Map({
-  container: "mapbox", // container ID
-  style: "mapbox://styles/mapbox/streets-v12", // style URL
-  center: [106.707748, 10.780571], // starting position [lng, lat]
-  zoom: 17, // starting zoom
-});
-
-map.addControl(new mapboxgl.NavigationControl());
-map.addControl(new mapboxgl.FullscreenControl());
-map.addControl(
-  new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true,
-    },
-    // When active the map will receive updates to the device's location as it changes.
-    trackUserLocation: true,
-    // Draw an arrow next to the location dot to indicate which direction the device is heading.
-    showUserHeading: true,
-  })
-);
-
-const inspectCluster = (e, layer) => {
-  const features = map.queryRenderedFeatures(e.point, {
+const inspectClusterModal = (e, layer) => {
+  const features = modalMap.queryRenderedFeatures(e.point, {
     layers: [`${layer}-cluster`],
   });
   const clusterId = features[0].properties.cluster_id;
-  map.getSource(layer).getClusterExpansionZoom(clusterId, (err, zoom) => {
+  modalMap.getSource(layer).getClusterExpansionZoom(clusterId, (err, zoom) => {
     if (err) return;
 
-    map.easeTo({
+    modalMap.easeTo({
       center: features[0].geometry.coordinates,
       zoom: zoom,
     });
   });
 };
 
-const mouseEnterEventUnclustered = (e, layer) => {
+const mouseEnterEventUnclusteredModal = (e, layer) => {
   let popup;
   if (layer == "sipulated") {
     popup = sipulatedPopup;
@@ -84,7 +50,7 @@ const mouseEnterEventUnclustered = (e, layer) => {
     popup = selfReportedPopup;
   }
 
-  map.getCanvas().style.cursor = "pointer";
+  modalMap.getCanvas().style.cursor = "pointer";
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
@@ -94,10 +60,10 @@ const mouseEnterEventUnclustered = (e, layer) => {
   }
 
   const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
-  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
+  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap);
 };
 
-const mouseLeaveEventUnclustered = (layer) => {
+const mouseLeaveEventUnclusteredModal = (layer) => {
   let popup;
   if (layer == "sipulated") {
     popup = sipulatedPopup;
@@ -109,26 +75,25 @@ const mouseLeaveEventUnclustered = (layer) => {
     popup = selfReportedPopup;
   }
 
-  map.getCanvas().style.cursor = "";
+  modalMap.getCanvas().style.cursor = "";
   popup.remove();
 };
 
-const handleClickEvent = (e) => {
-  //Use this to view all properties of a placement
-  // console.log(e.features[0].properties)
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
+const modalMap = new mapboxgl.Map({
+  container: "mapboxModal",
 
-  //Change the address of the address input field (the disabled field)
-  const addrInput = document.querySelector("#addressCreateModal");
-  const addrInput_send = document.querySelector("#addressCreateSend");
-  const address = `${e.features[0].properties.address}, ${
-    JSON.parse(e.features[0].properties.area).ward
-  }, ${JSON.parse(e.features[0].properties.area).district}`;
-  addrInput.value = address;
-  addrInput_send.value = address;
-  //Alert the ID of selected placement
-};
+  style: "mapbox://styles/mapbox/streets-v12",
+  center: [106.569958, 10.722345],
+  zoom: 17,
+});
+// Map navigation control
+modalMap.addControl(new mapboxgl.NavigationControl());
+modalMap.addControl(new mapboxgl.FullscreenControl());
 
-map.on("load", async () => {
+modalMap.on("load", async () => {
+  //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
   );
@@ -140,7 +105,8 @@ map.on("load", async () => {
   const nonSipulated = await fetchedNonSipulatedData.json();
   const reported = await fetchedReportData.json();
 
-  map.addSource("sipulated", {
+  // Sipulated source data
+  modalMap.addSource("sipulated", {
     type: "geojson",
     data: JSON.parse(sipulated),
     cluster: true,
@@ -148,7 +114,7 @@ map.on("load", async () => {
     clusterRadius: 20,
   });
   //Sipulated cluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-cluster",
     type: "circle",
     source: "sipulated",
@@ -160,7 +126,7 @@ map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Sipulated count
-  map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-count",
     type: "symbol",
     source: "sipulated",
@@ -174,7 +140,7 @@ map.on("load", async () => {
     },
   });
   //Sipulated uncluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-unclustered",
     type: "circle",
     source: "sipulated",
@@ -188,7 +154,7 @@ map.on("load", async () => {
     },
   });
   //Sipulated label
-  map.addLayer({
+  modalMap.addLayer({
     id: "sipulated-label",
     type: "symbol",
     source: "sipulated",
@@ -205,28 +171,26 @@ map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map.on("click", "sipulated-cluster", (e) => {
-    inspectCluster(e, "sipulated");
+  modalMap.on("click", "sipulated-cluster", (e) => {
+    inspectClusterModal(e, "sipulated");
   });
-  map.on("mouseenter", "sipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "sipulated");
+  //Get info when user moves their mouse over the unclustered layer
+
+  modalMap.on("mouseenter", "sipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "sipulated");
   });
-  map.on("mouseleave", "sipulated-unclustered", (e) => {
-    mouseLeaveEventUnclustered("sipulated");
+  modalMap.on("mouseleave", "sipulated-unclustered", (e) => {
+    mouseLeaveEventUnclusteredModal("sipulated");
   });
-  //Get unclustered info on click
-  map.on("click", "sipulated-unclustered", async (e) => {
-    await handleClickEvent(e);
+  modalMap.on("mouseenter", "sipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
   });
-  map.on("mouseenter", "sipulated-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  map.on("mouseleave", "sipulated-cluster", () => {
-    map.getCanvas().style.cursor = "";
+  modalMap.on("mouseleave", "sipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
   });
 
   //Non sipulated section
-  map.addSource("nonSipulated", {
+  modalMap.addSource("nonSipulated", {
     type: "geojson",
     data: JSON.parse(nonSipulated),
     cluster: true,
@@ -234,7 +198,7 @@ map.on("load", async () => {
     clusterRadius: 15,
   });
   //Non sipulated cluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-cluster",
     type: "circle",
     source: "nonSipulated",
@@ -246,7 +210,7 @@ map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Non sipulated count
-  map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-count",
     type: "symbol",
     source: "nonSipulated",
@@ -260,7 +224,7 @@ map.on("load", async () => {
     },
   });
   //Non sipulated uncluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-unclustered",
     type: "circle",
     source: "nonSipulated",
@@ -274,7 +238,7 @@ map.on("load", async () => {
     },
   });
   //Non sipulated label
-  map.addLayer({
+  modalMap.addLayer({
     id: "nonSipulated-label",
     type: "symbol",
     source: "nonSipulated",
@@ -291,29 +255,25 @@ map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map.on("click", "nonSipulated-cluster", (e) => {
-    inspectCluster(e, "nonSipulated");
+  modalMap.on("click", "nonSipulated-cluster", (e) => {
+    inspectClusterModal(e, "nonSipulated");
   });
   //Get info when user moves their mouse over the unclustered layer
-  map.on("mouseenter", "nonSipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "nonSipulated");
-  });
-  map.on("mouseleave", "nonSipulated-unclustered", () => {
-    mouseLeaveEventUnclustered("nonSipulated");
-  });
-  //Get infor onclick
-  map.on("click", "nonSipulated-unclustered", async (e) => {
-    await handleClickEvent(e);
-  });
-  map.on("mouseenter", "nonSipulated-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  map.on("mouseleave", "nonSipulated-cluster", () => {
-    map.getCanvas().style.cursor = "";
-  });
 
+  modalMap.on("mouseenter", "nonSipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "nonSipulated");
+  });
+  modalMap.on("mouseleave", "nonSipulated-unclustered", () => {
+    mouseLeaveEventUnclusteredModal("nonSipulated");
+  });
+  modalMap.on("mouseenter", "nonSipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
+  });
+  modalMap.on("mouseleave", "nonSipulated-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
+  });
   //Reported section
-  map.addSource("reported", {
+  modalMap.addSource("reported", {
     type: "geojson",
     data: JSON.parse(reported),
     cluster: true,
@@ -321,7 +281,7 @@ map.on("load", async () => {
     clusterRadius: 15,
   });
   //Reported cluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "reported-cluster",
     type: "circle",
     source: "reported",
@@ -333,7 +293,7 @@ map.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Reported count
-  map.addLayer({
+  modalMap.addLayer({
     id: "reported-count",
     type: "symbol",
     source: "reported",
@@ -347,7 +307,7 @@ map.on("load", async () => {
     },
   });
   //Reported uncluster
-  map.addLayer({
+  modalMap.addLayer({
     id: "reported-unclustered",
     type: "circle",
     source: "reported",
@@ -361,7 +321,7 @@ map.on("load", async () => {
     },
   });
   //Reported label
-  map.addLayer({
+  modalMap.addLayer({
     id: "reported-label",
     type: "symbol",
     source: "reported",
@@ -378,83 +338,104 @@ map.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map.on("click", "reported-cluster", (e) => {
-    inspectCluster(e, "reported");
+  modalMap.on("click", "reported-cluster", (e) => {
+    inspectClusterModal(e, "reported");
   });
 
-  map.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "reported");
+  modalMap.on("mouseenter", "reported-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal(e, "reported");
   });
-  map.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered("reported");
+  modalMap.on("mouseleave", "reported-unclustered", () => {
+    mouseLeaveEventUnclusteredModal("reported");
   });
-  // Get info on click
-  map.on("click", "reported-unclustered", async (e) => {
-    await handleClickEvent(e);
+
+  modalMap.on("mouseenter", "reported-cluster", () => {
+    modalMap.getCanvas().style.cursor = "pointer";
   });
-  map.on("mouseenter", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  map.on("mouseleave", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "";
+  modalMap.on("mouseleave", "reported-cluster", () => {
+    modalMap.getCanvas().style.cursor = "";
   });
 });
 
-function navigateToLocation(long, lat) {
-  map.flyTo({
-    center: [parseFloat(long), parseFloat(lat)],
-    zoom: 15,
-  });
+
+const myModal = document.getElementById("createModal");
+//Resize map in the modal
+myModal.addEventListener("shown.bs.modal", (event) => {
+  modalMap.resize(); // Importance
+});
+
+//Dragable marker
+const dragMarker = new mapboxgl.Marker({
+  draggable: true,
+});
+
+//Find button handle
+const findBtn = document.querySelector("#find-location");
+findBtn.addEventListener("click", async (e) => {
+  const addr = document.querySelector("#addressCreateModal").value;
+  const ward = document.querySelector("#wardSelectCreateModal").value;
+  const district = document.querySelector("#districtSelectCreateModal").value;
+
+  //Make a request
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${addr}, ${ward}, ${district}, Hồ Chí Minh, Việt Nam`;
+  console.log(query);
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  //Handle response
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    if (data.length == 0) {
+      //Handle case when no result
+    } else {
+      const geometry = data.results[0].geometry;
+      modalMap.flyTo({ center: geometry });
+      const { lat, lng } = geometry;
+      console.log(lat, lng);
+      console.log(geometry);
+      document.getElementById("lngCreateModal").value = lng;
+      document.getElementById("latCreateModal").value = lat;
+      //Set the marker to the map
+      dragMarker.setLngLat(geometry).addTo(modalMap);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//Get lngLat of the marker
+function onDragEnd() {
+  const lngLat = dragMarker.getLngLat();
 }
 
-const myModalEl_Edit = document.getElementById("editModal");
-//Resize map in the modal
-myModalEl_Edit.addEventListener("shown.bs.modal", (event) => {
-  const mapDiv_edit = document.getElementById("mapbox_edit");
-  map_edit.resize(); // Importance
-});
+dragMarker.on("dragend", onDragEnd);
 
-// Mapbox generation
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicGpsZW9uYXJkMzciLCJhIjoic2YyV2luUSJ9.lPoix24JhyR8sljAwjHg9A";
-
-const map_edit = new mapboxgl.Map({
-  container: "mapbox_edit", // container ID
-  style: "mapbox://styles/mapbox/streets-v12", // style URL
-  center: [106.707748, 10.780571], // starting position [lng, lat]
-  zoom: 17, // starting zoom
-});
-
-map_edit.addControl(new mapboxgl.NavigationControl());
-map_edit.addControl(new mapboxgl.FullscreenControl());
-map_edit.addControl(
-  new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true,
-    },
-    // When active the map will receive updates to the device's location as it changes.
-    trackUserLocation: true,
-    // Draw an arrow next to the location dot to indicate which direction the device is heading.
-    showUserHeading: true,
-  })
-);
-
-const inspectCluster_edit = (e, layer) => {
-  const features = map_edit.queryRenderedFeatures(e.point, {
+const inspectClusterModal_edit = (e, layer) => {
+  const features = modalMap_edit.queryRenderedFeatures(e.point, {
     layers: [`${layer}-cluster`],
   });
   const clusterId = features[0].properties.cluster_id;
-  map_edit.getSource(layer).getClusterExpansionZoom(clusterId, (err, zoom) => {
-    if (err) return;
+  modalMap_edit
+    .getSource(layer)
+    .getClusterExpansionZoom(clusterId, (err, zoom) => {
+      if (err) return;
 
-    map_edit.easeTo({
-      center: features[0].geometry.coordinates,
-      zoom: zoom,
+      modalMap_edit.easeTo({
+        center: features[0].geometry.coordinates,
+        zoom: zoom,
+      });
     });
-  });
 };
 
-const mouseEnterEventUnclustered_edit = (e, layer) => {
+const mouseEnterEventUnclusteredModal_edit = (e, layer) => {
   let popup;
   if (layer == "sipulated") {
     popup = sipulatedPopup;
@@ -466,7 +447,7 @@ const mouseEnterEventUnclustered_edit = (e, layer) => {
     popup = selfReportedPopup;
   }
 
-  map_edit.getCanvas().style.cursor = "pointer";
+  modalMap_edit.getCanvas().style.cursor = "pointer";
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
@@ -476,10 +457,10 @@ const mouseEnterEventUnclustered_edit = (e, layer) => {
   }
 
   const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
-  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(map_edit);
+  popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap_edit);
 };
 
-const mouseLeaveEventUnclustered_edit = (layer) => {
+const mouseLeaveEventUnclusteredModal_edit = (layer) => {
   let popup;
   if (layer == "sipulated") {
     popup = sipulatedPopup;
@@ -491,27 +472,25 @@ const mouseLeaveEventUnclustered_edit = (layer) => {
     popup = selfReportedPopup;
   }
 
-  map_edit.getCanvas().style.cursor = "";
+  modalMap_edit.getCanvas().style.cursor = "";
   popup.remove();
 };
 
-const handleClickEvent_edit = (e) => {
-  //Use this to view all properties of a placement
-  console.log(e.features[0].properties);
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYm9vbnJlYWwiLCJhIjoiY2xvOWZ0eXQ2MDljNzJybXRvaW1oaXR3NyJ9.iu4mRTZ3mUFb7ggRtyPcWw";
+const modalMap_edit = new mapboxgl.Map({
+  container: "mapboxEditModal",
 
-  //Change the address of the address input field (the disabled field)
-  const addrInput = document.querySelector("#addressEditModal");
-  const addrInput_send = document.querySelector("#addressEditSend");
-  const address = `${e.features[0].properties.address}, ${
-    JSON.parse(e.features[0].properties.area).ward
-  }, ${JSON.parse(e.features[0].properties.area).district}`;
-  addrInput.value = address;
-  addrInput_send.value = address;
+  style: "mapbox://styles/mapbox/streets-v12",
+  center: [106.569958, 10.722345],
+  zoom: 12,
+});
+// Map navigation control
+modalMap_edit.addControl(new mapboxgl.NavigationControl());
+modalMap_edit.addControl(new mapboxgl.FullscreenControl());
 
-  //Alert the ID of selected placement
-};
-
-map_edit.on("load", async () => {
+modalMap_edit.on("load", async () => {
+  //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
   );
@@ -523,7 +502,8 @@ map_edit.on("load", async () => {
   const nonSipulated = await fetchedNonSipulatedData.json();
   const reported = await fetchedReportData.json();
 
-  map_edit.addSource("sipulated", {
+  // Sipulated source data
+  modalMap_edit.addSource("sipulated", {
     type: "geojson",
     data: JSON.parse(sipulated),
     cluster: true,
@@ -531,7 +511,7 @@ map_edit.on("load", async () => {
     clusterRadius: 20,
   });
   //Sipulated cluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "sipulated-cluster",
     type: "circle",
     source: "sipulated",
@@ -543,7 +523,7 @@ map_edit.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Sipulated count
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "sipulated-count",
     type: "symbol",
     source: "sipulated",
@@ -557,7 +537,7 @@ map_edit.on("load", async () => {
     },
   });
   //Sipulated uncluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "sipulated-unclustered",
     type: "circle",
     source: "sipulated",
@@ -571,7 +551,7 @@ map_edit.on("load", async () => {
     },
   });
   //Sipulated label
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "sipulated-label",
     type: "symbol",
     source: "sipulated",
@@ -588,28 +568,26 @@ map_edit.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map_edit.on("click", "sipulated-cluster", (e) => {
-    inspectCluster_edit(e, "sipulated");
+  modalMap_edit.on("click", "sipulated-cluster", (e) => {
+    inspectClusterModal_edit(e, "sipulated");
   });
-  map_edit.on("mouseenter", "sipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered_edit(e, "sipulated");
+  //Get info when user moves their mouse over the unclustered layer
+
+  modalMap_edit.on("mouseenter", "sipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "sipulated");
   });
-  map_edit.on("mouseleave", "sipulated-unclustered", (e) => {
-    mouseLeaveEventUnclustered_edit("sipulated");
+  modalMap_edit.on("mouseleave", "sipulated-unclustered", (e) => {
+    mouseLeaveEventUnclusteredModal_edit("sipulated");
   });
-  //Get unclustered info on click
-  map_edit.on("click", "sipulated-unclustered", async (e) => {
-    await handleClickEvent_edit(e);
+  modalMap_edit.on("mouseenter", "sipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
   });
-  map_edit.on("mouseenter", "sipulated-cluster", () => {
-    map_edit.getCanvas().style.cursor = "pointer";
-  });
-  map_edit.on("mouseleave", "sipulated-cluster", () => {
-    map_edit.getCanvas().style.cursor = "";
+  modalMap_edit.on("mouseleave", "sipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
   });
 
   //Non sipulated section
-  map_edit.addSource("nonSipulated", {
+  modalMap_edit.addSource("nonSipulated", {
     type: "geojson",
     data: JSON.parse(nonSipulated),
     cluster: true,
@@ -617,7 +595,7 @@ map_edit.on("load", async () => {
     clusterRadius: 15,
   });
   //Non sipulated cluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "nonSipulated-cluster",
     type: "circle",
     source: "nonSipulated",
@@ -629,7 +607,7 @@ map_edit.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Non sipulated count
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "nonSipulated-count",
     type: "symbol",
     source: "nonSipulated",
@@ -643,7 +621,7 @@ map_edit.on("load", async () => {
     },
   });
   //Non sipulated uncluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "nonSipulated-unclustered",
     type: "circle",
     source: "nonSipulated",
@@ -657,7 +635,7 @@ map_edit.on("load", async () => {
     },
   });
   //Non sipulated label
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "nonSipulated-label",
     type: "symbol",
     source: "nonSipulated",
@@ -674,29 +652,25 @@ map_edit.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map_edit.on("click", "nonSipulated-cluster", (e) => {
-    inspectCluster(e, "nonSipulated");
+  modalMap_edit.on("click", "nonSipulated-cluster", (e) => {
+    inspectClusterModal_edit(e, "nonSipulated");
   });
   //Get info when user moves their mouse over the unclustered layer
-  map_edit.on("mouseenter", "nonSipulated-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "nonSipulated");
-  });
-  map_edit.on("mouseleave", "nonSipulated-unclustered", () => {
-    mouseLeaveEventUnclustered("nonSipulated");
-  });
-  //Get infor onclick
-  map_edit.on("click", "nonSipulated-unclustered", async (e) => {
-    await handleClickEvent_edit(e);
-  });
-  map_edit.on("mouseenter", "nonSipulated-cluster", () => {
-    map_edit.getCanvas().style.cursor = "pointer";
-  });
-  map_edit.on("mouseleave", "nonSipulated-cluster", () => {
-    map_edit.getCanvas().style.cursor = "";
-  });
 
+  modalMap_edit.on("mouseenter", "nonSipulated-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "nonSipulated");
+  });
+  modalMap_edit.on("mouseleave", "nonSipulated-unclustered", () => {
+    mouseLeaveEventUnclusteredModal_edit("nonSipulated");
+  });
+  modalMap_edit.on("mouseenter", "nonSipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
+  });
+  modalMap_edit.on("mouseleave", "nonSipulated-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
+  });
   //Reported section
-  map_edit.addSource("reported", {
+  modalMap_edit.addSource("reported", {
     type: "geojson",
     data: JSON.parse(reported),
     cluster: true,
@@ -704,7 +678,7 @@ map_edit.on("load", async () => {
     clusterRadius: 15,
   });
   //Reported cluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "reported-cluster",
     type: "circle",
     source: "reported",
@@ -716,7 +690,7 @@ map_edit.on("load", async () => {
     layout: { visibility: "visible" },
   });
   //Reported count
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "reported-count",
     type: "symbol",
     source: "reported",
@@ -730,7 +704,7 @@ map_edit.on("load", async () => {
     },
   });
   //Reported uncluster
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "reported-unclustered",
     type: "circle",
     source: "reported",
@@ -744,7 +718,7 @@ map_edit.on("load", async () => {
     },
   });
   //Reported label
-  map_edit.addLayer({
+  modalMap_edit.addLayer({
     id: "reported-label",
     type: "symbol",
     source: "reported",
@@ -761,31 +735,89 @@ map_edit.on("load", async () => {
     },
   });
   //Inspect a cluster on click
-  map_edit.on("click", "reported-cluster", (e) => {
-    inspectCluster(e, "reported");
+  modalMap_edit.on("click", "reported-cluster", (e) => {
+    inspectClusterModal_edit(e, "reported");
   });
 
-  map_edit.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered_edit(e, "reported");
+  modalMap_edit.on("mouseenter", "reported-unclustered", (e) => {
+    mouseEnterEventUnclusteredModal_edit(e, "reported");
   });
-  map_edit.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered_edit("reported");
+  modalMap_edit.on("mouseleave", "reported-unclustered", () => {
+    mouseLeaveEventUnclusteredModal_edit("reported");
   });
-  // Get info on click
-  map_edit.on("click", "reported-unclustered", async (e) => {
-    await handleClickEvent_edit(e);
+
+  modalMap_edit.on("mouseenter", "reported-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "pointer";
   });
-  map_edit.on("mouseenter", "reported-cluster", () => {
-    map_edit.getCanvas().style.cursor = "pointer";
-  });
-  map_edit.on("mouseleave", "reported-cluster", () => {
-    map_edit.getCanvas().style.cursor = "";
+  modalMap_edit.on("mouseleave", "reported-cluster", () => {
+    modalMap_edit.getCanvas().style.cursor = "";
   });
 });
 
 function navigateToLocation_edit(long, lat) {
-  map_edit.flyTo({
+  modalMap_edit.flyTo({
     center: [parseFloat(long), parseFloat(lat)],
     zoom: 15,
   });
 }
+
+const myModal_edit = document.getElementById("editModal");
+//Resize map in the modal
+myModal_edit.addEventListener("shown.bs.modal", (event) => {
+  modalMap_edit.resize(); // Importance
+});
+
+//Dragable marker
+const dragMarker_edit = new mapboxgl.Marker({
+  draggable: true,
+});
+
+//Find button handle
+const findBtn_edit = document.querySelector("#find-location-edit");
+findBtn_edit.addEventListener("click", async (e) => {
+  const addr = document.querySelector("#addressEditModal").value;
+  const ward = document.querySelector("#wardSelectEditModal").value;
+  const district = document.querySelector("#districtSelectEditModal").value;
+
+  //Make a request
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const query = `${addr}, ${ward}, ${district}`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+
+  //Handle response
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
+    console.log(data);
+    if (data.length == 0) {
+      //Handle case when no result
+    } else {
+      const geometry = data.results[0].geometry;
+      modalMap_edit.flyTo({ center: geometry });
+      const { lat, lng } = geometry;
+      console.log(lat, lng);
+      console.log(geometry);
+      document.getElementById("lngEditModal").value = lng;
+      document.getElementById("latEditModal").value = lat;
+      //Set the marker to the map
+      dragMarker_edit.setLngLat(geometry).addTo(modalMap_edit);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//Get lngLat of the marker
+function onDragEnd_edit() {
+  const lngLat = dragMarker_edit.getLngLat();
+  document.getElementById("lngEditModal").value = lngLat.lng;
+  document.getElementById("latEditModal").value = lngLat.lat;
+}
+
+dragMarker_edit.on("dragend", onDragEnd_edit);
