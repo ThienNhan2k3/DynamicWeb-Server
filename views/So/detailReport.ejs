@@ -29,6 +29,7 @@
     <%- include("./subPartials/navbar.ejs") %> 
     <!-- Main content -->
     <main class="dynamic-container container mb-5 mt-sm-4 mt-5 justify-content-center">
+      <% if (report.image.length > 1) { %>
       <div id="carouselId" class="carousel slide col-12 col-md-10 col-lg-8 rounded px-0 shadow mt-5" data-bs-ride="carousel">
           <ol class="carousel-indicators">
               <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active" aria-current="true" aria-label="First slide"></li>
@@ -36,10 +37,10 @@
           </ol>
           <div class="carousel-inner rounded" role="listbox">
               <div class="carousel-item active">
-                  <img src="<%= report.image %>" class="w-100 d-block" alt="First slide">
+                  <img src="/<%= report.image[0] %>" class="w-100 d-block" alt="First slide">
               </div>
               <div class="carousel-item">
-                  <img src="<%= report.image %>" class="w-100 d-block" alt="Second slide">
+                  <img src="/<%= report.image[1] %>" class="w-100 d-block" alt="Second slide">
               </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
@@ -51,7 +52,11 @@
               <span class="visually-hidden">Next</span>
           </button>
       </div>
-  
+      <% } else { %>
+      <div class="row mt-5 mx-1 mx-sm-0">
+        <img src="/<%= report.image[0] %>" class="w-100 d-block rounded p-0" alt="First slide">
+      </div>
+      <% } %>
       <div class="container row mt-3">
         <div class="row gx-5 gy-2">
           <h3 class="col-5 col-md-3 col-xl-2 fs-5">Loại báo cáo:</h3>
@@ -74,6 +79,7 @@
           <p class="col-7 col-md-2 p-md-0"><%= report.phone %></p>
         </div>
   
+        <% if (report.Account != null && report.status !== 'Chưa xử lý') { %>
         <div class="row gx-5 gy-2">
           <h3 class="col-md-3 col-xl-2 col-5 fs-5">Cán bộ xử lý:</h3>
           <p class="col-md-9 col-xl-10 col-7"><%= report.Account.lastName %> <%= report.Account.firstName %></p>
@@ -86,7 +92,7 @@
           <h3 class="col-5 col-md-2 fs-5 p-md-0">Loại tài khoản:</h3>
           <p class="col-7 col-md-2 p-md-0"><%= report.Account.type %></p>
         </div>
-  
+        <% } %>
         <div class="row gx-5 gy-2">
           <h3 class="col-md-3 col-xl-2 col-5 fs-5">Địa chỉ báo cáo:</h3>
           <p class="col-md-9 col-xl-10 col-7"><%= report.AdsPlacement.address %>, <%=  report.AdsPlacement.Area.ward %>, <%= report.AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</p>
