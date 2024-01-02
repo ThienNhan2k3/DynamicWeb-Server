@@ -204,7 +204,8 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[0].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[0].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src = adsData[0].image;
+    HTMLthumbnail.src = "/"+adsData[0].image;
+    // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${adsData[0].image}`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -287,7 +288,10 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
       HTMLclassification.innerHTML =
         adsData[page - 1].AdsPlacement.LocationType.locationType;
-      HTMLthumbnail.src = adsData[page - 1].image;
+      HTMLthumbnail.src = "/"+adsData[page - 1].image;
+      // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
+      //   adsData[page - 1].image
+      // }`;
       HTMLboardContract.setAttribute(
         "data-bs-content",
         `Ngày hết hạn: ${
@@ -343,7 +347,10 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src = adsData[page - 1].image;
+    HTMLthumbnail.src =  "/"+adsData[page - 1].image;
+    // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
+    //   adsData[page - 1].image
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -396,7 +403,10 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src = adsData[page - 1].image;
+    HTMLthumbnail.src =  "/"+adsData[page - 1].image;
+    // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
+    //   adsData[page - 1].image
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
