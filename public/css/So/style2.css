@@ -185,6 +185,10 @@ main {
   width: 100%;
 }
 
+.navbar-nav {
+  z-index: 999;
+}
+
 .edit-button {
   order: 1; /* Đặt edit button ở bên trái */
 }

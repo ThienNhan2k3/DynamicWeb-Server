@@ -24,6 +24,7 @@
   width: 36px;
   padding: 0;
   border: none;
+  z-index: 999;
 }
 .navbar-toggler span {
   background-color: #fff;
@@ -36,6 +37,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   transition: all 0.5s;
+  z-index: 999;
 }
 
 .navbar-toggler span:nth-child(1) {
