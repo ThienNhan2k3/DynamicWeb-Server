@@ -43,6 +43,7 @@ controller.home = async (req, res) => {
 };
 
 controller.addPermitRequest = async (req, res) => {
+  let redirectMethod = 1;
   let {boardId} = req.body;
   if (boardId == -1) {
     let { adsPlacementId, boardTypeId, boardSize, boardQuantity } = req.body;
@@ -55,6 +56,7 @@ controller.addPermitRequest = async (req, res) => {
         AdsPlacementId: adsPlacementId,
       });
       boardId = newBoard.id;
+      redirectMethod = 0;
     } catch (error) {
       req.flash('Message', {
         title: 'Tạo bảng QC mới thất bại',
@@ -82,6 +84,7 @@ controller.addPermitRequest = async (req, res) => {
         message: 'Có lỗi xảy ra trong quá trình. Vui lòng thử lại',
         status: 'fail',
       });
+      if (redirectMethod == 1) return res.redirect('back');
       return res.json({redirect: 'back'});
     }
   }
@@ -121,6 +124,7 @@ controller.addPermitRequest = async (req, res) => {
       status: 'fail',
     });
   }
+  if (redirectMethod == 1) return res.redirect('back');
   return res.json({redirect: 'back'});
 };
 
