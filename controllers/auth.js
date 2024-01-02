@@ -136,12 +136,16 @@ const postResetPassword = async (req, res, next) => {
 };
 
 const getLogin = async (req, res) => {
-  if (req.session.accountId) {
-    const account = await Account.findOne({ where: { id: req.session.accountId } });
-    if (account) {
-      if (account.type.toUpperCase() === "SO") {
-        return res.redirect("/department/accountManagement");
-      }
+  const nextUrl = req.query.nextUrl || "";
+  if (req.user) {
+    if (nextUrl.trim() !== "") {
+      return res.redirect(nextUrl);
+    } else if (req.user.type.toUpperCase() === "SO") {
+      return res.redirect("/department/accountManagement");
+    } else if (req.user.type.toUpperCase() === "QUAN") {
+      return res.redirect("/district/home");
+    } else if (req.user.type.toUpperCase() === "PHUONG") {
+      return res.redirect("/ward/home");
     }
   }
 
@@ -149,31 +153,38 @@ const getLogin = async (req, res) => {
   const error = req.flash("error")[0];
   console.log("Error: ", error);
   const message = (error != null || typeof error === 'object') ? JSON.parse(error) : null;
-  const resetPwMessage=req.flash("resetPasswordMsg")
+  const resetPwMessage=req.flash("resetPasswordMsg");
   res.render("index", {
     message,
-    resetPwMessage
+    resetPwMessage,
+    nextUrl
   });
 };
 
 const postLogin = async (req, res) => {
-  console.log("Auth");
   req.session.accountId = req.user.id;
+  const nextUrl = req.session.nextUrl || "";
   if (req.user.type === 'So') {
-      req.session.accountType = 'department';
+    req.session.accountType = 'department';
+  } else if (req.user.type === 'Quan') {
+    req.session.accountDistrict = req.user.Area.district;
+    req.session.accountType = 'district';
+  } else if (req.user.type === 'Phuong') {
+    req.session.accountWard = req.user.Area.ward;
+    req.session.accountDistrict = req.user.Area.district;
+    req.session.accountType = 'ward'; 
+  }
+
+  if (nextUrl.trim() !== '') {
+    res.redirect(nextUrl);
+  }
+  else if (req.user.type === 'So') {
       res.redirect("/department/accountManagement");
   }
-
   else if (req.user.type === 'Quan') {
-      req.session.accountType = 'district';
-      req.session.accountDistrict = req.user.Area.district;
       res.redirect("/district/home");
   }
-
   else if (req.user.type === 'Phuong') {
-      req.session.accountType = 'ward';
-      req.session.accountWard = req.user.Area.ward;
-      req.session.accountDistrict = req.user.Area.district;
       res.redirect("/ward/home");
   }
 };
