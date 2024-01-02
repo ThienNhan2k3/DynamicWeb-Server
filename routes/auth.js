@@ -1,6 +1,6 @@
 const express = require("express");
 const authController = require("../controllers/auth.js");
-const { authUser } = require("../middlewares/authentication.js");
+const { authUser, storeRedirectToInSession } = require("../middlewares/authentication.js");
 const passport = require("passport");
 const controller = require("../controllers/departmentController.js");
 const title = require('../middlewares/title.js');
@@ -8,23 +8,26 @@ const router = express.Router();
 
 router.get("/", authController.getLogin);
 router.get("/login", authController.getLogin);
-router.post("/login", passport.authenticate('local', {
+router.post("/login", storeRedirectToInSession, passport.authenticate('local', {
     failureRedirect: "/login",
-    failureFlash: true 
+    failureFlash: true,
+    keepSessionInfo: true
 }), authController.postLogin);
 
-router.get("/login/google", passport.authenticate("google", {
+router.get("/login/google", storeRedirectToInSession, passport.authenticate("google", {
     scope: ['profile', 'email']
 }));
 router.get("/login/google/redirect", passport.authenticate("google", {
     failureRedirect: "/login",
-    failureFlash: true 
+    failureFlash: true ,
+    keepSessionInfo: true
 }), authController.postLogin);
 
-router.get("/login/facebook", passport.authenticate("facebook", {scope : ['email'] }));
+router.get("/login/facebook", storeRedirectToInSession, passport.authenticate("facebook", {scope : ['email'] }));
 router.get("/login/facebook/callback", passport.authenticate("facebook", {
     failureRedirect: "/login",
-    failureFlash: true 
+    failureFlash: true,
+    keepSessionInfo: true
 }), authController.postLogin);
 
 

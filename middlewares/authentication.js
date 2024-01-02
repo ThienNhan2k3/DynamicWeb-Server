@@ -6,7 +6,8 @@ const authUser = async (req, res, next) => {
         res.locals.accountType = req.user.type;
         next();
     } else {
-        return res.redirect("/");
+        const nextUrl = req.originalUrl;
+        return res.redirect(`/login?nextUrl=${nextUrl}`);
     }
 }
 
@@ -15,7 +16,7 @@ const authRole = (type) => {
         const account = req.user;
         if (account.type !== type) {
             res.status(401)
-            return res.send("Not allowed !!!");
+            return res.render("404.ejs");
         }
         res.locals.accountType = type;
         res.locals.createWardDistrictPageQueryString = require("../util/queryString").createWardDistrictPageQueryString;
@@ -23,9 +24,15 @@ const authRole = (type) => {
     }
 }
 
+const storeRedirectToInSession = (req, res, next) => {
+    req.session.nextUrl = req.body.nextUrl || req.query.nextUrl || "";
+    next();
+} 
+
 module.exports = {
     authUser,
-    authRole
+    authRole,
+    storeRedirectToInSession
 }
 
 

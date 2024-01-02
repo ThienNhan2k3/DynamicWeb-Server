@@ -71,7 +71,6 @@
 
   </head>
   <body class="bg-light-subtle">
-
     <% if (resetPwMessage.length>0) {%>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <span><%=resetPwMessage[0] %></span>
@@ -118,6 +117,7 @@
                 <% } %>
                 <a href="/forget-password" id="forgotPasswordLink">Quên mật khẩu?</a>
               </div>
+              <input type="hidden" value="<%= nextUrl %>" name="nextUrl">
             </fieldset>
             <button type="submit" class="btn btn-success w-100" id="login-button">Đăng nhập</button>
           </form>
@@ -128,6 +128,7 @@
             <span></span>
           </div>
 
+          <% if (nextUrl === "") { %>
           <a class="btn btn-outline-danger mt-0 px-3 py-2" href="/login/google">
             <i class="fa-brands fa-google me-2"></i>
             Đăng nhập với Google
@@ -136,6 +137,16 @@
             <i class="fa-brands fa-facebook-f me-2"></i>
             Đăng nhập với Facebook
           </a>
+          <% } else { %>
+            <a class="btn btn-outline-danger mt-0 px-3 py-2" href="/login/google?nextUrl=<%= nextUrl %>">
+              <i class="fa-brands fa-google me-2"></i>
+              Đăng nhập với Google
+            </a>
+            <a class="btn btn-outline-primary mt-3 px-3 py-2" href="/login/facebook?nextUrl=<%= nextUrl %>">
+              <i class="fa-brands fa-facebook-f me-2"></i>
+              Đăng nhập với Facebook
+            </a>
+          <% } %>
       </div>
 
       <div class="row mt-3" id="listOfAccounts">

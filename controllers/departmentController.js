@@ -480,7 +480,7 @@ controller.viewAdsRequests = async (req, res) => {
       },
     ],
   });
-  const permitRequestsPerPage = 1;
+  const permitRequestsPerPage = 5;
   let pagination = await getPagination(
     req,
     res,
@@ -794,7 +794,7 @@ controller.viewEditRequest = async (req, res) => {
       },
     ],
   });
-  const editRequestsPerPage = 1;
+  const editRequestsPerPage = 5;
   let pagination = await getPagination(
     req,
     res,
@@ -803,7 +803,6 @@ controller.viewEditRequest = async (req, res) => {
     page
   );
   const currentUrl = req.url.slice(1);
-  console.log(pagination);
 
   return res.render("So/acceptOrDenyEditRequest.ejs", {
     formatDate: (date) => {

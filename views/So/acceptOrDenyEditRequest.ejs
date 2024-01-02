@@ -120,15 +120,15 @@
                       <%= formatDate(pagination.rows[i].createdAt) %>
                     </td>
                     <td>
-                      <% if (pagination.rows[i].requestStatus==='Chờ xác nhận' ) { %>
+                      <% if (pagination.rows[i].requestStatus==='Chờ phê duyệt' ) { %>
                         <button class="btn btn-warning">
                           <%= pagination.rows[i].requestStatus %>
                         </button>
-                      <% } else if (pagination.rows[i].requestStatus==='Từ chối' ) { %>
+                      <% } else if (pagination.rows[i].requestStatus==='Bị từ chối' ) { %>
                         <button class="btn btn-danger">
                           <%= pagination.rows[i].requestStatus %>
                         </button>
-                      <% } else { %>
+                      <% } else if (pagination.rows[i].requestStatus==='Đã được duyệt' ) { %>
                         <button class="btn btn-success">
                           <%= pagination.rows[i].requestStatus %>
                         </button>
