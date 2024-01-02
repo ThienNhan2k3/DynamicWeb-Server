@@ -10,6 +10,7 @@ const accountDistrict = document.querySelector("#account-district").innerText;
 let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
+let isClickPoint = 0;
 
 //Full geojson
 let sipulated;
@@ -83,8 +84,6 @@ const mouseLeaveEventUnclustered = (layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
   }
 
   map.getCanvas().style.cursor = "";
@@ -107,7 +106,6 @@ const searchFunc = async (e) => {
       throw new Error("Network response was not ok");
     }
     const data = await respond.json();
-    console.log(data);
     const geometry = data.results[0].geometry;
     map.flyTo({ center: geometry });
   } catch (err) {
@@ -135,6 +133,7 @@ const toggleEvent = (e, targetLayer) => {
 };
 
 const getInfoOnclickUnclustered = async (e) => {
+  isClickPoint = 1;
   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
   const target = e.features[0];
   const areaObjTarget = JSON.parse(target.properties.area);
@@ -179,7 +178,6 @@ const getInfoOnclickUnclustered = async (e) => {
     popover.update();
   } else {
     HTMLdetails.style.display = "block";
-    console.log("Status", adsData[0].status);
     HTMLaddPermitRequestBtn.style.display =
       adsData[0].status != "" ? "none" : "block";
     HTMLid.innerHTML = adsData[0].id;
@@ -436,7 +434,6 @@ const initLngLat = async () => {
       throw new Error("Network response was not ok");
     }
     const data = await respond.json();
-    console.log(data);
     const geometry = data.results[0].geometry;
     map.flyTo({ center: geometry });
   } catch (err) {
@@ -480,7 +477,6 @@ map.on("load", async () => {
   filterSipulated = Object.assign({}, sipulated);
   filterNonSipulated = Object.assign({}, nonSipulated);
   filterReported = Object.assign({}, reported);
-  console.log(reported);
 
   // Sort for placement that belongs to specified area
   if (accountType == "Quan") {
@@ -501,7 +497,6 @@ map.on("load", async () => {
         return p.properties.area.district == accountDistrict;
       })
       .slice();
-    console.log(reported);
   } else if (accountType == "Phuong") {
     filterSipulated.features = sipulated.features.filter((p) => {
       return (
@@ -787,7 +782,46 @@ map.on("load", async () => {
     map.getCanvas().style.cursor = "";
   });
 });
+const fowardMaker = new mapboxgl.Marker({ color: "red" });
+map.on("click", async (e) => {
+  const { lat, lng } = e.lngLat;
+  fowardMaker.setLngLat([lng, lat]).addTo(map);
+  const query = `${lat}+${lng}`;
+  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&pretty=1&no_annotations=1`;
+  const respond = await fetch(requestUrl);
+  try {
+    if (!respond.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await respond.json();
 
+    let [locationName, ...locationAddr] = data.results[0].formatted.split(",");
+    locationAddr = locationAddr.join(",");
+    if (locationName === "unnamed road") {
+      locationName = "Chưa có thông tin đường trên bản đồ";
+    }
+    const HTMLlocationName = document.querySelector("#location-name");
+    const HTMLlocationAddr = document.querySelector("#location-address");
+    HTMLlocationName.innerHTML = locationName;
+    HTMLlocationAddr.innerHTML = locationAddr;
+  } catch (err) {
+    console.log(err);
+  }
+
+  //Reset 
+  if (isClickPoint == 1) {
+    isClickPoint = 0;
+  } else {
+    document.querySelector('#num-ads').innerText="Vui lòng chọn điểm trên bản đồ để xem"
+    document.querySelector('#add-board-permit-btn').style.display="none"
+    document.querySelector('#board-details-toggle').style.display="none"
+  }
+
+});
 //Toggle layer
 const sipulatedToggle = document.querySelector("#firstCheckboxStretched");
 const nonSipulatedToggle = document.querySelector("#secondCheckboxStretched");
@@ -810,7 +844,6 @@ const searchBtn = document.querySelector("#search-button");
 
 searchBtn.addEventListener("click", searchFunc);
 locationInput.addEventListener("keypress", (e) => {
-  e.preventDefault();
   if (e.key == "Enter") {
     searchFunc(e);
   }
@@ -837,7 +870,6 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
 const filterSelect = document.querySelector("#filterSelect");
 filterSelect.addEventListener("change", (e) => {
   // e.preventDefault();
-  console.log("CHanged");
   const selectedWardsHTML = filterSelect.selectedOptions;
   let selectedWard = [];
   for (let i = 0; i < selectedWardsHTML.length; i++) {
@@ -845,8 +877,6 @@ filterSelect.addEventListener("change", (e) => {
   }
 
   //Refilter
-  console.log(reported);
-
   filterSipulated.features = sipulated.features
     .filter((p) => {
       return (

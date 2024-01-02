@@ -90,6 +90,7 @@ function districtSelectChange(districtSelect, wardSelect, callback) {
       }
     })
     .catch((err) => console.error(err));
+  findLocation();
 }
 
 async function showEditAdplaceModal(button) {
@@ -106,12 +107,10 @@ async function showEditAdplaceModal(button) {
   const long = button.dataset.long;
   const lat = button.dataset.lat;
 
-  console.log(ward);
   // Update the content of the editModal form with the retrieved data
   document.getElementById("adTypeSelectEditModal").value = adtype;
   document.getElementById("statusEditModal").value = status;
   document.getElementById("districtSelectEditModal").value = district;
-  console.log(districtField.value);
   districtSelectChange(districtField, wardField, () => {
     document.getElementById("wardSelectEditModal").value = ward;
   });

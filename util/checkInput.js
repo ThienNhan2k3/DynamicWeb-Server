@@ -105,6 +105,18 @@ async function getLatLongFromAddress(address, apiKey) {
   return false;
 }
 
+async function getLatLongFromAdplaceId(id) {
+  const adPlace = await AdsPlacement.findOne({
+    where: {
+      id: id,
+    },
+  });
+  if (adPlace) {
+    return { lat: adPlace.lat, lon: adPlace.long };
+  }
+  return false;
+}
+
 async function getFullAddressInfo(address, apiKey) {
   const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
     address
@@ -212,7 +224,6 @@ function getFirstPartOfAddress(address) {
 
   // Get the first element and trim to remove whitespaces
   var firstPart = addressArray[0].trim();
-  console.log(firstPart);
   return firstPart;
 }
 async function findAdplacementByOnlyAddress(address) {
@@ -300,4 +311,5 @@ module.exports = {
   isDuplicateLongLat,
   phoneExists,
   isDuplicateReportType,
+  getLatLongFromAdplaceId,
 };

@@ -162,6 +162,8 @@
                                                         data-type="<%= pagination.rows[i].BoardType.type %>"
                                                         data-district="<%= pagination.rows[i].AdsPlacement.Area.district %>"
                                                         data-ward="<%= pagination.rows[i].AdsPlacement.Area.ward %>"
+                                                        data-lat="<%= pagination.rows[i].AdsPlacement.lat %>"
+                                                        data-lng="<%= pagination.rows[i].AdsPlacement.long %>"
                                                         onclick="showEditBoardModal(this)"></i>
                                                     <i class="fas fa-trash" style="color: #EB3223;"
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -587,7 +589,6 @@
 
                         <!-- Javascript -->
                         <script src="/javascript/So/boardManagement.js"></script>
-                        <script src="/javascript/So/passwordStrengthIndicator.js"></script>
                         <script src="/javascript/toggleNavigation.js"></script>
                         <script src="/javascript/So/mapForBoardManagement.js"></script>
 

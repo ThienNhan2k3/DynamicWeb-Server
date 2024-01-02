@@ -54,12 +54,12 @@ const mouseEnterEventUnclusteredModal = (e, layer) => {
   const coordinates = e.features[0].geometry.coordinates.slice();
   const { id, address, adsType, area, locationType, status } =
     e.features[0].properties;
-
+  const areaObj = JSON.parse(area);
   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}</p><h5>${status}</h5>`;
+  const popupDesc = `<b>${adsType}</b><p>${locationType}</p><p>${address}, ${areaObj.ward}, ${areaObj.district}</p><h5>${status}</h5>`;
   popup.setLngLat(coordinates).setHTML(popupDesc).addTo(modalMap);
 };
 
@@ -86,7 +86,7 @@ const modalMap = new mapboxgl.Map({
 
   style: "mapbox://styles/mapbox/streets-v12",
   center: [106.569958, 10.722345],
-  zoom: 12,
+  zoom: 17,
 });
 // Map navigation control
 modalMap.addControl(new mapboxgl.NavigationControl());
@@ -357,13 +357,6 @@ modalMap.on("load", async () => {
   });
 });
 
-function navigateToLocation(long, lat) {
-  map.flyTo({
-    center: [parseFloat(long), parseFloat(lat)],
-    zoom: 15,
-  });
-}
-
 const myModal = document.getElementById("createModal");
 //Resize map in the modal
 myModal.addEventListener("shown.bs.modal", (event) => {
@@ -375,16 +368,24 @@ const dragMarker = new mapboxgl.Marker({
   draggable: true,
 });
 
-//Find button handle
-const findBtn = document.querySelector("#find-location");
-findBtn.addEventListener("click", async (e) => {
+async function findLocation() {
   const addr = document.querySelector("#addressCreateModal").value;
   const ward = document.querySelector("#wardSelectCreateModal").value;
   const district = document.querySelector("#districtSelectCreateModal").value;
 
   //Make a request
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  const query = `${addr}, ${ward}, ${district}, Hồ Chí Minh, Việt Nam`;
+  let query;
+  if (addr !== "") {
+    query = addr;
+  }
+  if (ward !== "") {
+    query = `${query}, ${ward}`;
+  }
+  if (district !== "") {
+    query = `${query}, ${district}`;
+  }
+  query = `${query}, Ho Chi Minh City, Viet Nam`;
   console.log(query);
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
@@ -415,6 +416,12 @@ findBtn.addEventListener("click", async (e) => {
   } catch (err) {
     console.log(err);
   }
+}
+//Find button handle
+const findBtn = document.querySelector("#find-location");
+findBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  findLocation();
 });
 
 //Get lngLat of the marker
@@ -778,16 +785,25 @@ const dragMarker_edit = new mapboxgl.Marker({
   draggable: true,
 });
 
-//Find button handle
-const findBtn_edit = document.querySelector("#find-location-edit");
-findBtn_edit.addEventListener("click", async (e) => {
+async function findLocation_edit() {
   const addr = document.querySelector("#addressEditModal").value;
   const ward = document.querySelector("#wardSelectEditModal").value;
   const district = document.querySelector("#districtSelectEditModal").value;
 
   //Make a request
+  let query;
+  if (addr !== "") {
+    query = addr;
+  }
+  if (ward !== "") {
+    query = `${query}, ${ward}`;
+  }
+  if (district !== "") {
+    query = `${query}, ${district}`;
+  }
+  query = `${query}, Ho Chi Minh City, Viet Nam`;
+  console.log(query);
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  const query = `${addr}, ${ward}, ${district}`;
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
     query
@@ -817,6 +833,12 @@ findBtn_edit.addEventListener("click", async (e) => {
   } catch (err) {
     console.log(err);
   }
+}
+//Find button handle
+const findBtn_edit = document.querySelector("#find-location-edit");
+findBtn_edit.addEventListener("click", async (e) => {
+  e.preventDefault();
+  findLocation_edit();
 });
 
 //Get lngLat of the marker

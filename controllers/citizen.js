@@ -253,7 +253,7 @@ const postReport = async (req, res, next) => {
     files.forEach((file) => {
       path.push(file.path);
     });
-    imageUrl = path.join(",");
+    imageUrl = path.join(", ");
     imageUrl = imageUrl.replace(/\\/g, "/");
   }
 
