@@ -16,7 +16,7 @@
     <script src="https://kit.fontawesome.com/5990078b0a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/So/style.css">
     <link rel="stylesheet" href="/css/So/table.css">
-    <link rel="stylesheet" href="/css/toggleNavigation.css">
+    <link rel="stylesheet" href="/css/PhuongQuan/toggleNavigation.css">
   </head>
 
   <body>
@@ -42,6 +42,7 @@
             </div>
             <div class="col-md-6">
                 <div class="card mb-3">
+
                     <% if (report.image.split(", ").length==1) {%>
                     <img src="<%= "/"+ report.image.split(", ")[0] %>" class="card-img-top" alt="...">
                     <% } else if (report.image.split(", ").length==2) {%>

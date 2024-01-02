@@ -477,7 +477,9 @@ controller.showReportDetails = async (req, res) => {
   res.locals.report = await models.Report.findOne({
     where: { id },
   });
-  console.log(res.locals.report);
+
+  
+
   res.locals.message = req.flash("Message")[0];
 
   return res.render("PhuongQuan/view-report-details.ejs", {
