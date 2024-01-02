@@ -2,6 +2,7 @@ const {
   Area,
   Account,
   AdsPlacement,
+  AdsPlacementRequest,
   AdsType,
   LocationType,
   PermitRequest,
@@ -639,7 +640,7 @@ controller.detailReport = async (req, res) => {
       id,
     },
   });
-  report.image = report.image.split(', ');
+  report.image = report.image.split(", ");
   return res.render("So/detailReport.ejs", {
     report,
   });
@@ -2527,4 +2528,136 @@ controller.deleteReportType = async (req, res) => {
   }
 };
 
+controller.viewEditAdplaceRequest = async (req, res) => {
+  const page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
+  const district = req.query.district || "";
+  const ward = req.query.ward || "";
+
+  let whereCondition = {};
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
+  if (district.trim() !== "") {
+    wards = await Area.findAll({
+      where: {
+        district,
+      },
+    });
+    whereCondition.district = district;
+    currentDistrict = district;
+    if (ward.trim() !== "") {
+      currentWard = ward;
+      whereCondition.ward = ward;
+    }
+  }
+
+  const [districts] = await sequelize.query(
+    `SELECT DISTINCT district FROM Areas`
+  );
+
+  let adsPlacementRequests = await AdsPlacementRequest.findAll({
+    include: [
+      {
+        model: Account,
+        attributes: ["firstName", "lastName", "type", "email"],
+      },
+      {
+        model: AdsPlacement,
+        include: [
+          {
+            model: Area,
+            where: whereCondition,
+            attributes: ["ward", "district"],
+            required: true,
+          },
+        ],
+        required: true,
+      },
+      LocationType,
+      AdsType,
+    ],
+  });
+  const adsPlacementRequestsPerPage = 5;
+  let pagination = await getPagination(
+    req,
+    res,
+    adsPlacementRequests,
+    adsPlacementRequestsPerPage,
+    page
+  );
+  const currentUrl = req.url.slice(1);
+
+  return res.render("So/acceptOrDenyEditAdsPlacementRequest.ejs", {
+    formatDate: (date) => {
+      return date.toLocaleDateString({
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+    pagination,
+    currentUrl,
+    districts,
+    wards,
+    currentDistrict,
+    currentWard,
+  });
+};
+controller.acceptOrDenyEditAdplaceRequest = async (req, res) => {
+  console.log(req.body);
+
+  const {
+    adsplacementId,
+    adPlacecRequestId,
+    result,
+    address,
+    area,
+    adsType,
+    locationType,
+    status,
+    reason,
+    areaId,
+    locationTypeId,
+    adTypeId,
+  } = req.body;
+  if (result == "Chấp nhận") {
+    await AdsPlacement.update(
+      {
+        AreaId: areaId,
+        address: address,
+        LocationTypeId: locationTypeId,
+        AdsTypeId: adTypeId,
+        status: status,
+      },
+      {
+        where: {
+          id: adsplacementId,
+        },
+      }
+    );
+    await AdsPlacementRequest.update(
+      {
+        requestStatus: "Đã được duyệt",
+      },
+      {
+        where: {
+          id: adPlacecRequestId,
+        },
+      }
+    );
+    return res.json({ status: "Success" });
+  } else {
+    await AdsPlacementRequest.update(
+      {
+        requestStatus: "Bị từ chối",
+      },
+      {
+        where: {
+          id: adPlacecRequestId,
+        },
+      }
+    );
+    return res.json({ status: "Fail" });
+  }
+};
 module.exports = controller;
