@@ -37,7 +37,7 @@
   <!-- Main content -->
   <main class="dynamic-container">
     <!--Ward sorting area  -->
-    <% if (role == 'Quận') { %>
+    <% if (user.type == 'Quan') { %>
       <%- include("./subPartials/ward-filter.ejs") %> 
     <% } %>
     <!-- Danh sách bảng quảng cáo -->

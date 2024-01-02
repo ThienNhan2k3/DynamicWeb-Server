@@ -157,9 +157,11 @@
                 <td><%= request.start.toLocaleString() %></td>
                 <td><%= request.end.toLocaleString() %></td>
                 <td>
-                  <a href="" data-bs-toggle="modal" data-bs-target="#cancelRequestConfirmModal" onclick="showCancelRequestConfirmModal(this)" data-id="<%= request.id %>" data-table="PermitRequest" data-table-name="cấp phép quảng cáo">
-                    <i class="fa fa-trash-can"></i>
-                  </a>
+                  <% if (request.requestStatus == "Chờ phê duyệt") { %>
+                    <a href="" data-bs-toggle="modal" data-bs-target="#cancelRequestConfirmModal" onclick="showCancelRequestConfirmModal(this)" data-id="<%= request.id %>" data-table="PermitRequest" data-table-name="cấp phép quảng cáo">
+                      <i class="fa fa-trash-can"></i>
+                    </a>
+                  <% }; %>
                 </td>
               </tr>
             <% }); %>
