@@ -35,6 +35,29 @@
                             <button
                                 class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <% if (currentStatus !=='' ) { %>
+                                    <%= currentStatus %>
+                                <% } else { %>
+                                    Trạng thái 
+                                <% } %>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <% for (let i=0; i < status.length; i++){ %>
+                                    <li>
+                                        <!-- Thêm class "status-item" và data attribute "data-status" -->
+                                        <a class="dropdown-item status-item" data-status="<%= status[i] %>">
+                                            <%= status[i] %>
+                                        </a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
+                        <div class="dropdown">
+                            <button
+                                class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <% if (currentDistrict !=='' ) { %>
                                     <%= currentDistrict %>
                                         <% } else { %>
@@ -153,7 +176,7 @@
                                         <% } else { %>
                                             <tr>
                                                 <td colspan="7" class="text-center fs-5">Không có bất kì yêu cầu cấp
-                                                    phép nào</td>td>
+                                                    phép nào</td>
                                             </tr>
                                             <% } %>
                         </tbody>
@@ -296,10 +319,10 @@
                                         </div>
                                     </div>
                                     <div class="row mt-4">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" placeholder="Lý do thay đổi" id="reasonEdit"
+                                        <div class="form-floating" style ="height: 200px">
+                                            <textarea class="form-control h-100" placeholder="Lý do thay đổi" id="reasonEdit"
                                                 name="reason"></textarea>
-                                            <label for="floatingTextarea2">Lý do chỉnh sửa</label>
+                                            <label for="floatingTextarea2 h-100">Lý do chỉnh sửa</label>
                                         </div>
                                     </div>
                                 </form>
@@ -334,7 +357,31 @@
                             document.getElementById("deny-btn").disabled = true;
                         }
                     }
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const statusItems = document.querySelectorAll('.status-item');
+                
+                        statusItems.forEach(function (item) {
+                            item.addEventListener('click', function () {
+                                const statusValue = this.dataset.status;
+                                console.log(statusValue);
+                
+                                // Chuyển hướng URL với status được thêm vào query string
+                                let currentUrl = window.location.href;
+                                const url = new URL(currentUrl);
+                                const params = new URLSearchParams(url.search);
 
+                                // Loại bỏ tham số status
+                                params.delete('status');
+
+                                currentUrl = `${url.origin}${url.pathname}?${params.toString()}`;
+
+                                const separator = currentUrl.includes('?') ? '&' : '?';
+                                const newUrl = currentUrl + separator + 'status=' + statusValue;
+                                console.log(newUrl);
+                                window.location.href = newUrl;
+                            });
+                        });
+                    });
                     function acceptOrDenyEditAdsPlacementRequest(e) {
                         e.preventDefault();
                         console.log(e.target);
@@ -367,6 +414,7 @@
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
                     integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
                     crossorigin="anonymous"></script>
+                    
 </body>
 
 </html>

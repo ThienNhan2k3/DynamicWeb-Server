@@ -1490,7 +1490,7 @@ controller.createBoard = async (req, res) => {
   }
 
   if (createFailed) {
-    req.flash("addressCreateModal", addressCreateSend);
+    req.flash("addressCreateModal", "Địa chỉ không hợp lệ");
 
     req.flash(
       "message",
@@ -2530,8 +2530,10 @@ controller.viewEditAdplaceRequest = async (req, res) => {
   const page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   const district = req.query.district || "";
   const ward = req.query.ward || "";
-
+  const currentStatus = req.query.status || "";
+  console.log(currentStatus);
   let whereCondition = {};
+
   let wards = [],
     currentDistrict = "",
     currentWard = "";
@@ -2548,33 +2550,65 @@ controller.viewEditAdplaceRequest = async (req, res) => {
       whereCondition.ward = ward;
     }
   }
+  const status = ["Chờ phê duyệt", "Đã được duyệt", "Bị từ chối"];
 
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas`
   );
 
-  let adsPlacementRequests = await AdsPlacementRequest.findAll({
-    include: [
-      {
-        model: Account,
-        attributes: ["firstName", "lastName", "type", "email"],
+  let adsPlacementRequests;
+
+  if (currentStatus !== "") {
+    adsPlacementRequests = await AdsPlacementRequest.findAll({
+      include: [
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+        {
+          model: AdsPlacement,
+          include: [
+            {
+              model: Area,
+              where: whereCondition,
+              attributes: ["ward", "district"],
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        LocationType,
+        AdsType,
+      ],
+      where: {
+        requestStatus: currentStatus,
       },
-      {
-        model: AdsPlacement,
-        include: [
-          {
-            model: Area,
-            where: whereCondition,
-            attributes: ["ward", "district"],
-            required: true,
-          },
-        ],
-        required: true,
-      },
-      LocationType,
-      AdsType,
-    ],
-  });
+    });
+  } else {
+    adsPlacementRequests = await AdsPlacementRequest.findAll({
+      include: [
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+        {
+          model: AdsPlacement,
+          include: [
+            {
+              model: Area,
+              where: whereCondition,
+              attributes: ["ward", "district"],
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        LocationType,
+        AdsType,
+      ],
+    });
+  }
+
   const adsPlacementRequestsPerPage = 5;
   let pagination = await getPagination(
     req,
@@ -2599,6 +2633,8 @@ controller.viewEditAdplaceRequest = async (req, res) => {
     wards,
     currentDistrict,
     currentWard,
+    status,
+    currentStatus,
   });
 };
 controller.acceptOrDenyEditAdplaceRequest = async (req, res) => {
