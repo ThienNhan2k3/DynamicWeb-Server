@@ -93,7 +93,8 @@
             <thead>
               <tr class="align-top">
                 <th scope="col-2 align-top">Loại bảng quảng cáo</th>
-                <th scope="col-2">Tên người gửi</th>
+                <th scope="col-1">Kích thước</th>
+                <th scope="col-1">Số lượng</th>
                 <th scope="col-3">Địa điểm</th>
                 <th scope="col-2">Thời gian gửi</th>
                 <th scope="col-2">Trạng thái</th>
@@ -108,8 +109,10 @@
                       <%= pagination.rows[i].Board.BoardType.type %>
                     </td>
                     <td>
-                      <%= pagination.rows[i].Account.lastName %>
-                        <%= pagination.rows[i].Account.firstName %>
+                      <%= pagination.rows[i].size %>
+                    </td>
+                    <td>
+                      <%= pagination.rows[i].quantity %>
                     </td>
                     <td>
                       <%= pagination.rows[i].Board.AdsPlacement.address %>, <%=
@@ -137,6 +140,8 @@
                     <td>
                       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#boardRequest"
                         data-quantity="<%= pagination.rows[i].quantity%>" data-size="<%= pagination.rows[i].size%>"
+                        data-reason="<%= pagination.rows[i].reason %>"
+                        data-request-status="<%= pagination.rows[i].requestStatus %>"
                         data-board-id="<%= pagination.rows[i].Board.id %>"
                         data-board-type="<%= pagination.rows[i].BoardType.type %>"
                         data-board-type-id="<%= pagination.rows[i].BoardType.id %>"
@@ -167,45 +172,42 @@
               <% if (pagination.currentPage===pagination.minPage) { %>
                 <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Previous</button>
                 </li>
-                <% }else{%>
-                  <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                      href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a>
-                  </li>
+              <% }else{%>
+                <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                    href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a>
+                </li>
+                <% } %>
+                <% for (let i=pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
+                  <% if (i>= pagination.minPage){ %>
+                    <li class="page-item"><a class="page-link text-dark fw-bold border-0"
+                      href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>">
+                      <%=i%>
+                    </a></li>
                   <% } %>
+                <% } %>
 
-                    <% for (let i=pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
-                      <% if (i>= pagination.minPage){ %>
-                        <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                            href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>">
-                            <%=i%>
-                          </a></li>
-                        <% } %>
-                          <% } %>
+                <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0"
+                    href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"
+                    style="background-color: #0FC2C0;">
+                    <%= pagination.currentPage %>
+                  </a></li>
 
-                            <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0"
-                                href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"
-                                style="background-color: #0FC2C0;">
-                                <%= pagination.currentPage %>
-                              </a></li>
+                <% for (let i = pagination.currentPage + 1; i <=pagination.currentPage + pagination.limitPage; i++) { %>
+                  <% if (i <=pagination.maxPage) { %>
+                    <li class="page-item">
+                      <a class="page-link text-dark fw-bold border-0"
+                        href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a>
+                    </li>
+                  <% } %>
+                <% } %>
 
-                            <% for (let i=pagination.currentPage + 1; i <=pagination.currentPage + pagination.limitPage;
-                              i++) { %>
-                              <% if (i <=pagination.maxPage) { %>
-                                <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                    href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>">
-                                    <%=i%>
-                                  </a></li>
-                                <% } %>
-                                  <% } %>
-
-                                    <% if (pagination.currentPage===pagination.maxPage) { %>
-                                      <li class="page-item"><button class="page-link text-dark fw-bold border-0"
-                                          disabled>Next</button></li>
-                                      <% }else{%>
-                                        <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                            href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a>
-                                        </li>
-                                        <% } %>
+                <% if (pagination.currentPage===pagination.maxPage) { %>
+                  <li class="page-item"><button class="page-link text-dark fw-bold border-0"disabled>Next</button></li>
+                <% }else{%>
+                <li class="page-item">
+                  <a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a>
+                </li>
+                <% } %>
 
             </ul>
           </nav>
@@ -231,32 +233,46 @@
                 <form action="/department/acceptOrDenyEditRequest" method="POST" id="edit-request-form">
                   <fieldset class="container">
                     <div class="row mb-3 gy-3">
-                      <div class="col col-12 col-sm-6 pe-sm-1 p-0 has-validation">
+                      <div class="col col-12 has-validation">
                         <div class="mb-0 form-floating is-invalid">
                           <input readonly type="text" class="form-control" id="boardType" name="boardType"
                             autocomplete="true" placeholder="">
                           <label for="boardType" class="mb-2">Loại bảng quảng cáo</label>
                         </div>
                       </div>
-                      <div class="col col-12 col-sm-6 ps-sm-1 p-0 has-validation">
+                    </div>
+                    <div class="row mb-3 gy-3">
+                      <div class="col col-12 col-sm-6 has-validation">
                         <div class="mb-0 form-floating is-invalid">
                           <input readonly type="text" class="form-control" id="size" name="size" autocomplete="true"
                             placeholder="">
                           <label for="size" class="mb-2">Kích thước</label>
                         </div>
                       </div>
-                      <div class="col col-12 col-sm-6  p-0 has-validation">
+                      <div class="col col-12 col-sm-6 has-validation">
                         <div class="mb-0 form-floating is-invalid">
                           <input readonly type="text" class="form-control" id="quantity" name="quantity"
                             autocomplete="true" placeholder="">
                           <label for="quantity" class="mb-2">Số lượng</label>
                         </div>
                       </div>
-                      <input type="hidden" id="boardId" name="boardId">
-                      <input type="hidden" id="boardTypeId" name="boardTypeId">
-                      <input type="hidden" id="boardRequestId" name="boardRequestId">
                     </div>
+                    <div class="row mb-3 gy-3">
+                      <div class="col col-12 has-validation">
+                        <div class="mb-0 form-floating is-invalid">
+                          <textarea readonly id="reason" class="form-control" name="reason" style="height: 150px;"></textarea>
+                          <label for="reason" class="mb-2">Lý do chỉnh sửa</label>
+                        </div>
+                      </div>
+                    </div>
+                    <input type="hidden" id="boardId" name="boardId">
+                    <input type="hidden" id="boardTypeId" name="boardTypeId">
+                    <input type="hidden" id="boardRequestId" name="boardRequestId">
                   </fieldset>
+                  <button type="submit" class="mt-4 btn btn-success w-100" id="accept-btn"
+                  onclick="acceptOrDenyEditRequest(event)" >Chấp nhận</button>
+                  <button type="submit" class="mt-2 btn btn-danger w-100" id="deny-btn"
+                    onclick="acceptOrDenyEditRequest(event)">Từ chối</button>
                 </form>
               </div>
 
@@ -270,17 +286,27 @@
             console.log(event.target.dataset);
             const size = event.target.dataset.size;
             const quantity = event.target.dataset.quantity;
+            const reason = event.target.dataset.reason;
+            const requestStatus = event.target.dataset.requestStatus;
             const boardRequestId = event.target.dataset.boardRequestId;
             const boardId = event.target.dataset.boardId;
             const boardType = event.target.dataset.boardType;
             const boardTypeId = event.target.dataset.boardTypeId;
 
+            document.getElementById("reason").value = reason;
             document.getElementById("quantity").value = quantity;
             document.getElementById("size").value = size;
             document.getElementById("boardType").value = boardType;
             document.getElementById("boardId").value = boardId;
             document.getElementById("boardTypeId").value = boardTypeId;
             document.getElementById("boardRequestId").value = boardRequestId;
+            console.log(requestStatus);
+
+            if (requestStatus === 'Bị từ chối' || requestStatus === 'Đã được duyệt') {
+              console.log(requestStatus);
+              document.getElementById("accept-btn").disabled = true;
+              document.getElementById("deny-btn").disabled = true;
+            }
           }
 
           function acceptOrDenyEditRequest(e) {
@@ -289,9 +315,9 @@
             const formData = new FormData(document.getElementById("edit-request-form"));
             const data = Object.fromEntries(formData.entries());
             if (e.target.matches("#accept-btn")) {
-              data.status = "Chấp nhận";
+              data.status = "Đã được duyệt";
             } else {
-              data.status = "Từ chối";
+              data.status = "Bị từ chối";
             }
 
             fetch("/department/acceptOrDenyEditRequest", {
