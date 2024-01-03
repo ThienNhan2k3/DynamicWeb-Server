@@ -917,7 +917,6 @@ controller.adplaceManagement = async (req, res) => {
       // ... other associations ...
     ],
   };
-
   let district = req.query.district || "";
   let ward = req.query.ward || "";
   let search = req.query.search || "";
