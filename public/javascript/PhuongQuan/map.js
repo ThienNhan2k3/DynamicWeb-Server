@@ -92,7 +92,9 @@ const mouseLeaveEventUnclustered = (layer) => {
 
 const searchFunc = async (e) => {
   e.preventDefault();
-
+  if (locationInput.value == ""||locationInput.value==undefined) {
+    return;
+  }
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
   const query = locationInput.value;
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
@@ -204,7 +206,7 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[0].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[0].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src = "/"+adsData[0].image;
+    HTMLthumbnail.src = "/" + adsData[0].image;
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${adsData[0].image}`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
@@ -288,7 +290,7 @@ const getInfoOnclickUnclustered = async (e) => {
       HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
       HTMLclassification.innerHTML =
         adsData[page - 1].AdsPlacement.LocationType.locationType;
-      HTMLthumbnail.src = "/"+adsData[page - 1].image;
+      HTMLthumbnail.src = "/" + adsData[page - 1].image;
       // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
       //   adsData[page - 1].image
       // }`;
@@ -347,7 +349,7 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src =  "/"+adsData[page - 1].image;
+    HTMLthumbnail.src = "/" + adsData[page - 1].image;
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
@@ -403,7 +405,7 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLform.innerHTML = adsData[page - 1].AdsPlacement.AdsType.type;
     HTMLclassification.innerHTML =
       adsData[page - 1].AdsPlacement.LocationType.locationType;
-    HTMLthumbnail.src =  "/"+adsData[page - 1].image;
+    HTMLthumbnail.src = "/" + adsData[page - 1].image;
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
@@ -822,15 +824,15 @@ map.on("click", async (e) => {
     console.log(err);
   }
 
-  //Reset 
+  //Reset
   if (isClickPoint == 1) {
     isClickPoint = 0;
   } else {
-    document.querySelector('#num-ads').innerText="Vui lòng chọn điểm trên bản đồ để xem"
-    document.querySelector('#add-board-permit-btn').style.display="none"
-    document.querySelector('#board-details-toggle').style.display="none"
+    document.querySelector("#num-ads").innerText =
+      "Vui lòng chọn điểm trên bản đồ để xem";
+    document.querySelector("#add-board-permit-btn").style.display = "none";
+    document.querySelector("#board-details-toggle").style.display = "none";
   }
-
 });
 //Toggle layer
 const sipulatedToggle = document.querySelector("#firstCheckboxStretched");
