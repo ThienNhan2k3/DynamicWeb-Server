@@ -92,7 +92,7 @@ const mouseLeaveEventUnclustered = (layer) => {
 
 const searchFunc = async (e) => {
   e.preventDefault();
-  if (locationInput.value == ""||locationInput.value==undefined) {
+  if (locationInput.value == "" || locationInput.value == undefined) {
     return;
   }
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
@@ -145,8 +145,13 @@ const getInfoOnclickUnclustered = async (e) => {
   const data = await fetchedData.json();
   adsData = JSON.parse(data);
   const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
+  const HTMLviewReportLocation = document.querySelector(
+    "#view-report-location"
+  );
   HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
   HTMLaddBoardBtn.style.display = "block";
+  HTMLviewReportLocation.style.display = "block";
+  HTMLviewReportLocation.parentElement.href = `${serverPath}/district/list-report-location/${selectedLocation.properties.id}`;
 
   const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
@@ -185,6 +190,10 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLid.innerHTML = adsData[0].id;
 
     HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
+
+    document.querySelector(
+      "#view-report-board"
+    ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
 
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
@@ -306,6 +315,12 @@ const getInfoOnclickUnclustered = async (e) => {
       popover.update();
       //Set active
       e.target.parentNode.classList.add("active");
+      //Set new link in view report button
+      document.querySelector(
+        "#view-report-board"
+      ).parentElement.href = `${serverPath}/district/list-report-board/${
+        adsData[page - 1].id
+      }`;
       //Set enable/disable for prev/next button
       pagePrev.parentNode.classList.remove("disabled");
       pageNext.parentNode.classList.remove("disabled");
@@ -353,6 +368,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
+    document.querySelector(
+      "#view-report-board"
+    ).parentElement.href = `${serverPath}/district/list-report-board/${
+      adsData[page - 1].id
+    }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -409,6 +429,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
+    document.querySelector(
+      "#view-report-board"
+    ).parentElement.href = `${serverPath}/district/list-report-board/${
+      adsData[page - 1].id
+    }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -830,6 +855,7 @@ map.on("click", async (e) => {
   } else {
     document.querySelector("#num-ads").innerText =
       "Vui lòng chọn điểm trên bản đồ để xem";
+    document.querySelector("#view-report-location").style.display = "none";
     document.querySelector("#add-board-permit-btn").style.display = "none";
     document.querySelector("#board-details-toggle").style.display = "none";
   }

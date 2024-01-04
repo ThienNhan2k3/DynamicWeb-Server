@@ -529,21 +529,13 @@
 
 
   document.body.addEventListener('click', (event) => {
-    // Check if the clicked element is not a property-card or location-details
     if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#mapbox') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
-      // Hide location-details
-      // Remove 'clicked' class from all property-cards
       propertyCards.forEach(c => c.classList.remove('clicked'));
-      // Remove other active classes
+     
     }
   });
 
 
-
-
-</script>
-
-<script>
   document.addEventListener('DOMContentLoaded', function () {
     const propertyCards = document.querySelectorAll('.property-card');
 

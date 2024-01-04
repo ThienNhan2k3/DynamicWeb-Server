@@ -495,7 +495,7 @@
                                                         <div class="col-6 col-md-6">
                                                             <select name="districtSelectEditModal" class="form-select"
                                                                 id="districtSelectEditModal"
-                                                                onchange="districtSelectChangeAndFlyTo(document.getElementById('districtSelectEditModal'), document.getElementById('districtSelectEditModal'))">
+                                                                onchange="districtSelectChangeAndFlyTo_edit(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
                                                                 <% for (let i=0; i < districts.length; i++){ %>
                                                                     <option value="<%= districts[i].district %>"
                                                                         class="districts">
@@ -507,7 +507,7 @@
                                                         <div class="col-6 col-md-6">
                                                             <select name="wardSelectEditModal" class="form-select"
                                                                 id="wardSelectEditModal"
-                                                                onchange="wardSelectChangeAndFlyTo(document.getElementById('districtSelectEditModal'), document.getElementById('districtSelectEditModal'))">
+                                                                onchange="wardSelectChangeAndFlyTo(document.getElementById('districtSelectEditModal'), document.getElementById('wardSelectEditModal'))">
                                                             </select>
                                                         </div>
                                                     </div>
