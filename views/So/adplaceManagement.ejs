@@ -42,7 +42,7 @@
           <main class="container-fluid dynamic-container">
             <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3" id="content">
               <div class="col-4">
-                <h2>Điểm quảng cáo tại Sài Gòn</h2>
+                <h2>Điểm quảng cáo tại TP Hồ Chí Minh</h2>
                 <form action="adplaceManagement" method="GET" id="search-bar">
                   <div class="input-group  w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
                     <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
@@ -555,21 +555,13 @@
 
 
   document.body.addEventListener('click', (event) => {
-    // Check if the clicked element is not a property-card or location-details
     if (!event.target.closest('.property-card') && !event.target.closest('#location-details') && !event.target.closest('#mapbox') && !event.target.closest('.dropdown') && !event.target.closest('#permissionReport-sub') && !event.target.closest('#deleteLocation')) {
-      // Hide location-details
-      // Remove 'clicked' class from all property-cards
       propertyCards.forEach(c => c.classList.remove('clicked'));
-      // Remove other active classes
+     
     }
   });
 
 
-
-
-</script>
-
-<script>
   document.addEventListener('DOMContentLoaded', function () {
     const propertyCards = document.querySelectorAll('.property-card');
 

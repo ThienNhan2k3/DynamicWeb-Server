@@ -216,4 +216,30 @@ function onDragEnd() {
   const lngLat = dragMarker.getLngLat();
 }
 
+async function districtSelectChangeAndFlyTo_edit(
+  districtSelect,
+  wardSelect,
+  callback
+) {
+  console.log("laksdmlda");
+  districtSelectChange(districtSelect, wardSelect, callback);
+  const { lat, lon } = await getLatLongFromDistrict(
+    districtSelect.value,
+    apiKey
+  );
+  navigateToLocation_edit(lon, lat);
+}
+
+async function wardSelectChangeAndFlyTo_edit(districtSelect, wardSelect, callback) {
+  const { lat, lon } = await getLatLongFromWard(
+    wardSelect.value,
+    districtSelect.value,
+    apiKey
+  );
+  if (callback) {
+    callback();
+  }
+  navigateToLocation_edit(lon, lat);
+}
+
 dragMarker.on("dragend", onDragEnd);
