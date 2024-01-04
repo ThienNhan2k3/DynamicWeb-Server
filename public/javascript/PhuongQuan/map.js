@@ -188,14 +188,12 @@ const getInfoOnclickUnclustered = async (e) => {
     HTMLaddPermitRequestBtn.style.display =
       adsData[0].status != "" ? "none" : "block";
     HTMLid.innerHTML = adsData[0].id;
-    
+
     HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
 
     document.querySelector(
       "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${
-      adsData[0].id
-    }`;
+    ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
 
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
@@ -857,6 +855,7 @@ map.on("click", async (e) => {
   } else {
     document.querySelector("#num-ads").innerText =
       "Vui lòng chọn điểm trên bản đồ để xem";
+    document.querySelector("#view-report-location").style.display = "none";
     document.querySelector("#add-board-permit-btn").style.display = "none";
     document.querySelector("#board-details-toggle").style.display = "none";
   }
