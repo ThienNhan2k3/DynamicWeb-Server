@@ -45,5 +45,7 @@ router.post("/my-requests", controller.deleteRequest);
 router.get("/list-reports", title.role, controller.showListReports);
 router.get("/list-reports/:id", title.role, controller.showReportDetails);
 router.post("/list-reports/", title.role, controller.updateReportDetails);
+router.get("/list-report-location/:id",title.role,controller.showListReportsByLocation);
+router.get("/list-report-board/:id",title.role,controller.showListReportsByBoard)
 
 module.exports = router;
