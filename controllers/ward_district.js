@@ -478,8 +478,6 @@ controller.showReportDetails = async (req, res) => {
     where: { id },
   });
 
-  
-
   res.locals.message = req.flash("Message")[0];
 
   return res.render("PhuongQuan/view-report-details.ejs", {
@@ -548,6 +546,72 @@ controller.updateReportDetails = async (req, res) => {
     });
   }
   res.redirect("back");
+};
+
+controller.showListReportsByLocation = async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  let options = {
+
+    include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
+      { model: models.ReportType },
+    ],
+    where: {
+      adsPlacementId: id,
+      boardId: null,
+    },
+  };
+
+  res.locals.reports = await models.Report.findAll(options);
+
+
+  return res.render("PhuongQuan/list-report-location.ejs", {
+    tab: "Danh sách báo cáo",
+    path: "/list-reports",
+  });
+};
+
+controller.showListReportsByBoard = async (req, res) => {
+  const id = req.params.id;
+  let options = {
+
+    include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
+      { model: models.ReportType },
+    ],
+    where: {
+      boardId: id,
+    },
+  };
+
+  res.locals.reports = await models.Report.findAll(options);
+
+
+  return res.render("PhuongQuan/list-report-location.ejs", {
+    tab: "Danh sách báo cáo",
+    path: "/list-reports",
+  });
 };
 
 module.exports = controller;
