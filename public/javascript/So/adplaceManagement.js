@@ -160,3 +160,80 @@ if (confirmDeleteButton) {
     location.reload();
   });
 }
+
+let yTemp, clicked = false;
+
+function addGrabIconToAdplacementContainer() {
+
+  function handleTouchMouseEnd(e) {
+    console.log("e: ", e.target);
+    e.stopPropagation();
+    const parentElement = e.target.parentElement.parentElement;
+    if (parentElement.matches("#adplacement-container")) {
+      if (parentElement.style.height === "90vh" || parentElement.style.height === "") {
+        parentElement.style.height = "6vh";
+      } else if (parentElement.style.height === "6vh") {
+        parentElement.style.height = "90vh";
+      } 
+    }
+  }
+
+  const divElement = document.createElement("div");
+  divElement.className = "d-flex justify-content-center align-items-center";
+  divElement.setAttribute("id", "grab-icon");
+  divElement.style.width = "100%";
+  divElement.style.height = "1rem";
+  divElement.style.marginBottom = "10px";
+  divElement.innerHTML = `<div style="width: 10%; height: 6px; border-radius: 2rem; background-color: #cecece; cursor: grab"></div>`
+  // const htmlContent = `
+  // <div class="d-flex justify-content-center" style="width: 100%; height: 10px; cursor: grab; margin-bottom: 10px;" onmousedown="handleMouseDown(event)">
+  //   <div style="width: 10%; height: 4px; border-radius: 2rem; background-color: #cecece;"></div>
+  // </div>
+  // `
+
+  
+
+  const container = document.getElementById("adplacement-container");
+  container.insertBefore(divElement, container.firstElementChild);
+
+  divElement.firstElementChild.addEventListener("mousedown", (e) => {
+    console.log("mousedown");
+    handleTouchMouseEnd(e);
+  });
+  
+
+  divElement.firstElementChild.addEventListener("touchstart", (e) => {
+    console.log("touchstart");
+    handleTouchMouseEnd(e);
+  });
+
+  divElement.firstElementChild.addEventListener("touchmove touchend touchcancel", (e) => {
+    console.log("touchend");    
+    handleTouchEnd(e)
+  });
+}
+
+function removeGrabIconFromAdplacementContainer() {
+    const grabIcon = document.getElementById("grab-icon");
+    if (grabIcon) {
+      grabIcon.remove();
+    }
+}
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768 && document.getElementById("grab-icon") == null) {
+    addGrabIconToAdplacementContainer();
+    document.scrollTop();
+  } else if (window.innerWidth > 768) {
+    if (document.getElementById("adplacement-container").style.height !== "") {
+      document.getElementById("adplacement-container").style.height = "";
+    } 
+    removeGrabIconFromAdplacementContainer();
+  }
+})
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (window.innerWidth < 768 && document.getElementById("grab-icon") == null) {
+    addGrabIconToAdplacementContainer();
+  }
+})

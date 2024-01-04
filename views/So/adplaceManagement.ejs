@@ -39,10 +39,10 @@
         <% } %>
 
           <!-- Main content -->
-          <main class="container-fluid dynamic-container">
-            <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3" id="content">
-              <div class="col-4">
-                <h2>Điểm quảng cáo tại Sài Gòn</h2>
+          <main class=" dynamic-container">
+            <div class="w-sm-50 p-0 w-100" id="content">
+              <div id="adplacement-container">
+                <h2>Điểm quảng cáo</h2>
                 <form action="adplaceManagement" method="GET" id="search-bar">
                   <div class="input-group  w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
                     <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
@@ -53,213 +53,187 @@
                   </div>
                 </form>
 
-                <div class="row" id="filter">
-                  <div class="col">
-                    <div class="badge bg-primary text-nowrap">
-                      Số lượng: <%= adsPlacements.length %>
-                    </div>
-
+                <div id="filter">
+                  <div class="badge bg-primary text-nowrap">
+                    Số lượng: <%= adsPlacements.length %>
                   </div>
-                  <div class="col">
-                    <button class="green-button add-button px-3 py-1 rounded" data-bs-toggle="modal"
+                  <button class="green-button add-button px-3 py-1 rounded" data-bs-toggle="modal"
                       data-bs-target="#createModal">
                       <i class="fas fa-plus-circle" style="color: #ffffff;"></i>
-                      Thêm điểm quảng cáo
+                      Thêm điểm đặt quảng cáo
+                  </button>
+                  <a class="btn all btn-secondary text-center custom-button" href="adplaceManagement">
+                    All
+                  </a>
+                  <div class="dropdown" id="district-dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+                      aria-expanded="false" id="district-filter">
+                      <% if (currentDistrict !=='' ) { %>
+                        <%= currentDistrict %>
+                          <% } else { %>
+                            Quận
+                            <% } %>
                     </button>
+                    <ul class="dropdown-menu">
+                      <% for (let i=0; i < districts.length; i++){ %>
+                        <li>
+                          <a class="dropdown-item"
+                            href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
+                            <%= districts[i].district %>
+                          </a>
+                        </li>
+                        <% } %>
+                    </ul>
                   </div>
-                  <div class="col" id="filter">
 
-                    <a class="btn all btn-secondary text-center custom-button" href="adplaceManagement">
-                      All
-                    </a>
-
-
-
-                    <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false" id="district-filter">
-                        <% if (currentDistrict !=='' ) { %>
-                          <%= currentDistrict %>
+                  <div class="dropdown" id="ward-dropdown">
+                    <button
+                      id="ward-filter"
+                      class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                      type="button" data-bs-toggle="dropdown" aria-expanded="false" <% if (wards.length===0) { %>
+                      disabled
+                      <% } %>
+                        >
+                        <% if (currentWard !=='' ) { %>
+                          <%= currentWard %>
                             <% } else { %>
-                              Quận
+                              Phường
                               <% } %>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <% for (let i=0; i < districts.length; i++){ %>
+                    </button>
+
+                    <ul class="dropdown-menu">
+                      <% if (wards.length> 0) { %>
+                        <% for (let i=0; i < wards.length; i++){ %>
                           <li>
                             <a class="dropdown-item"
-                              href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
-                              <%= districts[i].district %>
+                              href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
+                              <%= wards[i].ward %>
                             </a>
                           </li>
                           <% } %>
-                      </ul>
-                    </div>
-
-                    <div class="dropdown">
-                      <button
-                        id="ward-filter"
-                        class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-                        type="button" data-bs-toggle="dropdown" aria-expanded="false" <% if (wards.length===0) { %>
-                        disabled
-                        <% } %>
-                          >
-                          <% if (currentWard !=='' ) { %>
-                            <%= currentWard %>
-                              <% } else { %>
-                                Phường
-                                <% } %>
-                      </button>
-
-                      <ul class="dropdown-menu">
-                        <% if (wards.length> 0) { %>
-                          <% for (let i=0; i < wards.length; i++){ %>
-                            <li>
-                              <a class="dropdown-item"
-                                href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
-                                <%= wards[i].ward %>
-                              </a>
-                            </li>
                             <% } %>
-                              <% } %>
-                      </ul>
-                    </div>
-                  </div>
+                    </ul>
+                  </div>  
+
+                   
                 </div>
 
-                <div class="col">
-                  <div class="col">
-                    <% if (pagination.rows.length> 0) { %>
-                      <% for (let i=0;i<pagination.rows.length;i++) { %>
-                        <div class="property-card" id="property_<%= pagination.rows[i].id %>"
-                          onclick="navigateToLocation('<%= pagination.rows[i].long %>', '<%= pagination.rows[i].lat %>')">
-                          <div class="property-details">
-                            <div class="address">
-                              <p class="property-address">
-                                <%= pagination.rows[i].address %><br>
-                                  <%= pagination.rows[i].Area.ward %>,
-                                    <%= pagination.rows[i].Area.district %>
+                <div class="card-container">
+                  <% if (pagination.rows.length> 0) { %>
+                    <% for (let i=0;i<pagination.rows.length;i++) { %>
+                      <div class="property-card" id="property_<%= pagination.rows[i].id %>"
+                        onclick="navigateToLocation('<%= pagination.rows[i].long %>', '<%= pagination.rows[i].lat %>')">
+                        <div class="property-details">
+                          <div class="address">
+                            <p class="property-address">
+                              <%= pagination.rows[i].address %><br>
+                                <%= pagination.rows[i].Area.ward %>,
+                                  <%= pagination.rows[i].Area.district %>
+                            </p>
+                          </div>
+                          <div class="property-info">
+                            <div class="property-info-item">
+                              <p class="info-label">Hình thức:</p>
+                              <p class="info-value">
+                                <%= pagination.rows[i].AdsType.type %>
                               </p>
                             </div>
-                            <div class="property-info">
-                              <div class="property-info-item">
-                                <p class="info-label">Hình thức:</p>
-                                <p class="info-value">
-                                  <%= pagination.rows[i].AdsType.type %>
-                                </p>
-                              </div>
-                              <div class="property-info-item">
-                                <p class="info-label">Phân loại:</p>
-                                <p class="info-value">
-                                  <%= pagination.rows[i].LocationType.locationType %>
-                                </p>
-                              </div>
-
-                              <div class="property-info-item">
-                                <p class="info-label">Trạng thái:</p>
-                                <p class="info-value">
-                                  <%= pagination.rows[i].status %>
-                                </p>
-                              </div>
-
-                              <div class="property-info-item">
-                                <p class="info-label">Số lượng bảng:</p>
-                                <p class="info-value">
-                                  <%= pagination.rows[i].Boards.length %> bảng
-                                </p>
-                              </div>
+                            <div class="property-info-item">
+                              <p class="info-label">Phân loại:</p>
+                              <p class="info-value">
+                                <%= pagination.rows[i].LocationType.locationType %>
+                              </p>
                             </div>
-                            <div class="property-actions">
-                              <i class="fas fa-pen edit-button" style="color: #f29d38;" data-bs-toggle="modal"
-                                data-bs-target="#editModal" data-id="<%= pagination.rows[i].id %>"
-                                data-adstype="<%= pagination.rows[i].AdsType.type %>"
-                                data-district="<%= pagination.rows[i].Area.district %>"
-                                data-ward="<%= pagination.rows[i].Area.ward %>"
-                                data-location="<%= pagination.rows[i].LocationType.locationType %>"
-                                data-address="<%= pagination.rows[i].address %>"
-                                data-long="<%= pagination.rows[i].long %>" data-lat="<%= pagination.rows[i].lat %>"
-                                data-status="<%= pagination.rows[i].status %>" onclick="showEditAdplaceModal(this)"></i>
 
-                              <i class="fas fa-trash delete-button" style="color: #EB3223;" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal" data-id="<%= pagination.rows[i].id %>"
-                                onclick="showDeleteAdplaceModal(this)"></i>
+                            <div class="property-info-item">
+                              <p class="info-label">Trạng thái:</p>
+                              <p class="info-value">
+                                <%= pagination.rows[i].status %>
+                              </p>
+                            </div>
+
+                            <div class="property-info-item">
+                              <p class="info-label">Số lượng bảng:</p>
+                              <p class="info-value">
+                                <%= pagination.rows[i].Boards.length %> bảng
+                              </p>
                             </div>
                           </div>
+                          <div class="property-actions">
+                            <i class="fas fa-pen edit-button" style="color: #f29d38;" data-bs-toggle="modal"
+                              data-bs-target="#editModal" data-id="<%= pagination.rows[i].id %>"
+                              data-adstype="<%= pagination.rows[i].AdsType.type %>"
+                              data-district="<%= pagination.rows[i].Area.district %>"
+                              data-ward="<%= pagination.rows[i].Area.ward %>"
+                              data-location="<%= pagination.rows[i].LocationType.locationType %>"
+                              data-address="<%= pagination.rows[i].address %>"
+                              data-long="<%= pagination.rows[i].long %>" data-lat="<%= pagination.rows[i].lat %>"
+                              data-status="<%= pagination.rows[i].status %>" onclick="showEditAdplaceModal(this)"></i>
+
+                            <i class="fas fa-trash delete-button" style="color: #EB3223;" data-bs-toggle="modal"
+                              data-bs-target="#deleteModal" data-id="<%= pagination.rows[i].id %>"
+                              onclick="showDeleteAdplaceModal(this)"></i>
+                          </div>
                         </div>
-                        <% } %>
-                          <% } else { %>
-                            <tr>
-                              <td colspan="7" class="text-center fs-5"> Không có bất kì điểm quảng cáo nào</td>
-                            </tr>
-                            <% } %>
-
-                              <div
-                                class="pagination-container d-flex flex-sm-row flex-column justify-content-between align-items-center py-2">
-                                <p class="pagination-text mb-0">Showing <b>
-                                    <%= pagination.currentPage %>
-                                  </b> Out of <b>
-                                    <%= pagination.maxPage %>
-                                  </b></p>
-                                <nav aria-label="Page navigation example">
-                                  <ul class="pagination mb-0">
-                                    <% if (pagination.currentPage===pagination.minPage) { %>
-                                      <li class="page-item"><button class="page-link text-dark fw-bold border-0"
-                                          disabled>Previous</button></li>
-                                      <% }else{%>
-                                        <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                            href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a>
-                                        </li>
-                                        <% } %>
-
-                                          <% for (let i=pagination.currentPage - pagination.limitPage; i <
-                                            pagination.currentPage; i++) { %>
-                                            <% if (i>= pagination.minPage){ %>
-                                              <li class="page-item"><a class="page-link text-dark fw-bold border-0"
-                                                  href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>">
-                                                  <%=i%>
-                                                </a></li>
-                                              <% } %>
-                                                <% } %>
-
-                                                  <li class="page-item" aria-current="page"><a
-                                                      class="page-link text-dark fw-bold border-0"
-                                                      href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"
-                                                      style="background-color: #0FC2C0;">
-                                                      <%= pagination.currentPage %>
-                                                    </a></li>
-
-                                                  <% for (let i=pagination.currentPage + 1; i <=pagination.currentPage +
-                                                    pagination.limitPage; i++) { %>
-                                                    <% if (i <=pagination.maxPage) { %>
-                                                      <li class="page-item"><a
-                                                          class="page-link text-dark fw-bold border-0"
-                                                          href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>">
-                                                          <%=i%>
-                                                        </a></li>
-                                                      <% } %>
-                                                        <% } %>
-
-                                                          <% if (pagination.currentPage===pagination.maxPage) { %>
-                                                            <li class="page-item"><button
-                                                                class="page-link text-dark fw-bold border-0"
-                                                                disabled>Next</a></li>
-                                                            <% }else{%>
-                                                              <li class="page-item"><a
-                                                                  class="page-link text-dark fw-bold border-0"
-                                                                  href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a>
-                                                              </li>
-                                                              <% } %>
-
-                                  </ul>
-                                </nav>
-                              </div>
-
-                  </div>
+                      </div>
+                    <% } %>
+                  <% } else { %>
+                    <p style="width:100%; height: 100%; font-weight: 500; font-size:1.2rem; display: flex; justify-content: center; align-items: center;">
+                      Không có bất kì điểm quảng cáo nào
+                    </p>
+                  <% } %>      
                 </div>
+                <div class="pagination-container w-100 d-flex flex-sm-row flex-column justify-content-between align-items-center py-2 mt-2">
+                  <p class="pagination-text mb-0">Showing <b>
+                      <%= pagination.currentPage %>
+                    </b> Out of <b>
+                      <%= pagination.maxPage %>
+                    </b></p>
+                  <nav aria-label="Page navigation example">
+                    <ul class="pagination mb-0">
+                      <% if (pagination.currentPage===pagination.minPage) { %>
+                        <li class="page-item"><button class="page-link text-dark fw-bold border-0"disabled>Previous</button></li>
+                      <% }else{%>
+                        <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
+                      <% } %>
+        
+                      <% for (let i=pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
+                        <% if (i>= pagination.minPage){ %>
+                          <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+                        <% } %>
+                      <% } %>
 
+                    <li class="page-item" aria-current="page"><a
+                        class="page-link text-dark fw-bold border-0"
+                        href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"
+                        style="background-color: #0FC2C0;">
+                        <%= pagination.currentPage %>
+                      </a></li>
+
+                    <% for (let i=pagination.currentPage + 1; i <=pagination.currentPage +
+                      pagination.limitPage; i++) { %>
+                      <% if (i <=pagination.maxPage) { %>
+                        <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+                      <% } %>
+                    <% } %>
+
+                      <% if (pagination.currentPage===pagination.maxPage) { %>
+                      <li class="page-item"><button
+                          class="page-link text-dark fw-bold border-0"
+                          disabled>Next</a></li>
+                      <% }else{%>
+                      <li class="page-item"><a
+                          class="page-link text-dark fw-bold border-0"
+                          href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a>
+                      </li>
+                      <% } %>
+
+                    </ul>
+                  </nav>
+                </div>
               </div>
 
-              <div class="col" id="mapbox"></div>
+              <div id="mapbox"></div>
 
             </div>
           </main>

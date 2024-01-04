@@ -26,6 +26,7 @@ a {
     margin-left: -300px;
     background-color: #ffffff;
     border-right:2px solid black;
+    z-index: 100;
 }
 
 .sidenav-link {
@@ -126,9 +127,12 @@ a {
 }
 
 
-@media only screen and (max-width: 610px) {
+
+
+
+@media only screen and (max-width: 992px) {
     main.dynamic-container {
-        margin-top: 61px;
+        margin-top: 61px !important;
     }
 }
 
