@@ -93,22 +93,21 @@ main {
 
 .property-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: start;
   box-shadow: 0 0.4rem 1.5rem rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
   background-color: #ffffff;
   border-radius: 2rem;
   height: fit-content;
-  margin-bottom: 20px;
   width: fit-content;
-  margin-left: 50px;
 }
 
 .add-button,
 .all {
   height: fit-content;
 }
-
+/* 
 .property-details {
   width: 300px;
   display: flex;
@@ -118,7 +117,7 @@ main {
   margin-top: 10px;
   margin-bottom: 10px;
   margin-left: 30px;
-}
+} */
 
 .property-address {
   font-size: 18px;
@@ -148,6 +147,7 @@ main {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .edit-button {
@@ -299,11 +299,12 @@ main {
   margin-top: 0;
   z-index: 0;
   height: 92vh;
+  max-height: 1000px;
 }
 
 #adplacement-container {
   position: absolute;
-  height: 90vh;
+  height: 65vh;
   width: 100%;
   z-index: 11;
   left: 0;
@@ -316,6 +317,7 @@ main {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
   transition: height 500ms linear;
+  max-height: inherit;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -354,6 +356,7 @@ main {
   position: relative;
   z-index: 10;
   width: 100%;
+  max-height: inherit;
 }
 
 #mapbox canvas {
@@ -383,6 +386,15 @@ main {
 
 .mapboxgl-ctrl-top-right {
   right: 20px !important;
+}
+
+
+@media only screen and (min-width: 576px)  {
+  .card-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -423,6 +435,10 @@ main {
   .mapboxgl-canvas {
     position: relative;
     border-radius: 1rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -170,10 +170,10 @@ function addGrabIconToAdplacementContainer() {
     e.stopPropagation();
     const parentElement = e.target.parentElement.parentElement;
     if (parentElement.matches("#adplacement-container")) {
-      if (parentElement.style.height === "90vh" || parentElement.style.height === "") {
+      if (parentElement.style.height === "65vh" || parentElement.style.height === "") {
         parentElement.style.height = "6vh";
       } else if (parentElement.style.height === "6vh") {
-        parentElement.style.height = "90vh";
+        parentElement.style.height = "65vh";
       } 
     }
   }
@@ -223,7 +223,6 @@ function removeGrabIconFromAdplacementContainer() {
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768 && document.getElementById("grab-icon") == null) {
     addGrabIconToAdplacementContainer();
-    document.scrollTop();
   } else if (window.innerWidth > 768) {
     if (document.getElementById("adplacement-container").style.height !== "") {
       document.getElementById("adplacement-container").style.height = "";
