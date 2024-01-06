@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const { boardRequests } = require("../data/boardRequests");
+    const { boardRequests } = require("../data/boardRequestsData.js");
     await queryInterface.bulkInsert('boardRequests', boardRequests, {});
   },
 

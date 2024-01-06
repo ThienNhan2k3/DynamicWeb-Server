@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
       },
       address: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
       },
       status: DataTypes.STRING,
@@ -27,7 +27,7 @@ module.exports = {
         allowNull: false
       },
       reason: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
       },
       requestStatus: {

@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    const { areas } = require("../areas");
+    const { areas } = require("../data/areasData.js");
     await queryInterface.bulkInsert(
       "areas",
       areas,

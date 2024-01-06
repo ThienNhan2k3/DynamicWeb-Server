@@ -18,7 +18,7 @@ module.exports = {
         allowNull: false 
       },
       address: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false 
       },
       email: {

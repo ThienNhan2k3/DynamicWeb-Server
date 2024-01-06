@@ -27,7 +27,7 @@ module.exports = {
         allowNull: false
       },
       reason: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
       },
       accountId: {

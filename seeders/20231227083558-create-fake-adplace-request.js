@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    const { adplaceRequests } = require("../data/adplaceRequests");
+    const { adplaceRequests } = require("../data/adplaceRequestsData.js");
     await queryInterface.bulkInsert(
       "adsPlacementRequests",
       adplaceRequests,

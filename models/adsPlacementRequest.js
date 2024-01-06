@@ -29,12 +29,12 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       address: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       status: DataTypes.STRING,
       reason: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       requestStatus: {

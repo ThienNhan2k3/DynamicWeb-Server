@@ -602,7 +602,8 @@ controller.viewReports = async (req, res) => {
     ],
     required: true,
   });
-  const pagination = await getPagination(req, res, reports, 1, page);
+  const reportsPerPage = 4;
+  const pagination = await getPagination(req, res, reports, reportsPerPage, page);
   // console.log(pagination.rows);
   const currentUrl = req.url.slice(1);
   return res.render("So/viewReports.ejs", {
