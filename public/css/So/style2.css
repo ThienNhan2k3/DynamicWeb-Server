@@ -416,9 +416,11 @@ main {
   }
 
   #mapbox, #adplacement-container  {
-    position: static;
     grid-row-start: 1;
     height: 100%;
+  }
+  #adplacement-container {
+    position: static;
   }
 
   #mapbox {
@@ -430,16 +432,6 @@ main {
     grid-column-start: 1;
     border-radius: 1rem;
     width: 92%;
-  }
-
-  .mapboxgl-canvas {
-    position: relative;
-    border-radius: 1rem;
-  }
-
-  .mapboxgl-canvas-container {
-    position: relative;
-    border-radius: 1rem;
   }
 
   .card-container {
