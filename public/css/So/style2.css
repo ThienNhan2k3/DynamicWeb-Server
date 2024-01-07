@@ -437,6 +437,11 @@ main {
     border-radius: 1rem;
   }
 
+  .mapboxgl-canvas-container {
+    position: relative;
+    border-radius: 1rem;
+  }
+
   .card-container {
     grid-template-columns: 1fr;
   }
