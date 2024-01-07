@@ -287,7 +287,6 @@ main {
   z-index: 0;
 }
 
-
 /* New */
 #content {
   display: grid;
@@ -314,8 +313,8 @@ main {
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   overflow: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   transition: height 500ms linear;
   max-height: inherit;
 }
@@ -331,8 +330,8 @@ main {
   row-gap: 1.2rem;
   height: 65%;
   overflow: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   margin-top: 1.2rem;
   background-color: transparent;
   border-radius: 2rem;
@@ -388,8 +387,7 @@ main {
   right: 20px !important;
 }
 
-
-@media only screen and (min-width: 576px)  {
+@media only screen and (min-width: 576px) {
   .card-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -401,7 +399,6 @@ main {
   body {
     overflow: auto;
   }
-
 
   #content {
     grid-template-columns: 45% 55%; /* 50%, 50% */
@@ -415,7 +412,8 @@ main {
     /* overflow: hidden; */
   }
 
-  #mapbox, #adplacement-container  {
+  #mapbox,
+  #adplacement-container {
     grid-row-start: 1;
     height: 100%;
   }
@@ -426,6 +424,7 @@ main {
   #mapbox {
     grid-column-start: 2;
     width: 96%;
+    border-radius: 2rem;
   }
 
   #adplacement-container {
@@ -439,14 +438,14 @@ main {
   }
 }
 
-@media only screen and (min-width: 992px)  {
+@media only screen and (min-width: 992px) {
   #content {
-    grid-template-columns: 40% 60%; 
+    grid-template-columns: 40% 60%;
   }
 }
 
-@media only screen and (min-width: 1200px)  {
+@media only screen and (min-width: 1200px) {
   #content {
-    grid-template-columns: 30% 70%; 
+    grid-template-columns: 30% 70%;
   }
 }

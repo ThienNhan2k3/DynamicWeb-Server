@@ -771,7 +771,7 @@ modalMap_edit.on("load", async () => {
 function navigateToLocation_edit(long, lat) {
   modalMap_edit.flyTo({
     center: [parseFloat(long), parseFloat(lat)],
-    zoom: 15,
+    zoom: 20,
   });
 }
 
