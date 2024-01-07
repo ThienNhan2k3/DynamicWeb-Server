@@ -1076,7 +1076,7 @@ controller.createAdplace = async (req, res) => {
 
   console.log(district, ward);
 
-  if (districtSelectCreateModal != district || wardSelectCreateModal != ward) {
+  if (districtSelectCreateModal != district) {
     req.flash("wardSelectCreateModalError", "Khác với bản đồ.");
     req.flash("districtSelectCreateModalError", "Khác với bản đồ.");
     createFailed = true;

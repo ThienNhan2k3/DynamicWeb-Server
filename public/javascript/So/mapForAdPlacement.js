@@ -483,9 +483,7 @@ map.on("load", async () => {
   });
 });
 
-const locationMarker = new mapboxgl.Marker({
-  draggable: true,
-});
+const locationMarker = new mapboxgl.Marker({});
 
 function navigateToLocation(long, lat) {
   console.log(long, lat);
