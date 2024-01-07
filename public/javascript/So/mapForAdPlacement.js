@@ -4,7 +4,6 @@ const reportedColor = "#eb3434";
 const selfReportedColor = "#848991";
 const unclusteredRadius = 12;
 
-
 let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
@@ -133,7 +132,7 @@ const toggleEvent = (e, targetLayer) => {
   }
 };
 
-const initLngLat = async (district,ward) => {
+const initLngLat = async (district, ward) => {
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
   const query = `${district} ${ward} Hồ Chí Minh`;
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
@@ -168,7 +167,6 @@ map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new mapboxgl.FullscreenControl());
 
 map.on("load", async () => {
-  
   //Fetched section
   const fetchedsipulatedData = await fetch(
     `${serverPath}/citizen/get-sipulated`
@@ -200,8 +198,8 @@ map.on("load", async () => {
       : document.querySelector("#district-filter").innerText.trim();
 
   //Init location
-  if(ward!=""||district!=""){
-    initLngLat(district,ward)
+  if (ward != "" || district != "") {
+    initLngLat(district, ward);
   }
 
   filterSipulated.features = sipulated.features.filter((p) => {
@@ -485,11 +483,17 @@ map.on("load", async () => {
   });
 });
 
-const locationMarker=new mapboxgl.Marker()
+const locationMarker = new mapboxgl.Marker({
+  draggable: true,
+});
+
 function navigateToLocation(long, lat) {
+  console.log(long, lat);
+  long = parseFloat(long);
+  lat = parseFloat(lat);
   map.flyTo({
     center: [parseFloat(long), parseFloat(lat)],
-    zoom: 18,
+    zoom: 20,
   });
-  locationMarker.setLngLat([long,lat]).addTo(map)
+  locationMarker.setLngLat([long, lat]).addTo(map);
 }

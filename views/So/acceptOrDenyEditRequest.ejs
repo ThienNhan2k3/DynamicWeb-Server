@@ -32,7 +32,30 @@
         <div class="row w-sm-50 w-100 mt-4 justify-content-end gx-0 gx-sm-3 gy-3">
           <a class="btn btn-secondary col-lg-1 col-xl-1 col-sm-2 col-4" href="/department/acceptOrDenyEditRequest">
             All
-          </a>
+          </a>  
+          <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
+            <div class="dropdown">
+                <button
+                    class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <% if (currentStatus !=='' ) { %>
+                        <%= currentStatus %>
+                    <% } else { %>
+                        Trạng thái 
+                    <% } %>
+                </button>
+                <ul class="dropdown-menu">
+                    <% for (let i=0; i < status.length; i++){ %>
+                        <li>
+                            <!-- Thêm class "status-item" và data attribute "data-status" -->
+                            <a class="dropdown-item status-item" data-status="<%= status[i] %>">
+                                <%= status[i] %>
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+          </div>
           <div class="col-lg-3 col-xl-2 col-sm-4 col-8">
             <div class="dropdown">
               <button
@@ -307,7 +330,34 @@
               document.getElementById("accept-btn").disabled = true;
               document.getElementById("deny-btn").disabled = true;
             }
-          }
+          }  
+          
+          document.addEventListener('DOMContentLoaded', function () {
+            const statusItems = document.querySelectorAll('.status-item');
+    
+            statusItems.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    const statusValue = this.dataset.status;
+                    console.log(statusValue);
+    
+                    // Chuyển hướng URL với status được thêm vào query string
+                    let currentUrl = window.location.href;
+                    const url = new URL(currentUrl);
+                    const params = new URLSearchParams(url.search);
+
+                    // Loại bỏ tham số status
+                    params.delete('status');
+
+                    currentUrl = `${url.origin}${url.pathname}?${params.toString()}`;
+
+                    const separator = currentUrl.includes('?') ? '&' : '?';
+                    const newUrl = currentUrl + separator + 'status=' + statusValue;
+                    console.log(newUrl);
+                    window.location.href = newUrl;
+                });
+            });
+        });
+     
 
           function acceptOrDenyEditRequest(e) {
             e.preventDefault();

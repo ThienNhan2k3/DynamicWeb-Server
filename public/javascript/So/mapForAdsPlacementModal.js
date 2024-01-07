@@ -375,23 +375,22 @@ async function findLocation() {
 
   //Make a request
   const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  let query;
-  if (addr !== "") {
-    query = addr;
+  let query = "";
+  if (addr.trim() !== "") {
+    query = `${addr}, `;
   }
-  if (ward !== "") {
-    query = `${query}, ${ward}`;
+  if (ward.trim() !== "") {
+    query = `${query}${ward}, `;
   }
-  if (district !== "") {
-    query = `${query}, ${district}`;
+  if (district.trim() !== "") {
+    query = `${query}${district}`;
   }
-  query = `${query}, Ho Chi Minh City, Viet Nam`;
+  query = `${query}, Hồ Chí Minh, Việt Nam`;
   console.log(query);
   const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
   const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
     query
   )}&pretty=1&no_annotations=1`;
-
   //Handle response
   const respond = await fetch(requestUrl);
   try {
@@ -427,6 +426,8 @@ findBtn.addEventListener("click", async (e) => {
 //Get lngLat of the marker
 function onDragEnd() {
   const lngLat = dragMarker.getLngLat();
+  document.getElementById("lngCreateModal").value = lngLat.lng;
+  document.getElementById("latCreateModal").value = lngLat.lat;
 }
 
 dragMarker.on("dragend", onDragEnd);

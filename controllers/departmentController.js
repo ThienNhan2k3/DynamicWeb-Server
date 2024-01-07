@@ -603,7 +603,13 @@ controller.viewReports = async (req, res) => {
     required: true,
   });
   const reportsPerPage = 4;
-  const pagination = await getPagination(req, res, reports, reportsPerPage, page);
+  const pagination = await getPagination(
+    req,
+    res,
+    reports,
+    reportsPerPage,
+    page
+  );
   // console.log(pagination.rows);
   const currentUrl = req.url.slice(1);
   return res.render("So/viewReports.ejs", {
@@ -745,7 +751,9 @@ controller.viewEditRequest = async (req, res) => {
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let district = req.query.district || "";
   let ward = req.query.ward || "";
-
+  const currentStatus = req.query.status || "";
+  const status = ["Chờ phê duyệt", "Đã được duyệt", "Bị từ chối"];
+  console.log(currentStatus);
   let whereCondition = {};
   let wards = [],
     currentDistrict = "",
@@ -767,34 +775,67 @@ controller.viewEditRequest = async (req, res) => {
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas`
   );
-  console.log(whereCondition);
-  let boardRequest = await BoardRequest.findAll({
-    include: [
-      BoardType,
-      {
-        model: Board,
-        include: [
-          BoardType,
-          {
-            model: AdsPlacement,
-            include: [
-              {
-                model: Area,
-                where: whereCondition,
-                required: true,
-              },
-            ],
-            required: true,
-          },
-        ],
-        required: true,
+  let boardRequest;
+  if (currentStatus !== "") {
+    boardRequest = await BoardRequest.findAll({
+      include: [
+        BoardType,
+        {
+          model: Board,
+          include: [
+            BoardType,
+            {
+              model: AdsPlacement,
+              include: [
+                {
+                  model: Area,
+                  where: whereCondition,
+                  required: true,
+                },
+              ],
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+      ],
+      where: {
+        requestStatus: currentStatus,
       },
-      {
-        model: Account,
-        attributes: ["firstName", "lastName", "type", "email"],
-      },
-    ],
-  });
+    });
+  } else {
+    boardRequest = await BoardRequest.findAll({
+      include: [
+        BoardType,
+        {
+          model: Board,
+          include: [
+            BoardType,
+            {
+              model: AdsPlacement,
+              include: [
+                {
+                  model: Area,
+                  where: whereCondition,
+                  required: true,
+                },
+              ],
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+      ],
+    });
+  }
   const editRequestsPerPage = 5;
   let pagination = await getPagination(
     req,
@@ -819,6 +860,8 @@ controller.viewEditRequest = async (req, res) => {
     wards,
     currentDistrict,
     currentWard,
+    status,
+    currentStatus,
   });
 };
 
@@ -846,28 +889,19 @@ controller.acceptOrDenyEditRequest = async (req, res) => {
   }
 };
 
-const getLocationTypeName = async (adsPlacement) => {
-  try {
-    const locationType = await LocationType.findByPk(
-      adsPlacement.LocationTypeId
-    );
-    return locationType ? locationType.locationType : null;
-  } catch (error) {
-    console.error("Error fetching LocationType:", error);
-    throw error;
-  }
-};
-
 controller.adplaceManagement = async (req, res) => {
   const createErr = {
     error: {
       address: req.flash("addressCreateModalError"),
       numBoard: req.flash("numBoardCreateModalError"),
+      district: req.flash("districtSelectCreateModalError"),
+      ward: req.flash("wardSelectCreateModalError"),
     },
     value: {
       address: req.flash("addressCreateModal")[0],
       numBoard: req.flash("numBoardCreateModal")[0],
-      // ... add other value fields for AdsPlacement ...
+      district: req.flash("districtSelectCreateModal")[0],
+      ward: req.flash("wardSelectCreateModal")[0],
     },
   };
 
@@ -1032,7 +1066,21 @@ controller.createAdplace = async (req, res) => {
 
   console.log(req.body);
   let createFailed = false;
+  const { district, ward } = checkInput.extractDistrictAndWard(
+    await checkInput.getAddressFromLatLong(
+      latCreateModal,
+      lngCreateModal,
+      apiKey
+    )
+  );
 
+  console.log(district, ward);
+
+  if (districtSelectCreateModal != district || wardSelectCreateModal != ward) {
+    req.flash("wardSelectCreateModalError", "Khác với bản đồ.");
+    req.flash("districtSelectCreateModalError", "Khác với bản đồ.");
+    createFailed = true;
+  }
   addressCreateModal = checkInput.getFirstPartOfAddress(addressCreateModal);
 
   let fullAddress = await checkInput.getFullAddressInfo(
@@ -2532,7 +2580,6 @@ controller.viewEditAdplaceRequest = async (req, res) => {
   const district = req.query.district || "";
   const ward = req.query.ward || "";
   const currentStatus = req.query.status || "";
-  console.log(currentStatus);
   let whereCondition = {};
 
   let wards = [],

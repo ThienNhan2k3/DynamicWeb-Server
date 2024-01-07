@@ -286,6 +286,72 @@ async function isDuplicateReportType(name) {
   });
   return result ? true : false;
 }
+
+async function getAddressFromLatLong(lat, lon, apiKey) {
+  const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`;
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const addressComponents = data.results[0].components;
+    const formattedAddress = Object.values(addressComponents).join(", ");
+
+    return formattedAddress;
+  }
+
+  return false;
+}
+
+function extractDistrictAndWard(input) {
+  // Split the input string into individual components
+  const components = input.split(", ");
+
+  // Find district and ward components
+  let district, ward;
+  let districtIndex, wardIndex;
+  let type;
+
+  // Find the indices of "District" and "Ward"
+  for (let i = 0; i < components.length; i++) {
+    const component = components[i];
+    if (
+      component.includes("District") ||
+      component.includes("Huyện") ||
+      component.includes("Quận")
+    ) {
+      district = component.replace("District ", ""); // Extract only digits
+      district = component.replace("Huyện ", ""); // Extract only digits
+      district = component.replace("Quận ", ""); // Extract only digits
+      districtIndex = i;
+    } else if (component.includes("Ward") || component.includes("Phường")) {
+      ward = component.replace("Ward ", ""); // Extract only digits
+      ward = component.replace("Phường ", ""); // Extract only digits
+
+      wardIndex = i;
+      type = 1;
+    } else if (component.includes("Town") || component.includes("Thị trấn")) {
+      ward = component.replace("Town ", ""); // Extract only digits
+      ward = component.replace("Thị trấn ", ""); // Extract only digits
+      wardIndex = i;
+      type = 2;
+    } else if (component.includes("Commune") || component.includes("Xã")) {
+      ward = component.replace("Commune ", ""); // Extract only digits
+      ward = component.replace("Xã ", ""); // Extract only digits
+      wardIndex = i;
+      type = 3;
+    }
+  }
+
+  district = district !== null ? "Quận " + district : null;
+  if (parseInt(ward) < 10) ward = "0" + ward;
+  if (type === 1) ward = ward !== null ? "Phường " + ward : null;
+  if (type === 2) ward = ward !== null ? "Thị trấn " + ward : null;
+  if (type === 3) ward = ward !== null ? "Xã " + ward : null;
+
+  return { district, ward };
+}
+
 module.exports = {
   isEmpty,
   isEmail,
@@ -312,4 +378,6 @@ module.exports = {
   phoneExists,
   isDuplicateReportType,
   getLatLongFromAdplaceId,
+  getAddressFromLatLong,
+  extractDistrictAndWard,
 };
