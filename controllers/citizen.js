@@ -8,6 +8,7 @@ const {
   ReportType,
   PermitRequest,
   BoardType,
+  Board,
 } = require("../models");
 const Sequelize = require("sequelize");
 
@@ -41,24 +42,55 @@ const getSipulated = async (req, res, next) => {
     type: "FeatureCollection",
     features: [],
   };
-  sipulated.forEach((data) => {
+  for (i = 0; i < sipulated.length; i++) {
+    const boards = await Board.findAll({
+      where: {
+        adsPlacementId: sipulated[i].id,
+      },
+    });
     const feature = {
       type: "Feature",
       properties: {
-        id: data.id,
-        area: { ward: data.Area.ward, district: data.Area.district },
-        locationType: data.LocationType.locationType,
-        adsType: data.AdsType.type,
-        address: data.address,
-        status: "Đã quy hoạch",
+        id: sipulated[i].id,
+        area: { ward: sipulated[i].Area.ward, district: sipulated[i].Area.district },
+        locationType: sipulated[i].LocationType.locationType,
+        adsType: sipulated[i].AdsType.type,
+        address: sipulated[i].address,
+        status: "Chưa quy hoạch",
+        numBoard: boards.length,
       },
       geometry: {
-        coordinates: [data.long, data.lat],
+        coordinates: [sipulated[i].long, sipulated[i].lat],
         type: "Point",
       },
     };
     sipulatedGeoJSON.features.push(feature);
-  });
+  }
+
+  // sipulated.forEach(async (data) => {
+  //   const boards = await Board.findAll({
+  //     where: {
+  //       adsPlacementId: data.id,
+  //     },
+  //   });
+  //   const feature = {
+  //     type: "Feature",
+  //     properties: {
+  //       id: data.id,
+  //       area: { ward: data.Area.ward, district: data.Area.district },
+  //       locationType: data.LocationType.locationType,
+  //       adsType: data.AdsType.type,
+  //       address: data.address,
+  //       status: "Đã quy hoạch",
+  //       numBoard: boards.length,
+  //     },
+  //     geometry: {
+  //       coordinates: [data.long, data.lat],
+  //       type: "Point",
+  //     },
+  //   };
+  //   sipulatedGeoJSON.features.push(feature);
+  // });
 
   res.json(JSON.stringify(sipulatedGeoJSON));
 };
@@ -91,24 +123,30 @@ const getNonSipulated = async (req, res, next) => {
     type: "FeatureCollection",
     features: [],
   };
-  nonSipulated.forEach((data) => {
+  for (i = 0; i < nonSipulated.length; i++) {
+    const boards = await Board.findAll({
+      where: {
+        adsPlacementId: nonSipulated[i].id,
+      },
+    });
     const feature = {
       type: "Feature",
       properties: {
-        id: data.id,
-        area: { ward: data.Area.ward, district: data.Area.district },
-        locationType: data.LocationType.locationType,
-        adsType: data.AdsType.type,
-        address: data.address,
+        id: nonSipulated[i].id,
+        area: { ward: nonSipulated[i].Area.ward, district: nonSipulated[i].Area.district },
+        locationType: nonSipulated[i].LocationType.locationType,
+        adsType: nonSipulated[i].AdsType.type,
+        address: nonSipulated[i].address,
         status: "Chưa quy hoạch",
+        numBoard: boards.length,
       },
       geometry: {
-        coordinates: [data.long, data.lat],
+        coordinates: [nonSipulated[i].long, nonSipulated[i].lat],
         type: "Point",
       },
     };
     nonSipulatedGeoJSON.features.push(feature);
-  });
+  }
 
   res.json(JSON.stringify(nonSipulatedGeoJSON));
 };
@@ -119,9 +157,9 @@ const getReport = async (req, res, next) => {
       AdsPlacementId: {
         [Sequelize.Op.not]: null,
       },
-      status:{
-        [Sequelize.Op.not]:'Đã xử lý'
-      }
+      status: {
+        [Sequelize.Op.not]: "Đã xử lý",
+      },
     },
     include: [
       {
@@ -203,9 +241,9 @@ const getAds = async (req, res, next) => {
             required: true,
           },
           {
-            model:Area,
-            required:true
-          }
+            model: Area,
+            required: true,
+          },
         ],
       },
     ],
@@ -223,15 +261,15 @@ const getAds = async (req, res, next) => {
           status: permitRequest.status,
         };
         respondData.push(data);
-      }else{
-        const data={
+      } else {
+        const data = {
           ...board.dataValues,
           image: "",
           start: "",
           end: "",
           content: "",
           status: "",
-        }
+        };
         respondData.push(data);
       }
     } catch (err) {
