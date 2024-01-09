@@ -157,6 +157,9 @@
                 <td><%= request.start.toLocaleString() %></td>
                 <td><%= request.end.toLocaleString() %></td>
                 <td>
+                  <a href="#" data-bs-toggle="modal" data-bs-target="#view-image-modal" onclick="showImage(this)" data-img="/<%= request.image %>">
+                    <i class="fa fa-image"></i>
+                  </a>
                   <% if (request.status == "Chưa cấp phép") { %>
                     <a href="" data-bs-toggle="modal" data-bs-target="#cancelRequestConfirmModal" onclick="showCancelRequestConfirmModal(this)" data-id="<%= request.id %>" data-table="PermitRequest" data-table-name="cấp phép quảng cáo">
                       <i class="fa fa-trash-can"></i>
@@ -176,6 +179,7 @@
 
   <!-- Modals -->
   <%- include("./subPartials/cancel-request-confirm-modal.ejs") %>
+  <%- include("./subPartials/view-image-modal.ejs") %>
   <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
   </body>
 

@@ -371,7 +371,6 @@ controller.showMyRequests = async (req, res) => {
   res.locals.permitRequests = await models.PermitRequest.findAll({
     include: [{ model: models.Company }],
     where: {
-      status: "Chưa cấp phép",
       accountId: req.session.accountId,
     },
     order: [["id", "ASC"]],
@@ -475,6 +474,9 @@ controller.showReportDetails = async (req, res) => {
   }
 
   res.locals.report = await models.Report.findOne({
+    include: [
+      {model: models.ReportType}
+    ],
     where: { id },
   });
 
