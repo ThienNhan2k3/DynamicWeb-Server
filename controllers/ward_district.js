@@ -455,6 +455,30 @@ controller.showListReports = async (req, res) => {
 
   res.locals.reports = await models.Report.findAll(options);
 
+  options = {
+    include: [
+      {
+        model: models.Area,
+        where: {},
+      },
+      { model: models.ReportType },
+    ],
+    where: {},
+  };
+
+  options.include[0].where.district = req.session.accountDistrict;
+
+  if (req.user.type == "Phuong") {
+    options.where.areaId = req.user.AreaId;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.where.areaId = selectedArea;
+    }
+  }
+
+  res.locals.locationReports = await models.LocationReport.findAll(options);
+
   res.locals.myArea = await models.Area.findAll({
     where: { district: req.session.accountDistrict },
     order: [["ward", "ASC"]],
@@ -499,6 +523,46 @@ controller.showReportDetails = async (req, res) => {
   }
 
   let report = await models.Report.findOne(options);
+
+  if (!report) {
+    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!")
+  } 
+
+  res.locals.message = req.flash("Message")[0];
+
+  return res.render("PhuongQuan/view-report-details.ejs", {
+    report: report,
+    tab: "Chi tiết báo cáo",
+    path: "/list-reports",
+  });
+};
+
+controller.showLocationReportDetails = async (req, res) => {
+  let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
+
+  let options = {
+    include: [
+      {
+        model: models.Area,
+        where: {},
+      },
+      { model: models.ReportType },
+    ],
+    where: {id},
+  };
+
+  options.include[0].where.district = req.session.accountDistrict;
+
+  if (req.user.type == "Phuong") {
+    options.where.areaId = req.user.AreaId;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.where.areaId = selectedArea;
+    }
+  }
+
+  let report = await models.LocationReport.findOne(options);
 
   if (!report) {
     return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!")
@@ -575,70 +639,66 @@ controller.updateReportDetails = async (req, res) => {
   res.redirect("back");
 };
 
-controller.showListReportsByLocation = async (req, res) => {
-  const id = req.params.id;
-  console.log(id)
-  let options = {
-
-    include: [
+controller.updateLocationReportDetails = async (req, res) => {
+  let { reportId, method, status } = req.body;
+  try {
+    await models.LocationReport.update(
       {
-        model: models.AdsPlacement,
-        attribute: ["address"],
-        include: [
-          {
-            model: models.Area,
-            where: {},
-          },
-        ],
-        where: {},
+        method: method,
+        status: status,
+        AccountId: req.session.accountId,
       },
-      { model: models.ReportType },
-    ],
-    where: {
-      adsPlacementId: id,
-      boardId: null,
-    },
-  };
+      { where: { id: reportId } }
+    );
+    const report = await models.LocationReport.findOne({ where: { id: reportId } });
+    const account = await models.Account.findOne({
+      where: { id: req.session.accountId },
+      include: [{ model: models.Area }],
+    });
 
-  res.locals.reports = await models.Report.findAll(options);
-
-
-  return res.render("PhuongQuan/list-report-location.ejs", {
-    tab: "Danh sách báo cáo",
-    path: "/list-reports",
-  });
-};
-
-controller.showListReportsByBoard = async (req, res) => {
-  const id = req.params.id;
-  let options = {
-
-    include: [
-      {
-        model: models.AdsPlacement,
-        attribute: ["address"],
-        include: [
-          {
-            model: models.Area,
-            where: {},
+    // Send email
+    const request = await mailjet.post("send", { version: "v3.1" }).request({
+      Messages: [
+        {
+          From: {
+            Email: "hiiback0608@gmail.com",
+            Name: "Sở văn hóa và du lịch",
           },
-        ],
-        where: {},
-      },
-      { model: models.ReportType },
-    ],
-    where: {
-      boardId: id,
-    },
-  };
-
-  res.locals.reports = await models.Report.findAll(options);
-
-
-  return res.render("PhuongQuan/list-report-location.ejs", {
-    tab: "Danh sách báo cáo",
-    path: "/list-reports",
-  });
+          To: [
+            {
+              Email: report.email,
+              Name: report.email,
+            },
+          ],
+          TemplateID: 5485692,
+          Subject: "Phản hồi về báo cáo",
+          TemplateLanguage: true,
+          Variables: {
+            citizenName: report.name,
+            content: method,
+            officerName: `${account.lastName} ${account.firstName}`,
+            officerType:
+              account.type == "Quan"
+                ? `Cán bộ  ${account.Area.district.toLowerCase()}`
+                : ` Cán bộ ${account.Area.ward.toLowerCase()}`,
+            email: account.email,
+          },
+        },
+      ],
+    });
+    req.flash("Message", {
+      title: "Cập nhật báo cáo thành công",
+      message: "Xử lý báo cáo của bạn đã được cập nhật trên hệ thống",
+      status: "succeed",
+    });
+  } catch (error) {
+    req.flash("Message", {
+      title: "Cập nhật báo cáo thất bại",
+      message: "Có lỗi xảy ra trong quá trình. Vui lòng thử lại",
+      status: "fail",
+    });
+  }
+  res.redirect("back");
 };
 
 module.exports = controller;
