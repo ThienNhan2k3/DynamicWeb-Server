@@ -469,20 +469,45 @@ controller.showListReports = async (req, res) => {
 controller.showReportDetails = async (req, res) => {
   let id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
 
-  if (id == -1) {
-    return res.send("Report not found!");
+  let options = {
+    include: [
+      {
+        model: models.AdsPlacement,
+        attribute: ["address"],
+        include: [
+          {
+            model: models.Area,
+            where: {},
+          },
+        ],
+        where: {},
+      },
+      { model: models.ReportType },
+    ],
+    where: {id},
+  };
+
+  options.include[0].include[0].where.district = req.session.accountDistrict;
+
+  if (req.user.type == "Phuong") {
+    options.include[0].where.areaId = req.user.AreaId;
+  } else {
+    let selectedArea = req.query.selectedArea ? req.query.selectedArea : "";
+    if (selectedArea != "") {
+      options.include[0].where.areaId = selectedArea;
+    }
   }
 
-  res.locals.report = await models.Report.findOne({
-    include: [
-      {model: models.ReportType}
-    ],
-    where: { id },
-  });
+  let report = await models.Report.findOne(options);
+
+  if (!report) {
+    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!")
+  } 
 
   res.locals.message = req.flash("Message")[0];
 
   return res.render("PhuongQuan/view-report-details.ejs", {
+    report: report,
     tab: "Chi tiết báo cáo",
     path: "/list-reports",
   });
