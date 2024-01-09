@@ -48,5 +48,6 @@ router.post(
 );
 router.get("/get-report-data", citizenController.getReportData);
 router.post("/post-self-report", citizenController.postSelfReport);
+router.post("/get-report-by-lnglat",citizenController.getReportByLngLat)
 
 module.exports = router;

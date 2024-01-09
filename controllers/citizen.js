@@ -9,7 +9,7 @@ const {
   PermitRequest,
   BoardType,
   Board,
-  LocationReport
+  LocationReport,
 } = require("../models");
 const Sequelize = require("sequelize");
 
@@ -37,7 +37,7 @@ const getSipulated = async (req, res, next) => {
     type: "FeatureCollection",
     features: [],
   };
-  for (i = 0; i < sipulated.length; i++) {
+  for (let i = 0; i < sipulated.length; i++) {
     const boards = await Board.findAll({
       where: {
         adsPlacementId: sipulated[i].id,
@@ -280,6 +280,7 @@ const postReport = async (req, res, next) => {
     return;
   }
   const typeId = dbquery.id;
+  const placement = await AdsPlacement.findOne({ where: { id: location } });
 
   const newReport = await Report.create({
     submission_time: new Date(),
@@ -301,7 +302,7 @@ const postReport = async (req, res, next) => {
     permitRequest.status = "Bị báo cáo";
     permitRequest.save();
   }
-  res.status(200).json({ newReport });
+  res.status(200).json({ newReport, lng: placement.long, lat: placement.lat });
 };
 
 const getReportData = async (req, res, next) => {
@@ -329,15 +330,26 @@ const getReportData = async (req, res, next) => {
 };
 
 const postSelfReport = async (req, res) => {
-  const reportIds = req.body.reportIds;
+  const reportIdsType1 = req.body.reportIdsType1;
+  const reportIdsType2 = req.body.reportIdsType2;
   const reports = await Report.findAll({
-    where: { id: { [Sequelize.Op.in]: reportIds } },
+    where: { id: { [Sequelize.Op.in]: reportIdsType1 } },
     include: [
       { model: ReportType, required: true },
-      { model: AdsPlacement, required: true },
+      // { model: AdsPlacement, required: true },
     ],
   });
-  res.json(JSON.stringify(reports));
+  const reports2 = await LocationReport.findAll({
+    where: { id: { [Sequelize.Op.in]: reportIdsType2 } },
+    include: [
+      {
+        model: ReportType,
+        required: true,
+      },
+    ],
+  });
+  const combined=reports.concat(reports2)
+  res.json(JSON.stringify(combined));
 };
 
 const postReportRandomLocation = async (req, res) => {
@@ -373,18 +385,16 @@ const postReportRandomLocation = async (req, res) => {
   );
   const jsonReturn = await area.json();
   const data = jsonReturn.results;
-  let ward,district
-  console.log(data[0])
-  if(data.length>0){
-    ward=data[0].compound.commune,
-    district=data[0].compound.district
+  let ward, district;
+  if (data.length > 0) {
+    (ward = data[0].compound.commune), (district = data[0].compound.district);
   }
-  if(!ward.includes("0")&&/\d/.test(ward)){
-    let parts=ward.split(" ")
-    ward=parts[0]+" "+"0"+parts[1]
+  if (!ward.includes("0") && /\d/.test(ward)) {
+    let parts = ward.split(" ");
+    ward = parts[0] + " " + "0" + parts[1];
   }
-  if(!ward.includes("Phường")){
-    ward="Phường "+ward
+  if (!ward.includes("Phường")) {
+    ward = "Phường " + ward;
   }
   const selectedArea = await Area.findOne({
     where: {
@@ -393,28 +403,58 @@ const postReportRandomLocation = async (req, res) => {
     },
   });
 
-  if(!selectedArea)
-  {
-    console.log(ward)
-    console.log(district)
-    return
+  if (!selectedArea) {
+    console.log(ward);
+    console.log(district);
+    return;
   }
-  const areaId=selectedArea.id
-  const newReport=await LocationReport.create({
-    name:name,
-    email:email,
-    phone:phone,
-    reportContent:content,
-    image:imageUrl,
-    status:"Chờ xử lý",
-    address:address,
-    long:lng,
-    lat:lat,
-    AreaId:areaId,
+  const areaId = selectedArea.id;
+  const newReport = await LocationReport.create({
+    name: name,
+    email: email,
+    phone: phone,
+    reportContent: content,
+    image: imageUrl,
+    status: "Chờ xử lý",
+    address: address,
+    long: lng,
+    lat: lat,
+    AreaId: areaId,
     ReportTypeId: typeId,
-  })
+  });
   await newReport.save();
-  return res.status(200).json({ newReport }); 
+  return res.status(200).json({ newReport });
+};
+
+const getReportByLngLat = async (req, res) => {
+  const lng = parseFloat(req.query.lng);
+  const lat = parseFloat(req.query.lat);
+  const type = req.query.type;
+  const reportIds = req.body.reportIds;
+  if (type == 1) {
+    const reports = await Report.findAll({
+      where: { id: { [Sequelize.Op.in]: reportIds } },
+      include: [
+        { model: ReportType, required: true },
+        {
+          model: AdsPlacement,
+          where: {
+            long: lng,
+            lat: lat,
+          },
+        },
+      ],
+    });
+    console.log(reports);
+    return res.json(JSON.stringify(reports));
+  } else if (type == 2) {
+    const reports = await LocationReport.findAll({
+      where: { id: { [Sequelize.Op.in]: reportIds }, long: lng, lat: lat },
+      include: [{ model: ReportType, required: true }],
+    });
+    console.log(reports);
+    return res.json(JSON.stringify(reports));
+  }
 };
 module.exports = {
   getSipulated,
@@ -425,4 +465,5 @@ module.exports = {
   getReportData,
   postSelfReport,
   postReportRandomLocation,
+  getReportByLngLat,
 };
