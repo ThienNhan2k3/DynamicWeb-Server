@@ -30,10 +30,15 @@
             <div class="col-md-6 h-100 ">
                 <div class="card ">
                     <div class="card-header">
-                      Báo cáo của người dân
+                      Báo cáo của người dân - Báo cáo <% if (report.BoardId) { %> Bảng QC (ID: <%= report.BoardId %>) <% } else { %> Điểm đặt QC (ID: <%= report.AdsPlacementId %>) <% } %>
                     </div>
                     <div class="card-body overflow-y-scroll h-100" style="max-height: 45vh;" >
-                      <h5 class="card-title">Tiêu đề</h5>
+                      <h5 class="card-title"><%= report.name %></h5>
+                      <p class="card-text " >
+                        SĐT: <%= report.phone %>
+                        <br>Email: <%= report.email %>
+                      </p>
+                      <h5 class="card-title">Loại: <%= report.ReportType.type %></h5>
                       <p class="card-text " >
                         <%- report.reportContent %>
                       </p>
