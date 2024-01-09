@@ -9,6 +9,7 @@ const {
   PermitRequest,
   BoardType,
   Board,
+  LocationReport,
 } = require("../models");
 const Sequelize = require("sequelize");
 
@@ -16,11 +17,6 @@ const getSipulated = async (req, res, next) => {
   const sipulated = await AdsPlacement.findAll({
     where: {
       status: "Đã quy hoạch",
-      id: {
-        [Sequelize.Op.notIn]: Sequelize.literal(
-          "(SELECT AdsPlacementId FROM reports WHERE status!='Đã xử lý')"
-        ),
-      },
     },
     include: [
       {
@@ -37,12 +33,11 @@ const getSipulated = async (req, res, next) => {
       },
     ],
   });
-
   const sipulatedGeoJSON = {
     type: "FeatureCollection",
     features: [],
   };
-  for (i = 0; i < sipulated.length; i++) {
+  for (let i = 0; i < sipulated.length; i++) {
     const boards = await Board.findAll({
       where: {
         adsPlacementId: sipulated[i].id,
@@ -52,7 +47,10 @@ const getSipulated = async (req, res, next) => {
       type: "Feature",
       properties: {
         id: sipulated[i].id,
-        area: { ward: sipulated[i].Area.ward, district: sipulated[i].Area.district },
+        area: {
+          ward: sipulated[i].Area.ward,
+          district: sipulated[i].Area.district,
+        },
         locationType: sipulated[i].LocationType.locationType,
         adsType: sipulated[i].AdsType.type,
         address: sipulated[i].address,
@@ -67,42 +65,12 @@ const getSipulated = async (req, res, next) => {
     sipulatedGeoJSON.features.push(feature);
   }
 
-  // sipulated.forEach(async (data) => {
-  //   const boards = await Board.findAll({
-  //     where: {
-  //       adsPlacementId: data.id,
-  //     },
-  //   });
-  //   const feature = {
-  //     type: "Feature",
-  //     properties: {
-  //       id: data.id,
-  //       area: { ward: data.Area.ward, district: data.Area.district },
-  //       locationType: data.LocationType.locationType,
-  //       adsType: data.AdsType.type,
-  //       address: data.address,
-  //       status: "Đã quy hoạch",
-  //       numBoard: boards.length,
-  //     },
-  //     geometry: {
-  //       coordinates: [data.long, data.lat],
-  //       type: "Point",
-  //     },
-  //   };
-  //   sipulatedGeoJSON.features.push(feature);
-  // });
-
   res.json(JSON.stringify(sipulatedGeoJSON));
 };
 const getNonSipulated = async (req, res, next) => {
   const nonSipulated = await AdsPlacement.findAll({
     where: {
       status: "Chưa quy hoạch",
-      id: {
-        [Sequelize.Op.notIn]: Sequelize.literal(
-          "(SELECT AdsPlacementId FROM reports WHERE status!='Đã xử lý')"
-        ),
-      },
     },
     include: [
       {
@@ -123,7 +91,7 @@ const getNonSipulated = async (req, res, next) => {
     type: "FeatureCollection",
     features: [],
   };
-  for (i = 0; i < nonSipulated.length; i++) {
+  for (let i = 0; i < nonSipulated.length; i++) {
     const boards = await Board.findAll({
       where: {
         adsPlacementId: nonSipulated[i].id,
@@ -133,7 +101,10 @@ const getNonSipulated = async (req, res, next) => {
       type: "Feature",
       properties: {
         id: nonSipulated[i].id,
-        area: { ward: nonSipulated[i].Area.ward, district: nonSipulated[i].Area.district },
+        area: {
+          ward: nonSipulated[i].Area.ward,
+          district: nonSipulated[i].Area.district,
+        },
         locationType: nonSipulated[i].LocationType.locationType,
         adsType: nonSipulated[i].AdsType.type,
         address: nonSipulated[i].address,
@@ -309,6 +280,7 @@ const postReport = async (req, res, next) => {
     return;
   }
   const typeId = dbquery.id;
+  const placement = await AdsPlacement.findOne({ where: { id: location } });
 
   const newReport = await Report.create({
     submission_time: new Date(),
@@ -330,7 +302,7 @@ const postReport = async (req, res, next) => {
     permitRequest.status = "Bị báo cáo";
     permitRequest.save();
   }
-  res.status(200).json({ newReport });
+  res.status(200).json({ newReport, lng: placement.long, lat: placement.lat });
 };
 
 const getReportData = async (req, res, next) => {
@@ -358,17 +330,132 @@ const getReportData = async (req, res, next) => {
 };
 
 const postSelfReport = async (req, res) => {
-  const reportIds = req.body.reportIds;
+  const reportIdsType1 = req.body.reportIdsType1;
+  const reportIdsType2 = req.body.reportIdsType2;
   const reports = await Report.findAll({
-    where: { id: { [Sequelize.Op.in]: reportIds } },
+    where: { id: { [Sequelize.Op.in]: reportIdsType1 } },
     include: [
       { model: ReportType, required: true },
-      { model: AdsPlacement, required: true },
+      // { model: AdsPlacement, required: true },
     ],
   });
-  res.json(JSON.stringify(reports));
+  const reports2 = await LocationReport.findAll({
+    where: { id: { [Sequelize.Op.in]: reportIdsType2 } },
+    include: [
+      {
+        model: ReportType,
+        required: true,
+      },
+    ],
+  });
+  const combined=reports.concat(reports2)
+  res.json(JSON.stringify(combined));
 };
 
+const postReportRandomLocation = async (req, res) => {
+  let { name, email, phone, type, content, address, lng, lat } = req.body;
+  const files = req.files;
+  let imageUrl;
+  const path = [];
+  if (files) {
+    files.forEach((file) => {
+      path.push(file.path);
+    });
+    imageUrl = path.join(", ");
+    imageUrl = imageUrl.replace(/\\/g, "/");
+  }
+
+  if (type == "TGSP") {
+    type = "Tố giác sai phạm";
+  } else if (type == "DKND") {
+    type = "Đăng ký nội dung";
+  } else if (type == "DGYK") {
+    type = "Đóng góp ý kiến";
+  } else if (type == "GDTM") {
+    type = "Giải đáp thắc mắc";
+  }
+  const dbquery = await ReportType.findOne({ where: { type: type } });
+  if (dbquery == null) {
+    return;
+  }
+  const typeId = dbquery.id;
+
+  const area = await fetch(
+    `https://rsapi.goong.io/Geocode?latlng=${lat},%20${lng}&api_key=7iVK3dd86pgsEJggbfiky0xOrcRa9xJMNTtX22nS`
+  );
+  const jsonReturn = await area.json();
+  const data = jsonReturn.results;
+  let ward, district;
+  if (data.length > 0) {
+    (ward = data[0].compound.commune), (district = data[0].compound.district);
+  }
+  if (!ward.includes("0") && /\d/.test(ward)) {
+    let parts = ward.split(" ");
+    ward = parts[0] + " " + "0" + parts[1];
+  }
+  if (!ward.includes("Phường")) {
+    ward = "Phường " + ward;
+  }
+  const selectedArea = await Area.findOne({
+    where: {
+      ward: ward.trim(),
+      district: district.trim(),
+    },
+  });
+
+  if (!selectedArea) {
+    console.log(ward);
+    console.log(district);
+    return;
+  }
+  const areaId = selectedArea.id;
+  const newReport = await LocationReport.create({
+    name: name,
+    email: email,
+    phone: phone,
+    reportContent: content,
+    image: imageUrl,
+    status: "Chờ xử lý",
+    address: address,
+    long: lng,
+    lat: lat,
+    AreaId: areaId,
+    ReportTypeId: typeId,
+  });
+  await newReport.save();
+  return res.status(200).json({ newReport });
+};
+
+const getReportByLngLat = async (req, res) => {
+  const lng = parseFloat(req.query.lng);
+  const lat = parseFloat(req.query.lat);
+  const type = req.query.type;
+  const reportIds = req.body.reportIds;
+  if (type == 1) {
+    const reports = await Report.findAll({
+      where: { id: { [Sequelize.Op.in]: reportIds } },
+      include: [
+        { model: ReportType, required: true },
+        {
+          model: AdsPlacement,
+          where: {
+            long: lng,
+            lat: lat,
+          },
+        },
+      ],
+    });
+    console.log(reports);
+    return res.json(JSON.stringify(reports));
+  } else if (type == 2) {
+    const reports = await LocationReport.findAll({
+      where: { id: { [Sequelize.Op.in]: reportIds }, long: lng, lat: lat },
+      include: [{ model: ReportType, required: true }],
+    });
+    console.log(reports);
+    return res.json(JSON.stringify(reports));
+  }
+};
 module.exports = {
   getSipulated,
   getNonSipulated,
@@ -377,4 +464,6 @@ module.exports = {
   postReport,
   getReportData,
   postSelfReport,
+  postReportRandomLocation,
+  getReportByLngLat,
 };
