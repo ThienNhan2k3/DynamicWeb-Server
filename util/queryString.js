@@ -1,4 +1,4 @@
-createWardDistrictPageQueryString = (url, key, value) => {
+const createWardDistrictPageQueryString = (url, key, value) => {
   function getObjectFromUrl(url, key) {
     let startIndex = 0,
       endIndex = 0;

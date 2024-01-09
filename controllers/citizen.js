@@ -91,7 +91,7 @@ const getNonSipulated = async (req, res, next) => {
     type: "FeatureCollection",
     features: [],
   };
-  for (i = 0; i < nonSipulated.length; i++) {
+  for (let i = 0; i < nonSipulated.length; i++) {
     const boards = await Board.findAll({
       where: {
         adsPlacementId: nonSipulated[i].id,

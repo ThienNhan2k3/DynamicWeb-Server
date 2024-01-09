@@ -115,7 +115,7 @@
             <ul class="dropdown-menu">
               <% for (let i = 0; i < districts.length; i++){ %>
               <li>
-                <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'district=', districts[i].district)%>">
+                <a class="dropdown-item" href="<%= createWardDistrictPageTypeQueryString('district=', districts[i].district)%>">
                   <%= districts[i].district %>
                 </a>
               </li>
@@ -140,12 +140,43 @@
               <% if (wards.length > 0) { %>
                 <% for (let i = 0; i < wards.length; i++){ %>
                   <li>
-                    <a class="dropdown-item" href="<%= createWardDistrictPageQueryString(currentUrl, 'ward=', wards[i].ward) %>">
+                    <a class="dropdown-item" href="<%= createWardDistrictPageTypeQueryString('ward=', wards[i].ward) %>">
                       <%= wards[i].ward %>
                     </a>
                   </li>
                   <% } %>
               <% } %>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-4 col-xl-3 col-sm-5 col-12">
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <% if (currentType === 'locationReports') { %>
+                Địa điểm
+              <% } else if (currentType === 'reports') { %>
+                Bảng báo cáo
+              <% } else { %>
+                Loại báo cáo
+              <% } %>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="<%= createWardDistrictPageTypeQueryString('type=', '') %>">
+                  All
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="<%= createWardDistrictPageTypeQueryString('type=', 'locationReports') %>">
+                  Địa điểm
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="<%= createWardDistrictPageTypeQueryString('type=', 'reports') %>">
+                  Bảng báo cáo
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -157,7 +188,8 @@
         <table class="table-body table table-striped table-responsive mb-0">
           <thead>
             <tr class="align-top">
-              <th scope="col align-top">Loại báo cáo</th>
+              <th scope="col align-top">Đối tượng báo cáo</th>
+              <th scope="col">Loại báo cáo</th>
               <th scope="col">Tên người gửi</th>
               <th scope="col">Email</th>
               <th scope="col">Số điện thoại</th>
@@ -170,11 +202,24 @@
             <% if (pagination.rows.length > 0) { %>
               <% for (let i = 0; i < pagination.rows.length; i++) { %>
                 <tr>
+                  <td class="fw-bold">
+                    <% if (pagination.rows[i].address != null) { %>
+                      Địa điểm
+                    <% } else { %>
+                      Bảng quảng cáo
+                    <% }  %>
+                  </td>
                   <td><%= pagination.rows[i].ReportType.type %></td>
                   <td><%= pagination.rows[i].name %></td>
                   <td><%= pagination.rows[i].email %></td>
                   <td><%= pagination.rows[i].phone %></td>
-                  <td colspan="2"><%= pagination.rows[i].AdsPlacement.address %>, <%= pagination.rows[i].AdsPlacement.Area.ward %>, <%= pagination.rows[i].AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</td>
+                  <td colspan="2">
+                    <% if (pagination.rows[i].address != null) { %>
+                      <%= pagination.rows[i].address %>, <%= pagination.rows[i].Area.ward %>, <%= pagination.rows[i].Area.district %>, Thành phố Hồ Chí Minh
+                    <% } else { %>
+                      <%= pagination.rows[i].AdsPlacement.address %>, <%= pagination.rows[i].AdsPlacement.Area.ward %>, <%= pagination.rows[i].AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh
+                    <% }  %>
+                  </td>
                   <td>
                     <% if (pagination.rows[i].status === 'Đang xử lý') { %>
                       <button class="btn btn-warning">
@@ -191,13 +236,17 @@
                     <% } %>
                   </td>
                   <td class="text-center">
+                    <% if (pagination.rows[i].address != null) { %>
+                      <a href="viewReport/<%= pagination.rows[i].id %>?type=locationReport"><i class="fas fa-info-circle text-primary"></i></a>
+                    <% } else { %>
                       <a href="viewReport/<%= pagination.rows[i].id %>"><i class="fas fa-info-circle text-primary"></i></a>
+                    <% }  %>
                   </td>
                 </tr>
               <% } %>
             <% } else { %>
               <tr>
-                <td colspan="8" class="text-center fs-5">Không có bất kì yêu cầu cấp phép nào</td>
+                <td colspan="9" class="text-center fs-5">Không có bất kì yêu cầu cấp phép nào</td>
               </tr>
             <% } %>
           </tbody>
@@ -211,27 +260,27 @@
             <% if (pagination.currentPage === pagination.minPage) { %>
               <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Previous</button></li>
             <% }else{%>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage - 1) %>">Previous</a></li>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageTypeQueryString('page=', pagination.currentPage - 1) %>">Previous</a></li>
             <% } %>
   
             <% for (let i = pagination.currentPage - pagination.limitPage; i < pagination.currentPage; i++) { %>
               <% if (i >= pagination.minPage){ %>
-                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageTypeQueryString('page=', i) %>"><%=i%></a></li>
               <% } %>
             <% } %>
   
-            <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage) %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
+            <li class="page-item" aria-current="page"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageTypeQueryString('page=', pagination.currentPage) %>"  style="background-color: #0FC2C0;"><%= pagination.currentPage %></a></li>
   
             <% for (let i = pagination.currentPage + 1; i <= pagination.currentPage + pagination.limitPage; i++) { %>
               <% if (i <= pagination.maxPage) { %>
-                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', i) %>"><%=i%></a></li>
+                <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageTypeQueryString('page=', i) %>"><%=i%></a></li>
               <% } %>
             <% } %>
   
             <% if (pagination.currentPage === pagination.maxPage) { %>
               <li class="page-item"><button class="page-link text-dark fw-bold border-0" disabled>Next</button></li>
             <% }else{%>
-              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageQueryString(currentUrl, 'page=', pagination.currentPage + 1)%>">Next</a></li>
+              <li class="page-item"><a class="page-link text-dark fw-bold border-0" href="<%= createWardDistrictPageTypeQueryString('page=', pagination.currentPage + 1)%>">Next</a></li>
             <% } %>
   
           </ul>

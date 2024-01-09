@@ -5,6 +5,7 @@ const {
   AdsPlacementRequest,
   AdsType,
   LocationType,
+  LocationReport,
   PermitRequest,
   Company,
   BoardType,
@@ -563,10 +564,9 @@ controller.viewReports = async (req, res) => {
   let page = isNaN(req.query.page) ? 1 : parseInt(req.query.page);
   let district = req.query.district || "";
   let ward = req.query.ward || "";
-
-  let wards = [],
-    currentDistrict = "",
-    currentWard = "";
+  let type = req.query.type || "";
+  
+  let wards = [], currentDistrict = "", currentWard = "";
   let whereCondition = {};
   if (district.trim() !== "") {
     wards = await Area.findAll({
@@ -585,31 +585,111 @@ controller.viewReports = async (req, res) => {
   const [districts] = await sequelize.query(
     `SELECT DISTINCT district FROM Areas`
   );
-  let reports = await Report.findAll({
-    include: [
-      ReportType,
-      {
-        model: AdsPlacement,
-        include: [
-          {
-            model: Area,
-            where: whereCondition,
-            required: true,
-          },
-        ],
-        required: true,
-      },
-    ],
-    required: true,
-  });
+
+  let reports;
+  if (type.trim() === "reports") {
+    reports = await Report.findAll({
+      include: [
+        ReportType,
+        {
+          model: AdsPlacement,
+          include: [
+            {
+              model: Area,
+              where: whereCondition,
+              required: true,
+            },
+          ],
+          required: true,
+        },
+      ],
+      required: true,
+    });
+  } else if (type.trim() === "locationReports") {
+    reports = await LocationReport.findAll({
+      include: [
+        ReportType,
+        {
+          model: Area,
+              where: whereCondition,
+              required: true,
+        },
+      ],
+      required: true,
+    });
+    console.log(reports);
+  } else {
+    reports = await Report.findAll({
+      include: [
+        ReportType,
+        {
+          model: AdsPlacement,
+          include: [
+            {
+              model: Area,
+              where: whereCondition,
+              required: true,
+            },
+          ],
+          required: true,
+        },
+      ],
+      required: true,
+    });
+    let locationReports = await LocationReport.findAll({
+      include: [
+        ReportType,
+        {
+          model: Area,
+              where: whereCondition,
+              required: true,
+        },
+      ],
+      required: true,
+    });
+    reports = reports.concat(locationReports);
+  }
+
   const reportsPerPage = 4;
   const pagination = await getPagination(
     req,
     res,
     reports,
     reportsPerPage,
-    page
+    page,
   );
+  const createWardDistrictPageTypeQueryString = (key, value) => {
+    let newType = key === 'type=' ? {key: value === "" ? value : key , value} : {key: type === "" ? "" : "type=", value: type}; 
+    let newWard = key === "ward=" ? { key, value } : {key: ward === "" ? "" : "ward=", value: ward};
+    let newPage = key === "page=" ? { key, value } : { key: "", value: "" };
+    let newDistrict;
+    if (key === "district=") {
+      newDistrict = { key, value };
+      newWard = { key: "", value: "" };
+    } else {
+      newDistrict = { key: district === "" ? "": "district=", value: district };
+    }
+    let newUrl = req.originalUrl;
+    let index = newUrl.indexOf("?");
+    if (index === -1) {
+      return newUrl + "?" + key + value;
+    }
+
+    newUrl = newUrl.slice(0, index + 1);
+    console.log(">>> req: ", newUrl);
+    console.log(">>> index: ", index);
+
+    let temp = newUrl.length;
+    newUrl = newUrl + newPage.key + newPage.value +
+      (newWard.key !== "" ? "&" : "") + newWard.key + newWard.value +
+      (newDistrict.key !== "" ? "&" : "") + newDistrict.key + newDistrict.value + 
+      (newType.key !== "" ? "&" : "") + newType.key + newType.value;
+    if (newUrl.charAt(temp) === "&") {
+      newUrl = newUrl.slice(0, temp) + newUrl.slice(temp + 1);
+    }
+    return newUrl;
+  };
+  res.locals.createWardDistrictPageTypeQueryString = createWardDistrictPageTypeQueryString;
   // console.log(pagination.rows);
   const currentUrl = req.url.slice(1);
   return res.render("So/viewReports.ejs", {
@@ -626,30 +706,55 @@ controller.viewReports = async (req, res) => {
     wards,
     currentDistrict,
     currentWard,
+    currentType: type
   });
 };
 
 controller.detailReport = async (req, res) => {
+  const type = req.query.type || "";
   const id = isNaN(req.params.id) ? -1 : parseInt(req.params.id);
-  let report = await Report.findOne({
-    include: [
-      ReportType,
-      {
-        model: AdsPlacement,
-        include: [Area],
+  let report;
+  if (type.trim() === "") {
+    report = await Report.findOne({
+      include: [
+        ReportType,
+        {
+          model: AdsPlacement,
+          include: [Area],
+        },
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+      ],
+      where: {
+        id,
       },
-      {
-        model: Account,
-        attributes: ["firstName", "lastName", "type", "email"],
+    });
+  } else {
+    report = await LocationReport.findOne({
+      include: [
+        ReportType,
+        {
+          model: Area,
+          required: true,
+        },
+        {
+          model: Account,
+          attributes: ["firstName", "lastName", "type", "email"],
+        },
+      ],
+      where: {
+        id,
       },
-    ],
-    where: {
-      id,
-    },
-  });
+    });
+  
+  }
+  
   report.image = report.image.split(", ");
   return res.render("So/detailReport.ejs", {
     report,
+    type
   });
 };
 
@@ -658,20 +763,30 @@ controller.statisticReport = async (req, res) => {
   try {
     let reports = await Report.findAll({
       where: {
-        createdAt: {
+        updatedAt: {
           [Op.lt]: new Date(),
           [Op.gt]: new Date(
             new Date() -
               size * (type === "month" ? 31 : 1) * 24 * 60 * 60 * 1000
           ),
         },
-        method: {
-          [Op.not]: null,
+        status: "Chưa xử lý",
+      },
+    });
+    let locationReports = await LocationReport.findAll({
+      where: {
+        updatedAt: {
+          [Op.lt]: new Date(),
+          [Op.gt]: new Date(
+            new Date() -
+              size * (type === "month" ? 31 : 1) * 24 * 60 * 60 * 1000
+          ),
         },
         status: "Chưa xử lý",
       },
     });
-
+    reports = reports.concat(locationReports);
+  
     let labels = [],
       numberOfReportsList = [],
       waiting = 0,
@@ -730,6 +845,8 @@ controller.statisticReport = async (req, res) => {
 controller.getWaitingAndProcessedReport = async (req, res) => {
   try {
     let reports = await Report.findAll();
+    let locationReports = await LocationReport.findAll();
+    reports = reports.concat(locationReports);
     let waitingReports = reports.filter((report) => report.method == null);
 
     return res.json({

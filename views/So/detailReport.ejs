@@ -92,9 +92,23 @@
       <% } %>
       <div class="container row mt-3">
         <div class="row gx-0 gx-md-5 gy-2">
-          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Loại báo cáo:</h3>
-          <p class="col-7 col-md-5 col-xl-6"><%= report.ReportType.type %></p>
+          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Đối tượng báo cáo:</h3>
+          <p class="col-7 col-md-5 col-xl-6">
+            <% if (type === "locationReport") { %>
+              Địa điểm
+            <% } else { %>
+              Biển quảng cáo
+            <% }  %>
+          </p>
   
+          <h3 class="col-5 col-md-2 fs-5 p-md-0">Loại báo cáo:</h3>
+          <p class="col-7 col-md-2 p-md-0"><%= report.ReportType.type %></p>
+        </div>
+  
+        <div class="row gx-0 gx-md-5 gy-2">
+          <h3 class="col-5 col-md-3 col-xl-2 fs-5">Tên người gửi:</h3>
+          <p class="col-7 col-md-5 col-xl-6"><%= report.name %></p>
+
           <h3 class="col-5 col-md-2 fs-5 p-md-0">Trạng thái:</h3>
           <p class="col-7 col-md-2 p-md-0">
             <% if (report.status === 'Đang xử lý') { %>
@@ -111,11 +125,6 @@
               </button>
             <% } %>
           </p>
-        </div>
-  
-        <div class="row gx-0 gx-md-5 gy-2">
-          <h3 class="col-md-3 col-xl-2 col-5 fs-5">Tên người gửi:</h3>
-          <p class="col-md-9 col-xl-10 col-7"><%= report.name %></p>
         </div>
   
         <div class="row gx-0 gx-md-5 gy-2">
@@ -142,7 +151,13 @@
         <% } %>
         <div class="row gx-0 gx-md-5 gy-2">
           <h3 class="col-md-3 col-xl-2 col-5 fs-5">Địa chỉ báo cáo:</h3>
-          <p class="col-md-9 col-xl-10 col-7"><%= report.AdsPlacement.address %>, <%=  report.AdsPlacement.Area.ward %>, <%= report.AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh</p>
+          <p class="col-md-9 col-xl-10 col-7">
+            <% if (type === "locationReport") { %>
+              <%= report.address %>, <%=  report.Area.ward %>, <%= report.Area.district %>, Thành phố Hồ Chí Minh
+            <% } else { %>
+              <%= report.AdsPlacement.address %>, <%=  report.AdsPlacement.Area.ward %>, <%= report.AdsPlacement.Area.district %>, Thành phố Hồ Chí Minh
+            <% }  %>
+          </p>
         </div>
   
         <div class="row gx-0 gx-md-5 gy-2">
