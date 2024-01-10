@@ -190,16 +190,6 @@ const toggleEvent = (e, targetLayer) => {
         class="fa-solid fa-circle-exclamation text-primary"
       ></i>
     </span>
-    <a href="">
-      <button
-      type="button"
-      class="btn btn-outline-success fw-semibold toBCVP"
-      id="view-report-board"
-      >
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        Xem báo cáo vi phạm tại bảng này
-      </button>
-    </a>
     <button
       type="button"
       class="btn btn-outline-success fw-semibold toBCVP"
@@ -244,13 +234,13 @@ const getInfoOnclickUnclustered = async (e) => {
   const data = await fetchedData.json();
   adsData = JSON.parse(data);
   const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
-  const HTMLviewReportLocation = document.querySelector(
-    "#view-report-location"
-  );
+  // const HTMLviewReportLocation = document.querySelector(
+  //   "#view-report-location"
+  // );
   HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
   HTMLaddBoardBtn.style.display = "block";
-  HTMLviewReportLocation.style.display = "block";
-  HTMLviewReportLocation.parentElement.href = `${serverPath}/district/list-report-location/${selectedLocation.properties.id}`;
+  // HTMLviewReportLocation.style.display = "block";
+  // HTMLviewReportLocation.parentElement.href = `${serverPath}/district/list-report-location/${selectedLocation.properties.id}`;
 
   const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
@@ -290,9 +280,9 @@ const getInfoOnclickUnclustered = async (e) => {
 
     HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
 
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
 
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
@@ -415,11 +405,11 @@ const getInfoOnclickUnclustered = async (e) => {
       //Set active
       e.target.parentNode.classList.add("active");
       //Set new link in view report button
-      document.querySelector(
-        "#view-report-board"
-      ).parentElement.href = `${serverPath}/district/list-report-board/${
-        adsData[page - 1].id
-      }`;
+      // document.querySelector(
+      //   "#view-report-board"
+      // ).parentElement.href = `${serverPath}/district/list-report-board/${
+      //   adsData[page - 1].id
+      // }`;
       //Set enable/disable for prev/next button
       pagePrev.parentNode.classList.remove("disabled");
       pageNext.parentNode.classList.remove("disabled");
@@ -467,11 +457,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${
-      adsData[page - 1].id
-    }`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${
+    //   adsData[page - 1].id
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -528,11 +518,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${
-      adsData[page - 1].id
-    }`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${
+    //   adsData[page - 1].id
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -711,14 +701,19 @@ map.on("load", async () => {
     source: "sipulated",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": ["get", "numBoard"],
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
       visibility: "visible",
     },
     paint: {
-      "text-color": "#f2f7f4",
+      "text-color": [
+        "case",
+        [">", ["to-number", ["get", "numBoard"]], 0],
+        "#f2f7f4",
+        "#9c8198",
+      ],
     },
   });
   //Inspect a cluster on click
@@ -799,14 +794,19 @@ map.on("load", async () => {
     source: "nonSipulated",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": ["get", "numBoard"],
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
       visibility: "visible",
     },
     paint: {
-      "text-color": "#f2f7f4",
+      "text-color": [
+        "case",
+        [">", ["to-number", ["get", "numBoard"]], 0],
+        "#f2f7f4",
+        "#9c8198",
+      ],
     },
   });
   //Inspect a cluster on click
@@ -886,7 +886,7 @@ map.on("load", async () => {
     source: "reported",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": "VP",
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
@@ -923,9 +923,9 @@ map.on("load", async () => {
     isClickPoint = 1;
     const tempData = e.features[0];
     document.querySelector("#board-details-toggle").style.display =
-      "inline-block";
+      "block";
     document.querySelector("#report-view-detail").style.display =
-      "inline-block";
+      "block";
     const target = e.features[0].properties;
     const fetchData = await fetch(
       `${serverPath}/citizen/get-report-lnglat?lng=${target.lng}&lat=${target.lat}`
@@ -1110,7 +1110,7 @@ map.on("click", async (e) => {
   } else {
     document.querySelector("#num-ads").innerText =
       "Vui lòng chọn điểm trên bản đồ để xem";
-    document.querySelector("#view-report-location").style.display = "none";
+    // document.querySelector("#view-report-location").style.display = "none";
     document.querySelector("#add-board-permit-btn").style.display = "none";
     document.querySelector("#board-details-toggle").style.display = "none";
   }
@@ -1134,6 +1134,8 @@ reportedToggle.addEventListener("change", (e) => {
     "reported-label",
   ];
   if (reportedToggle.checked) {
+    //Hide create new request
+    document.querySelector('#add-board-permit-btn').style.display="none"
     //Change side section
     document.querySelector("#side-section").innerHTML = `
   <h4 class="card-title" id="report-type">
@@ -1146,11 +1148,12 @@ reportedToggle.addEventListener("change", (e) => {
     Trạng thái xử lý: <span class="details-info" id="report-status">Chưa có thông tin</span> <br>
     Địa chỉ: <span class="details-info" id="report-location">Chưa có thông tin</span> <br>
   </p>
-  <button type="button" class="btn btn-outline-success fw-semibold " id="report-view-detail" style="display: none;">
+  <button type="button" class="btn btn-outline-success fw-semibold " id="report-view-detail" style="display: none;" onclick="handleViewReportButton(event)">
     <i class="fa-solid fa-triangle-exclamation"></i>
     XEM CHI TIẾT
   </button>
     `;
+    document.querySelector('#board-pagination').innerHTML=""
     sipulatedToggle.checked = false;
     nonSipulatedToggle.checked = false;
     layers.forEach((layer) => {
@@ -1238,3 +1241,18 @@ filterSelect.addEventListener("change", (e) => {
   map.getSource("nonSipulated").setData(filterNonSipulated);
   map.getSource("reported").setData(filterReported);
 });
+
+// view report detail button
+const handleViewReportButton = async (e) => {
+  const selectedPage = parseInt(
+    document.querySelector(".page-item.active .page-link").innerText
+  );
+  const selectedReport = rpData[selectedPage - 1];
+  console.log(selectedReport);
+
+  if (selectedReport.type == 1) {
+    window.location.href =`${serverPath}/district/list-reports/${selectedReport.id}`;
+  } else if (selectedReport.type == 2) {
+    window.location.href = `${serverPath}/district/list-reports/location-report/${selectedReport.id}`;
+  }
+};
