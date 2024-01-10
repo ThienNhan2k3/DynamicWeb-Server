@@ -10,6 +10,7 @@ const accountDistrict = document.querySelector("#account-district").innerText;
 let selectedLocation;
 let selectedBoard;
 let adsData; //Ads data from selected location
+let rpData;
 let isClickPoint = 0;
 
 //Full geojson
@@ -128,6 +129,89 @@ const toggleEvent = (e, targetLayer) => {
   ];
 
   if (e.target.checked) {
+    document.querySelector("#board-details-toggle").style.display = "none";
+    document.querySelector("#side-section").innerHTML = `
+    <span class="text-muted"
+    >#ID:
+    <span class="fw-semibold" id="board-id">???</span></span
+  >
+  <h4 class="card-title" id="board-title">
+    Trụ, cụm pano
+    <span class="ms-2 badge bg-success" id="board-status"
+      >Đã quy hoạch</span
+    >
+  </h4>
+  <p class="card-text" id="board-address">
+    Chưa có thông tin để hiển thị
+  </p>
+
+  <p>
+    Kích thước:
+    <span class="details-info" id="board-size"
+      >Chưa có thông tin</span
+    >
+    <br />
+    Số lượng:
+    <span class="details-info" id="board-quantity"
+      >Chưa có thông tin</span
+    >
+    <br />
+    Hình thức:
+    <span class="details-info" id="board-form"
+      >Chưa có thông tin</span
+    >
+    <br />
+    Phân loại:
+    <span class="details-info" id="board-classification"
+      >Chưa có thông tin</span
+    >
+    <br />
+  </p>
+  <img
+    class="img-thumbnail mb-3"
+    src="img/BangQC1.jpg"
+    id="board-thumbnail"
+    alt=""
+    style="width: 100%"
+  />
+
+  <div class="d-flex justify-content-between">
+    <span
+      id="board-contract"
+      class="btn-icon fs-3"
+      data-bs-toggle="popover"
+      data-bs-trigger="hover focus"
+      data-bs-title="Hợp đồng quảng cáo"
+      data-bs-container="body"
+      data-bs-placement="left"
+      data-bs-content="Ngày hết hạn: 01-01-2003"
+    >
+      <i
+        class="fa-solid fa-circle-exclamation text-primary"
+      ></i>
+    </span>
+    <button
+      type="button"
+      class="btn btn-outline-success fw-semibold toBCVP"
+      data-bs-toggle="modal"
+      data-bs-target="#permitRequestModal"
+      id="createPermissionButton-half"
+      data-id="-1"
+      onclick="showAddPermitRequestModal('#permitRequestForm', this)"
+    >
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Tạo yêu cầu cấp phép
+    </button>`;
+    const layersReported = [
+      "reported-cluster",
+      "reported-count",
+      "reported-unclustered",
+      "reported-label",
+    ];
+    document.querySelector("#forthCheckboxStretched").checked = false;
+    layersReported.forEach((layer) => {
+      map.setLayoutProperty(layer, "visibility", "none");
+    });
     layers.forEach((layer) => {
       map.setLayoutProperty(layer, "visibility", "visible");
     });
@@ -139,6 +223,7 @@ const toggleEvent = (e, targetLayer) => {
 };
 
 const getInfoOnclickUnclustered = async (e) => {
+  console.log("layer");
   isClickPoint = 1;
   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
   const target = e.features[0];
@@ -149,13 +234,13 @@ const getInfoOnclickUnclustered = async (e) => {
   const data = await fetchedData.json();
   adsData = JSON.parse(data);
   const HTMLaddBoardBtn = document.querySelector("#add-board-permit-btn");
-  const HTMLviewReportLocation = document.querySelector(
-    "#view-report-location"
-  );
+  // const HTMLviewReportLocation = document.querySelector(
+  //   "#view-report-location"
+  // );
   HTMLaddBoardBtn.dataset.id = selectedLocation.properties.id;
   HTMLaddBoardBtn.style.display = "block";
-  HTMLviewReportLocation.style.display = "block";
-  HTMLviewReportLocation.parentElement.href = `${serverPath}/district/list-report-location/${selectedLocation.properties.id}`;
+  // HTMLviewReportLocation.style.display = "block";
+  // HTMLviewReportLocation.parentElement.href = `${serverPath}/district/list-report-location/${selectedLocation.properties.id}`;
 
   const HTMLdetails = document.querySelector("#board-details-toggle");
   const HTMLid = document.querySelector("#board-id");
@@ -195,9 +280,9 @@ const getInfoOnclickUnclustered = async (e) => {
 
     HTMLaddPermitRequestBtn.dataset.id = adsData[0].id;
 
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${adsData[0].id}`;
 
     HTMLnumber.innerHTML = `<p>Địa điểm này có ${adsData.length} quảng cáo`;
     HTMLtitle.innerHTML = `${
@@ -320,11 +405,11 @@ const getInfoOnclickUnclustered = async (e) => {
       //Set active
       e.target.parentNode.classList.add("active");
       //Set new link in view report button
-      document.querySelector(
-        "#view-report-board"
-      ).parentElement.href = `${serverPath}/district/list-report-board/${
-        adsData[page - 1].id
-      }`;
+      // document.querySelector(
+      //   "#view-report-board"
+      // ).parentElement.href = `${serverPath}/district/list-report-board/${
+      //   adsData[page - 1].id
+      // }`;
       //Set enable/disable for prev/next button
       pagePrev.parentNode.classList.remove("disabled");
       pageNext.parentNode.classList.remove("disabled");
@@ -372,11 +457,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${
-      adsData[page - 1].id
-    }`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${
+    //   adsData[page - 1].id
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -433,11 +518,11 @@ const getInfoOnclickUnclustered = async (e) => {
     // HTMLthumbnail.src = `${serverPath}/images/permitRequests/${
     //   adsData[page - 1].image
     // }`;
-    document.querySelector(
-      "#view-report-board"
-    ).parentElement.href = `${serverPath}/district/list-report-board/${
-      adsData[page - 1].id
-    }`;
+    // document.querySelector(
+    //   "#view-report-board"
+    // ).parentElement.href = `${serverPath}/district/list-report-board/${
+    //   adsData[page - 1].id
+    // }`;
     HTMLboardContract.setAttribute(
       "data-bs-content",
       `Ngày hết hạn: ${
@@ -616,14 +701,19 @@ map.on("load", async () => {
     source: "sipulated",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": ["get", "numBoard"],
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
       visibility: "visible",
     },
     paint: {
-      "text-color": "#f2f7f4",
+      "text-color": [
+        "case",
+        [">", ["to-number", ["get", "numBoard"]], 0],
+        "#f2f7f4",
+        "#9c8198",
+      ],
     },
   });
   //Inspect a cluster on click
@@ -704,14 +794,19 @@ map.on("load", async () => {
     source: "nonSipulated",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": ["get", "numBoard"],
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
       visibility: "visible",
     },
     paint: {
-      "text-color": "#f2f7f4",
+      "text-color": [
+        "case",
+        [">", ["to-number", ["get", "numBoard"]], 0],
+        "#f2f7f4",
+        "#9c8198",
+      ],
     },
   });
   //Inspect a cluster on click
@@ -754,7 +849,7 @@ map.on("load", async () => {
       "circle-color": reportedColor,
       "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
     },
-    layout: { visibility: "visible" },
+    layout: { visibility: "none" },
   });
   //Reported count
   map.addLayer({
@@ -767,7 +862,7 @@ map.on("load", async () => {
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
-      visibility: "visible",
+      visibility: "none",
     },
   });
   //Reported uncluster
@@ -776,7 +871,7 @@ map.on("load", async () => {
     type: "circle",
     source: "reported",
     filter: ["!", ["has", "point_count"]],
-    layout: { visibility: "visible" },
+    layout: { visibility: "none" },
     paint: {
       "circle-color": reportedColor,
       "circle-radius": unclusteredRadius,
@@ -791,11 +886,11 @@ map.on("load", async () => {
     source: "reported",
     filter: ["!", ["has", "point_count"]],
     layout: {
-      "text-field": "QC",
+      "text-field": "VP",
       "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
       "text-size": 12,
       "text-allow-overlap": true,
-      visibility: "visible",
+      visibility: "none",
     },
     paint: {
       "text-color": "#f2f7f4",
@@ -807,14 +902,169 @@ map.on("load", async () => {
   });
 
   map.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "reported");
+    map.getCanvas().style.cursor = "pointer";
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const { address, area } = e.features[0].properties;
+    const areaObj = JSON.parse(area);
+
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+
+    const popupDesc = `<b>${address}</b> <p>${areaObj.ward}, ${areaObj.district}</p>`;
+    reportedPopup.setLngLat(coordinates).setHTML(popupDesc).addTo(map);
   });
   map.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered("reported");
+    map.getCanvas().style.cursor = "";
+    reportedPopup.remove();
   });
   // Get info on click
   map.on("click", "reported-unclustered", async (e) => {
-    await getInfoOnclickUnclustered(e);
+    isClickPoint = 1;
+    const tempData = e.features[0];
+    document.querySelector("#board-details-toggle").style.display =
+      "block";
+    document.querySelector("#report-view-detail").style.display =
+      "block";
+    const target = e.features[0].properties;
+    const fetchData = await fetch(
+      `${serverPath}/citizen/get-report-lnglat?lng=${target.lng}&lat=${target.lat}`
+    );
+    const returnData = await fetchData.json();
+    rpData = JSON.parse(returnData);
+    console.log(rpData);
+
+    const HTMLReportType = document.querySelector("#report-type");
+    const HTMLReportName = document.querySelector("#reporter-name");
+    const HTMLReportDate = document.querySelector("#report-date");
+    const HTMLReportStatus = document.querySelector("#report-status");
+    const HTMLReportLocation = document.querySelector("#report-location");
+
+    if (rpData.length == 0) {
+      HTMLReportType.innerHTML = "Chưa có thông tin";
+      HTMLReportName.innerHTML = "Chưa có thông tin";
+      HTMLReportDate.innerHTML = "Chưa có thông tin";
+      HTMLReportStatus.innerHTML = "Chưa có thông tin";
+      HTMLReportLocation.innerHTML = "Chưa có thông tin";
+    } else {
+      HTMLReportType.innerHTML = rpData[0].ReportType.type;
+      HTMLReportName.innerHTML = rpData[0].name;
+      HTMLReportDate.innerHTML = rpData[0].createdAt.split("T")[0];
+      HTMLReportStatus.innerHTML = rpData[0].status;
+      HTMLReportLocation.innerHTML = tempData.properties.address;
+    }
+
+    let paginationData = "";
+    paginationData += `<li class="page-item disabled">
+    <a class="page-link" href="#" aria-label="Previous">
+      <span aria-hidden="true">&laquo;</span></a></li>`;
+    for (let i = 0; i < rpData.length; i++) {
+      if (i == 0) {
+        paginationData += `<li class="page-item active" aria-current="page"><a class="page-link" href="#">${
+          i + 1
+        }</a></li>`;
+      } else {
+        paginationData += `<li class="page-item" aria-current="page"><a class="page-link" href="#">${
+          i + 1
+        }</a></li>`;
+      }
+    }
+
+    if (rpData.length <= 1) {
+      paginationData += `<li class="page-item disabled">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span></a></li>`;
+    } else {
+      paginationData += `<li class="page-item "><a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span></a></li>`;
+    }
+    document.querySelector("#board-pagination").innerHTML = paginationData;
+
+    const pagePrev = document.querySelector(
+      '.page-link[aria-label="Previous"]'
+    );
+    const pageNext = document.querySelector('.page-link[aria-label="Next"]');
+    const pageItems = document.querySelectorAll(
+      '.page-item[aria-current="page"]'
+    );
+
+    pageItems.forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
+        //Deactive previous
+        const activeItem = document.querySelector(".page-item.active");
+        activeItem.classList.remove("active");
+
+        const page = e.target.innerText;
+        HTMLReportType.innerHTML = rpData[page - 1].ReportType.type;
+        HTMLReportName.innerHTML = rpData[page - 1].name;
+        HTMLReportDate.innerHTML =
+          rpData[page - 1].createdAt.split("T")[page - 1];
+        HTMLReportStatus.innerHTML = rpData[page - 1].status;
+        HTMLReportLocation.innerHTML = tempData.properties.address;
+        //Set active
+        e.target.parentNode.classList.add("active");
+        //Set enable/disable for prev/next button
+        pagePrev.parentNode.classList.remove("disabled");
+        pageNext.parentNode.classList.remove("disabled");
+        if (page == 1) {
+          pagePrev.parentNode.classList.add("disabled");
+        } else if (page == rpData.length) {
+          pageNext.parentNode.classList.add("disabled");
+        }
+      });
+    });
+    pagePrev.addEventListener("click", (e) => {
+      if (pagePrev.parentNode.classList.contains("disabled")) {
+        return;
+      }
+      const activeItem = document.querySelector(".page-item.active");
+      activeItem.classList.remove("active");
+
+      const page = parseInt(activeItem.firstChild.innerText) - 1;
+
+      HTMLReportType.innerHTML = rpData[page - 1].ReportType.type;
+      HTMLReportName.innerHTML = rpData[page - 1].name;
+      HTMLReportDate.innerHTML =
+        rpData[page - 1].createdAt.split("T")[page - 1];
+      HTMLReportStatus.innerHTML = rpData[page - 1].status;
+      HTMLReportLocation.innerHTML = tempData.properties.address;
+
+      //Set active
+      activeItem.previousSibling.classList.add("active");
+      //Deactive prev button if reach the first page
+      pageNext.parentNode.classList.remove("disabled");
+      pagePrev.parentNode.classList.remove("disabled");
+      if (page == 1) {
+        pagePrev.parentNode.classList.add("disabled");
+      }
+    });
+    pageNext.addEventListener("click", (e) => {
+      if (pageNext.parentNode.classList.contains("disabled")) {
+        return;
+      }
+      const activeItem = document.querySelector(".page-item.active");
+      activeItem.classList.remove("active");
+
+      const page = parseInt(activeItem.firstChild.innerText) + 1;
+      HTMLReportType.innerHTML = rpData[page - 1].ReportType.type;
+      HTMLReportName.innerHTML = rpData[page - 1].name;
+      HTMLReportDate.innerHTML =
+        rpData[page - 1].createdAt.split("T")[page - 1];
+      HTMLReportStatus.innerHTML = rpData[page - 1].status;
+      HTMLReportLocation.innerHTML = tempData.properties.address;
+
+      //Set active
+      activeItem.nextSibling.classList.add("active");
+      //Deactive next button if reach the last page
+      pageNext.parentNode.classList.remove("disabled");
+
+      pagePrev.parentNode.classList.remove("disabled");
+
+      if (page == rpData.length) {
+        pageNext.parentNode.classList.add("disabled");
+      }
+    });
   });
   map.on("mouseenter", "reported-cluster", () => {
     map.getCanvas().style.cursor = "pointer";
@@ -825,6 +1075,7 @@ map.on("load", async () => {
 });
 const fowardMaker = new mapboxgl.Marker({ color: "red" });
 map.on("click", async (e) => {
+  console.log("map");
   const { lat, lng } = e.lngLat;
   fowardMaker.setLngLat([lng, lat]).addTo(map);
   const query = `${lat}+${lng}`;
@@ -859,7 +1110,7 @@ map.on("click", async (e) => {
   } else {
     document.querySelector("#num-ads").innerText =
       "Vui lòng chọn điểm trên bản đồ để xem";
-    document.querySelector("#view-report-location").style.display = "none";
+    // document.querySelector("#view-report-location").style.display = "none";
     document.querySelector("#add-board-permit-btn").style.display = "none";
     document.querySelector("#board-details-toggle").style.display = "none";
   }
@@ -867,8 +1118,7 @@ map.on("click", async (e) => {
 //Toggle layer
 const sipulatedToggle = document.querySelector("#firstCheckboxStretched");
 const nonSipulatedToggle = document.querySelector("#secondCheckboxStretched");
-const reportedToggle = document.querySelector("#thirdCheckboxStretched");
-const selfReportedToggle = document.querySelector("#forthCheckboxStretched");
+const reportedToggle = document.querySelector("#forthCheckboxStretched");
 
 sipulatedToggle.addEventListener("change", (e) => {
   toggleEvent(e, "sipulated");
@@ -877,7 +1127,47 @@ nonSipulatedToggle.addEventListener("change", (e) => {
   toggleEvent(e, "nonSipulated");
 });
 reportedToggle.addEventListener("change", (e) => {
-  toggleEvent(e, "reported");
+  const layers = [
+    "reported-cluster",
+    "reported-count",
+    "reported-unclustered",
+    "reported-label",
+  ];
+  if (reportedToggle.checked) {
+    //Hide create new request
+    document.querySelector('#add-board-permit-btn').style.display="none"
+    //Change side section
+    document.querySelector("#side-section").innerHTML = `
+  <h4 class="card-title" id="report-type">
+    Loại hình báo cáo
+    <span class="ms-2 badge bg-success" id="board-status"></span>
+  </h4>
+  <p>
+    Người gửi: <span class="details-info" id="reporter-name">Chưa có thông tin</span> <br>
+    Ngày gửi: <span class="details-info" id="report-date">Chưa có thông tin</span> <br>
+    Trạng thái xử lý: <span class="details-info" id="report-status">Chưa có thông tin</span> <br>
+    Địa chỉ: <span class="details-info" id="report-location">Chưa có thông tin</span> <br>
+  </p>
+  <button type="button" class="btn btn-outline-success fw-semibold " id="report-view-detail" style="display: none;" onclick="handleViewReportButton(event)">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    XEM CHI TIẾT
+  </button>
+    `;
+    document.querySelector('#board-pagination').innerHTML=""
+    sipulatedToggle.checked = false;
+    nonSipulatedToggle.checked = false;
+    layers.forEach((layer) => {
+      map.setLayoutProperty(layer, "visibility", "visible");
+    });
+  } else {
+    sipulatedToggle.checked = true;
+    nonSipulatedToggle.checked = true;
+    layers.forEach((layer) => {
+      map.setLayoutProperty(layer, "visibility", "none");
+    });
+  }
+  sipulatedToggle.dispatchEvent(new Event("change"));
+  nonSipulatedToggle.dispatchEvent(new Event("change"));
 });
 
 // Reverse geo-location
@@ -951,3 +1241,18 @@ filterSelect.addEventListener("change", (e) => {
   map.getSource("nonSipulated").setData(filterNonSipulated);
   map.getSource("reported").setData(filterReported);
 });
+
+// view report detail button
+const handleViewReportButton = async (e) => {
+  const selectedPage = parseInt(
+    document.querySelector(".page-item.active .page-link").innerText
+  );
+  const selectedReport = rpData[selectedPage - 1];
+  console.log(selectedReport);
+
+  if (selectedReport.type == 1) {
+    window.location.href =`${serverPath}/district/list-reports/${selectedReport.id}`;
+  } else if (selectedReport.type == 2) {
+    window.location.href = `${serverPath}/district/list-reports/location-report/${selectedReport.id}`;
+  }
+};

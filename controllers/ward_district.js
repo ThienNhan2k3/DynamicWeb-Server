@@ -508,7 +508,7 @@ controller.showReportDetails = async (req, res) => {
       },
       { model: models.ReportType },
     ],
-    where: {id},
+    where: { id },
   };
 
   options.include[0].include[0].where.district = req.session.accountDistrict;
@@ -525,8 +525,8 @@ controller.showReportDetails = async (req, res) => {
   let report = await models.Report.findOne(options);
 
   if (!report) {
-    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!")
-  } 
+    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!");
+  }
 
   res.locals.message = req.flash("Message")[0];
 
@@ -548,7 +548,7 @@ controller.showLocationReportDetails = async (req, res) => {
       },
       { model: models.ReportType },
     ],
-    where: {id},
+    where: { id },
   };
 
   options.include[0].where.district = req.session.accountDistrict;
@@ -565,8 +565,8 @@ controller.showLocationReportDetails = async (req, res) => {
   let report = await models.LocationReport.findOne(options);
 
   if (!report) {
-    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!")
-  } 
+    return res.send("Báo cáo không tồn tại hoặc bạn không có quyền truy cập!");
+  }
 
   res.locals.message = req.flash("Message")[0];
 
@@ -650,7 +650,9 @@ controller.updateLocationReportDetails = async (req, res) => {
       },
       { where: { id: reportId } }
     );
-    const report = await models.LocationReport.findOne({ where: { id: reportId } });
+    const report = await models.LocationReport.findOne({
+      where: { id: reportId },
+    });
     const account = await models.Account.findOne({
       where: { id: req.session.accountId },
       include: [{ model: models.Area }],
@@ -700,5 +702,6 @@ controller.updateLocationReportDetails = async (req, res) => {
   }
   res.redirect("back");
 };
+
 
 module.exports = controller;
