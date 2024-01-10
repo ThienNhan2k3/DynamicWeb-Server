@@ -217,9 +217,9 @@ const getReport = async (req, res, next) => {
           type: "Point",
         },
       };
+      reportedGeoJSON.features.push(feature);
     }
   });
-  console.log(reportedGeoJSON);
   res.json(JSON.stringify(reportedGeoJSON));
 };
 
@@ -454,8 +454,8 @@ const postReportRandomLocation = async (req, res) => {
     image: imageUrl,
     status: "Chờ xử lý",
     address: address,
-    long: lng,
-    lat: lat,
+    long: parseFloat(lng).toFixed(6),
+    lat: parseFloat(lat).toFixed(6),
     AreaId: areaId,
     ReportTypeId: typeId,
   });
@@ -482,14 +482,14 @@ const getSelfReportByLngLat = async (req, res) => {
         },
       ],
     });
-    console.log(reports);
+
     return res.json(JSON.stringify(reports));
   } else if (type == 2) {
     const reports = await LocationReport.findAll({
       where: { id: { [Sequelize.Op.in]: reportIds }, long: lng, lat: lat },
       include: [{ model: ReportType, required: true }],
     });
-    console.log(reports);
+
     return res.json(JSON.stringify(reports));
   }
 };
@@ -503,6 +503,11 @@ const getReportByLngLat = async (req, res) => {
       { model: ReportType, required: true },
     ],
   });
+  report1.forEach((report) => {
+    report.dataValues.type = 1;
+  });
+  console.log(lng)
+  console.log(lat)
   const report2 = await LocationReport.findAll({
     where: {
       long: lng,
@@ -510,8 +515,12 @@ const getReportByLngLat = async (req, res) => {
     },
     include: [{ model: ReportType, required: true }],
   });
-  const combined=report1.concat(report2)
-  // console.log(combined)
+  report2.forEach((report) => {
+    report.dataValues.type = 2;
+  });
+  console.log(report2)
+  const combined = report1.concat(report2);
+  console.log(combined)
   return res.status(200).json(JSON.stringify(combined));
 };
 module.exports = {
@@ -524,5 +533,5 @@ module.exports = {
   postSelfReport,
   postReportRandomLocation,
   getSelfReportByLngLat,
-  getReportByLngLat
+  getReportByLngLat,
 };
