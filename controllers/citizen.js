@@ -151,6 +151,20 @@ const getReport = async (req, res, next) => {
           },
         ],
       },
+      {
+        model: ReportType,
+        required: true,
+      },
+    ],
+  });
+
+  const reportedTable2 = await LocationReport.findAll({
+    include: [
+      { model: Area, required: true },
+      {
+        model: ReportType,
+        required: true,
+      },
     ],
   });
 
@@ -165,15 +179,14 @@ const getReport = async (req, res, next) => {
       const feature = {
         type: "Feature",
         properties: {
-          id: data.AdsPlacement.id,
           area: {
             ward: data.AdsPlacement.Area.ward,
             district: data.AdsPlacement.Area.district,
           },
-          locationType: data.AdsPlacement.LocationType.locationType,
-          adsType: data.AdsPlacement.AdsType.type,
+          reportType: data.ReportType.type,
           address: data.AdsPlacement.address,
-          status: "Bị báo cáo",
+          lng: data.AdsPlacement.long,
+          lat: data.AdsPlacement.lat,
         },
         geometry: {
           coordinates: [data.AdsPlacement.long, data.AdsPlacement.lat],
@@ -183,6 +196,30 @@ const getReport = async (req, res, next) => {
       reportedGeoJSON.features.push(feature);
     }
   });
+  const placement2 = [];
+  reportedTable2.forEach((data) => {
+    if (placement2.indexOf([data.long, data.lat]) == -1) {
+      placement2.push([data.long, data.lat]);
+      const feature = {
+        type: "Feature",
+        properties: {
+          area: {
+            ward: data.Area.ward,
+            district: data.Area.district,
+          },
+          reportType: data.ReportType.type,
+          address: data.address,
+          lng: data.long,
+          lat: data.lat,
+        },
+        geometry: {
+          coordinates: [data.long, data.lat],
+          type: "Point",
+        },
+      };
+    }
+  });
+  console.log(reportedGeoJSON);
   res.json(JSON.stringify(reportedGeoJSON));
 };
 
@@ -348,7 +385,7 @@ const postSelfReport = async (req, res) => {
       },
     ],
   });
-  const combined=reports.concat(reports2)
+  const combined = reports.concat(reports2);
   res.json(JSON.stringify(combined));
 };
 
@@ -426,7 +463,7 @@ const postReportRandomLocation = async (req, res) => {
   return res.status(200).json({ newReport });
 };
 
-const getReportByLngLat = async (req, res) => {
+const getSelfReportByLngLat = async (req, res) => {
   const lng = parseFloat(req.query.lng);
   const lat = parseFloat(req.query.lat);
   const type = req.query.type;
@@ -456,6 +493,27 @@ const getReportByLngLat = async (req, res) => {
     return res.json(JSON.stringify(reports));
   }
 };
+
+const getReportByLngLat = async (req, res) => {
+  const lng = parseFloat(req.query.lng);
+  const lat = parseFloat(req.query.lat);
+  const report1 = await Report.findAll({
+    include: [
+      { model: AdsPlacement, where: { long: lng, lat: lat } },
+      { model: ReportType, required: true },
+    ],
+  });
+  const report2 = await LocationReport.findAll({
+    where: {
+      long: lng,
+      lat: lat,
+    },
+    include: [{ model: ReportType, required: true }],
+  });
+  const combined=report1.concat(report2)
+  // console.log(combined)
+  return res.status(200).json(JSON.stringify(combined));
+};
 module.exports = {
   getSipulated,
   getNonSipulated,
@@ -465,5 +523,6 @@ module.exports = {
   getReportData,
   postSelfReport,
   postReportRandomLocation,
-  getReportByLngLat,
+  getSelfReportByLngLat,
+  getReportByLngLat
 };
