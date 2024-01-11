@@ -511,8 +511,7 @@ const getReportByLngLat = async (req, res) => {
   report1.forEach((report) => {
     report.dataValues.type = 1;
   });
-  console.log(lng);
-  console.log(lat);
+
   const report2 = await LocationReport.findAll({
     where: {
       long: lng,
@@ -523,9 +522,7 @@ const getReportByLngLat = async (req, res) => {
   report2.forEach((report) => {
     report.dataValues.type = 2;
   });
-  console.log(report2);
   const combined = report1.concat(report2);
-  console.log(combined);
   return res.status(200).json(JSON.stringify(combined));
 };
 module.exports = {

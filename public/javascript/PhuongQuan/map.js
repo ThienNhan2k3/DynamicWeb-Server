@@ -223,7 +223,6 @@ const toggleEvent = (e, targetLayer) => {
 };
 
 const getInfoOnclickUnclustered = async (e) => {
-  console.log("layer");
   isClickPoint = 1;
   selectedLocation = { ...e.features[0], lngLat: e.lngLat };
   const target = e.features[0];
@@ -922,17 +921,14 @@ map.on("load", async () => {
   map.on("click", "reported-unclustered", async (e) => {
     isClickPoint = 1;
     const tempData = e.features[0];
-    document.querySelector("#board-details-toggle").style.display =
-      "block";
-    document.querySelector("#report-view-detail").style.display =
-      "block";
+    document.querySelector("#board-details-toggle").style.display = "block";
+    document.querySelector("#report-view-detail").style.display = "block";
     const target = e.features[0].properties;
     const fetchData = await fetch(
       `${serverPath}/citizen/get-report-lnglat?lng=${target.lng}&lat=${target.lat}`
     );
     const returnData = await fetchData.json();
     rpData = JSON.parse(returnData);
-    console.log(rpData);
 
     const HTMLReportType = document.querySelector("#report-type");
     const HTMLReportName = document.querySelector("#reporter-name");
@@ -1075,31 +1071,30 @@ map.on("load", async () => {
 });
 const fowardMaker = new mapboxgl.Marker({ color: "red" });
 map.on("click", async (e) => {
-  console.log("map");
   const { lat, lng } = e.lngLat;
   fowardMaker.setLngLat([lng, lat]).addTo(map);
-  const query = `${lat}+${lng}`;
-  const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
-  const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
-  const requestUrl = `${apiUrl}?key=${apiKey}&q=${encodeURIComponent(
-    query
-  )}&pretty=1&no_annotations=1`;
+  // const query = `${lat}+${lng}`;
+  // const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+  // const apiKey = "8c7c7c956fdd4a598e2301d88cb48135";
+  const requestUrl = `https://rsapi.goong.io/Geocode?latlng=${lat},%20${lng}&api_key=7iVK3dd86pgsEJggbfiky0xOrcRa9xJMNTtX22nS`;
   const respond = await fetch(requestUrl);
   try {
     if (!respond.ok) {
       throw new Error("Network response was not ok");
     }
     const data = await respond.json();
+    const result = data.results;
+    const { name, address } = result[0];
+    const fullAddr = `${name}, ${address}`;
 
-    let [locationName, ...locationAddr] = data.results[0].formatted.split(",");
-    locationAddr = locationAddr.join(",");
-    if (locationName === "unnamed road") {
-      locationName = "Chưa có thông tin đường trên bản đồ";
-    }
     const HTMLlocationName = document.querySelector("#location-name");
     const HTMLlocationAddr = document.querySelector("#location-address");
-    HTMLlocationName.innerHTML = locationName;
-    HTMLlocationAddr.innerHTML = locationAddr;
+    HTMLlocationName.innerHTML = name;
+    HTMLlocationAddr.innerHTML = address;
+    // Change in report random location form
+    document.querySelector("#form-address-random-location").value = fullAddr;
+    document.querySelector("#form-lng-random-location").value = lng;
+    document.querySelector("#form-lat-random-location").value = lat;
   } catch (err) {
     console.log(err);
   }
@@ -1135,7 +1130,7 @@ reportedToggle.addEventListener("change", (e) => {
   ];
   if (reportedToggle.checked) {
     //Hide create new request
-    document.querySelector('#add-board-permit-btn').style.display="none"
+    document.querySelector("#add-board-permit-btn").style.display = "none";
     //Change side section
     document.querySelector("#side-section").innerHTML = `
   <h4 class="card-title" id="report-type">
@@ -1153,7 +1148,7 @@ reportedToggle.addEventListener("change", (e) => {
     XEM CHI TIẾT
   </button>
     `;
-    document.querySelector('#board-pagination').innerHTML=""
+    document.querySelector("#board-pagination").innerHTML = "";
     sipulatedToggle.checked = false;
     nonSipulatedToggle.checked = false;
     layers.forEach((layer) => {
@@ -1248,10 +1243,9 @@ const handleViewReportButton = async (e) => {
     document.querySelector(".page-item.active .page-link").innerText
   );
   const selectedReport = rpData[selectedPage - 1];
-  console.log(selectedReport);
 
   if (selectedReport.type == 1) {
-    window.location.href =`${serverPath}/district/list-reports/${selectedReport.id}`;
+    window.location.href = `${serverPath}/district/list-reports/${selectedReport.id}`;
   } else if (selectedReport.type == 2) {
     window.location.href = `${serverPath}/district/list-reports/location-report/${selectedReport.id}`;
   }
