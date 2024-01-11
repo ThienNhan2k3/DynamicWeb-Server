@@ -54,7 +54,7 @@ const getSipulated = async (req, res, next) => {
         locationType: sipulated[i].LocationType.locationType,
         adsType: sipulated[i].AdsType.type,
         address: sipulated[i].address,
-        status: "Chưa quy hoạch",
+        status: "Đã quy hoạch",
         numBoard: boards.length,
       },
       geometry: {

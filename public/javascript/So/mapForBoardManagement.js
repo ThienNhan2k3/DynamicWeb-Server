@@ -314,91 +314,91 @@ map.on("load", async () => {
   });
 
   //Reported section
-  map.addSource("reported", {
-    type: "geojson",
-    data: JSON.parse(reported),
-    cluster: true,
-    clusterMaxZoom: 15,
-    clusterRadius: 15,
-  });
-  //Reported cluster
-  map.addLayer({
-    id: "reported-cluster",
-    type: "circle",
-    source: "reported",
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
-    },
-    layout: { visibility: "visible" },
-  });
-  //Reported count
-  map.addLayer({
-    id: "reported-count",
-    type: "symbol",
-    source: "reported",
-    filter: ["has", "point_count"],
-    layout: {
-      "text-field": "{point_count_abbreviated}",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-  });
-  //Reported uncluster
-  map.addLayer({
-    id: "reported-unclustered",
-    type: "circle",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: { visibility: "visible" },
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": unclusteredRadius,
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#fff",
-    },
-  });
-  //Reported label
-  map.addLayer({
-    id: "reported-label",
-    type: "symbol",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: {
-      "text-field": "QC",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-    paint: {
-      "text-color": "#f2f7f4",
-    },
-  });
-  //Inspect a cluster on click
-  map.on("click", "reported-cluster", (e) => {
-    inspectCluster(e, "reported");
-  });
+  // map.addSource("reported", {
+  //   type: "geojson",
+  //   data: JSON.parse(reported),
+  //   cluster: true,
+  //   clusterMaxZoom: 15,
+  //   clusterRadius: 15,
+  // });
+  // //Reported cluster
+  // map.addLayer({
+  //   id: "reported-cluster",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
+  //   },
+  //   layout: { visibility: "visible" },
+  // });
+  // //Reported count
+  // map.addLayer({
+  //   id: "reported-count",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   layout: {
+  //     "text-field": "{point_count_abbreviated}",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  // });
+  // //Reported uncluster
+  // map.addLayer({
+  //   id: "reported-unclustered",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: { visibility: "visible" },
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": unclusteredRadius,
+  //     "circle-stroke-width": 1,
+  //     "circle-stroke-color": "#fff",
+  //   },
+  // });
+  // //Reported label
+  // map.addLayer({
+  //   id: "reported-label",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: {
+  //     "text-field": "QC",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  //   paint: {
+  //     "text-color": "#f2f7f4",
+  //   },
+  // });
+  // //Inspect a cluster on click
+  // map.on("click", "reported-cluster", (e) => {
+  //   inspectCluster(e, "reported");
+  // });
 
-  map.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered(e, "reported");
-  });
-  map.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered("reported");
-  });
-  // Get info on click
-  map.on("click", "reported-unclustered", async (e) => {
-    await handleClickEvent(e);
-  });
-  map.on("mouseenter", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "pointer";
-  });
-  map.on("mouseleave", "reported-cluster", () => {
-    map.getCanvas().style.cursor = "";
-  });
+  // map.on("mouseenter", "reported-unclustered", (e) => {
+  //   mouseEnterEventUnclustered(e, "reported");
+  // });
+  // map.on("mouseleave", "reported-unclustered", () => {
+  //   mouseLeaveEventUnclustered("reported");
+  // });
+  // // Get info on click
+  // map.on("click", "reported-unclustered", async (e) => {
+  //   await handleClickEvent(e);
+  // });
+  // map.on("mouseenter", "reported-cluster", () => {
+  //   map.getCanvas().style.cursor = "pointer";
+  // });
+  // map.on("mouseleave", "reported-cluster", () => {
+  //   map.getCanvas().style.cursor = "";
+  // });
 });
 
 function navigateToLocation(long, lat) {
@@ -698,92 +698,92 @@ map_edit.on("load", async () => {
     map_edit.getCanvas().style.cursor = "";
   });
 
-  //Reported section
-  map_edit.addSource("reported", {
-    type: "geojson",
-    data: JSON.parse(reported),
-    cluster: true,
-    clusterMaxZoom: 15,
-    clusterRadius: 15,
-  });
-  //Reported cluster
-  map_edit.addLayer({
-    id: "reported-cluster",
-    type: "circle",
-    source: "reported",
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
-    },
-    layout: { visibility: "visible" },
-  });
-  //Reported count
-  map_edit.addLayer({
-    id: "reported-count",
-    type: "symbol",
-    source: "reported",
-    filter: ["has", "point_count"],
-    layout: {
-      "text-field": "{point_count_abbreviated}",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-  });
-  //Reported uncluster
-  map_edit.addLayer({
-    id: "reported-unclustered",
-    type: "circle",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: { visibility: "visible" },
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": unclusteredRadius,
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#fff",
-    },
-  });
-  //Reported label
-  map_edit.addLayer({
-    id: "reported-label",
-    type: "symbol",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: {
-      "text-field": "QC",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-    paint: {
-      "text-color": "#f2f7f4",
-    },
-  });
-  //Inspect a cluster on click
-  map_edit.on("click", "reported-cluster", (e) => {
-    inspectCluster(e, "reported");
-  });
+  // //Reported section
+  // map_edit.addSource("reported", {
+  //   type: "geojson",
+  //   data: JSON.parse(reported),
+  //   cluster: true,
+  //   clusterMaxZoom: 15,
+  //   clusterRadius: 15,
+  // });
+  // //Reported cluster
+  // map_edit.addLayer({
+  //   id: "reported-cluster",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
+  //   },
+  //   layout: { visibility: "visible" },
+  // });
+  // //Reported count
+  // map_edit.addLayer({
+  //   id: "reported-count",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   layout: {
+  //     "text-field": "{point_count_abbreviated}",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  // });
+  // //Reported uncluster
+  // map_edit.addLayer({
+  //   id: "reported-unclustered",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: { visibility: "visible" },
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": unclusteredRadius,
+  //     "circle-stroke-width": 1,
+  //     "circle-stroke-color": "#fff",
+  //   },
+  // });
+  // //Reported label
+  // map_edit.addLayer({
+  //   id: "reported-label",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: {
+  //     "text-field": "QC",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  //   paint: {
+  //     "text-color": "#f2f7f4",
+  //   },
+  // });
+  // //Inspect a cluster on click
+  // map_edit.on("click", "reported-cluster", (e) => {
+  //   inspectCluster(e, "reported");
+  // });
 
-  map_edit.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclustered_edit(e, "reported");
-  });
-  map_edit.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclustered_edit("reported");
-  });
-  // Get info on click
-  map_edit.on("click", "reported-unclustered", async (e) => {
-    await handleClickEvent_edit(e);
-  });
-  map_edit.on("mouseenter", "reported-cluster", () => {
-    map_edit.getCanvas().style.cursor = "pointer";
-  });
-  map_edit.on("mouseleave", "reported-cluster", () => {
-    map_edit.getCanvas().style.cursor = "";
-  });
+  // map_edit.on("mouseenter", "reported-unclustered", (e) => {
+  //   mouseEnterEventUnclustered_edit(e, "reported");
+  // });
+  // map_edit.on("mouseleave", "reported-unclustered", () => {
+  //   mouseLeaveEventUnclustered_edit("reported");
+  // });
+  // // Get info on click
+  // map_edit.on("click", "reported-unclustered", async (e) => {
+  //   await handleClickEvent_edit(e);
+  // });
+  // map_edit.on("mouseenter", "reported-cluster", () => {
+  //   map_edit.getCanvas().style.cursor = "pointer";
+  // });
+  // map_edit.on("mouseleave", "reported-cluster", () => {
+  //   map_edit.getCanvas().style.cursor = "";
+  // });
 });
 
 function navigateToLocation_edit(long, lat) {

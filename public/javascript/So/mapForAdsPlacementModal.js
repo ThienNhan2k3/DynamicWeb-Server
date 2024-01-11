@@ -46,9 +46,7 @@ const mouseEnterEventUnclusteredModal = (e, layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
-  }
+  } 
 
   modalMap.getCanvas().style.cursor = "pointer";
   const coordinates = e.features[0].geometry.coordinates.slice();
@@ -71,9 +69,7 @@ const mouseLeaveEventUnclusteredModal = (layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
-  }
+  } 
 
   modalMap.getCanvas().style.cursor = "";
   popup.remove();
@@ -273,88 +269,88 @@ modalMap.on("load", async () => {
     modalMap.getCanvas().style.cursor = "";
   });
   //Reported section
-  modalMap.addSource("reported", {
-    type: "geojson",
-    data: JSON.parse(reported),
-    cluster: true,
-    clusterMaxZoom: 15,
-    clusterRadius: 15,
-  });
-  //Reported cluster
-  modalMap.addLayer({
-    id: "reported-cluster",
-    type: "circle",
-    source: "reported",
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
-    },
-    layout: { visibility: "visible" },
-  });
-  //Reported count
-  modalMap.addLayer({
-    id: "reported-count",
-    type: "symbol",
-    source: "reported",
-    filter: ["has", "point_count"],
-    layout: {
-      "text-field": "{point_count_abbreviated}",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-  });
-  //Reported uncluster
-  modalMap.addLayer({
-    id: "reported-unclustered",
-    type: "circle",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: { visibility: "visible" },
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": unclusteredRadius,
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#fff",
-    },
-  });
-  //Reported label
-  modalMap.addLayer({
-    id: "reported-label",
-    type: "symbol",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: {
-      "text-field": "QC",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-    paint: {
-      "text-color": "#f2f7f4",
-    },
-  });
-  //Inspect a cluster on click
-  modalMap.on("click", "reported-cluster", (e) => {
-    inspectClusterModal(e, "reported");
-  });
+  // modalMap.addSource("reported", {
+  //   type: "geojson",
+  //   data: JSON.parse(reported),
+  //   cluster: true,
+  //   clusterMaxZoom: 15,
+  //   clusterRadius: 15,
+  // });
+  // //Reported cluster
+  // modalMap.addLayer({
+  //   id: "reported-cluster",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
+  //   },
+  //   layout: { visibility: "visible" },
+  // });
+  // //Reported count
+  // modalMap.addLayer({
+  //   id: "reported-count",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   layout: {
+  //     "text-field": "{point_count_abbreviated}",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  // });
+  // //Reported uncluster
+  // modalMap.addLayer({
+  //   id: "reported-unclustered",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: { visibility: "visible" },
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": unclusteredRadius,
+  //     "circle-stroke-width": 1,
+  //     "circle-stroke-color": "#fff",
+  //   },
+  // });
+  // //Reported label
+  // modalMap.addLayer({
+  //   id: "reported-label",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: {
+  //     "text-field": "QC",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  //   paint: {
+  //     "text-color": "#f2f7f4",
+  //   },
+  // });
+  // //Inspect a cluster on click
+  // modalMap.on("click", "reported-cluster", (e) => {
+  //   inspectClusterModal(e, "reported");
+  // });
 
-  modalMap.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclusteredModal(e, "reported");
-  });
-  modalMap.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclusteredModal("reported");
-  });
+  // modalMap.on("mouseenter", "reported-unclustered", (e) => {
+  //   mouseEnterEventUnclusteredModal(e, "reported");
+  // });
+  // modalMap.on("mouseleave", "reported-unclustered", () => {
+  //   mouseLeaveEventUnclusteredModal("reported");
+  // });
 
-  modalMap.on("mouseenter", "reported-cluster", () => {
-    modalMap.getCanvas().style.cursor = "pointer";
-  });
-  modalMap.on("mouseleave", "reported-cluster", () => {
-    modalMap.getCanvas().style.cursor = "";
-  });
+  // modalMap.on("mouseenter", "reported-cluster", () => {
+  //   modalMap.getCanvas().style.cursor = "pointer";
+  // });
+  // modalMap.on("mouseleave", "reported-cluster", () => {
+  //   modalMap.getCanvas().style.cursor = "";
+  // });
 });
 
 const myModal = document.getElementById("createModal");
@@ -457,9 +453,7 @@ const mouseEnterEventUnclusteredModal_edit = (e, layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
-  }
+  } 
 
   modalMap_edit.getCanvas().style.cursor = "pointer";
   const coordinates = e.features[0].geometry.coordinates.slice();
@@ -482,9 +476,7 @@ const mouseLeaveEventUnclusteredModal_edit = (layer) => {
     popup = nonSipulatedPopup;
   } else if (layer == "reported") {
     popup = reportedPopup;
-  } else if (layer == "selfReported") {
-    popup = selfReportedPopup;
-  }
+  } 
 
   modalMap_edit.getCanvas().style.cursor = "";
   popup.remove();
@@ -691,81 +683,81 @@ modalMap_edit.on("load", async () => {
     clusterMaxZoom: 15,
     clusterRadius: 15,
   });
-  //Reported cluster
-  modalMap_edit.addLayer({
-    id: "reported-cluster",
-    type: "circle",
-    source: "reported",
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
-    },
-    layout: { visibility: "visible" },
-  });
-  //Reported count
-  modalMap_edit.addLayer({
-    id: "reported-count",
-    type: "symbol",
-    source: "reported",
-    filter: ["has", "point_count"],
-    layout: {
-      "text-field": "{point_count_abbreviated}",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-  });
-  //Reported uncluster
-  modalMap_edit.addLayer({
-    id: "reported-unclustered",
-    type: "circle",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: { visibility: "visible" },
-    paint: {
-      "circle-color": reportedColor,
-      "circle-radius": unclusteredRadius,
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#fff",
-    },
-  });
-  //Reported label
-  modalMap_edit.addLayer({
-    id: "reported-label",
-    type: "symbol",
-    source: "reported",
-    filter: ["!", ["has", "point_count"]],
-    layout: {
-      "text-field": "QC",
-      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-      "text-size": 12,
-      "text-allow-overlap": true,
-      visibility: "visible",
-    },
-    paint: {
-      "text-color": "#f2f7f4",
-    },
-  });
-  //Inspect a cluster on click
-  modalMap_edit.on("click", "reported-cluster", (e) => {
-    inspectClusterModal_edit(e, "reported");
-  });
+  // //Reported cluster
+  // modalMap_edit.addLayer({
+  //   id: "reported-cluster",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": ["step", ["get", "point_count"], 15, 4, 30, 8, 45],
+  //   },
+  //   layout: { visibility: "visible" },
+  // });
+  // //Reported count
+  // modalMap_edit.addLayer({
+  //   id: "reported-count",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["has", "point_count"],
+  //   layout: {
+  //     "text-field": "{point_count_abbreviated}",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  // });
+  // //Reported uncluster
+  // modalMap_edit.addLayer({
+  //   id: "reported-unclustered",
+  //   type: "circle",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: { visibility: "visible" },
+  //   paint: {
+  //     "circle-color": reportedColor,
+  //     "circle-radius": unclusteredRadius,
+  //     "circle-stroke-width": 1,
+  //     "circle-stroke-color": "#fff",
+  //   },
+  // });
+  // //Reported label
+  // modalMap_edit.addLayer({
+  //   id: "reported-label",
+  //   type: "symbol",
+  //   source: "reported",
+  //   filter: ["!", ["has", "point_count"]],
+  //   layout: {
+  //     "text-field": "QC",
+  //     "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+  //     "text-size": 12,
+  //     "text-allow-overlap": true,
+  //     visibility: "visible",
+  //   },
+  //   paint: {
+  //     "text-color": "#f2f7f4",
+  //   },
+  // });
+  // //Inspect a cluster on click
+  // modalMap_edit.on("click", "reported-cluster", (e) => {
+  //   inspectClusterModal_edit(e, "reported");
+  // });
 
-  modalMap_edit.on("mouseenter", "reported-unclustered", (e) => {
-    mouseEnterEventUnclusteredModal_edit(e, "reported");
-  });
-  modalMap_edit.on("mouseleave", "reported-unclustered", () => {
-    mouseLeaveEventUnclusteredModal_edit("reported");
-  });
+  // modalMap_edit.on("mouseenter", "reported-unclustered", (e) => {
+  //   mouseEnterEventUnclusteredModal_edit(e, "reported");
+  // });
+  // modalMap_edit.on("mouseleave", "reported-unclustered", () => {
+  //   mouseLeaveEventUnclusteredModal_edit("reported");
+  // });
 
-  modalMap_edit.on("mouseenter", "reported-cluster", () => {
-    modalMap_edit.getCanvas().style.cursor = "pointer";
-  });
-  modalMap_edit.on("mouseleave", "reported-cluster", () => {
-    modalMap_edit.getCanvas().style.cursor = "";
-  });
+  // modalMap_edit.on("mouseenter", "reported-cluster", () => {
+  //   modalMap_edit.getCanvas().style.cursor = "pointer";
+  // });
+  // modalMap_edit.on("mouseleave", "reported-cluster", () => {
+  //   modalMap_edit.getCanvas().style.cursor = "";
+  // });
 });
 
 function navigateToLocation_edit(long, lat) {
