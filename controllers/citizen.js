@@ -159,6 +159,11 @@ const getReport = async (req, res, next) => {
   });
 
   const reportedTable2 = await LocationReport.findAll({
+    where: {
+      status: {
+        [Sequelize.Op.not]: "Đã xử lý",
+      },
+    },
     include: [
       { model: Area, required: true },
       {
@@ -506,8 +511,8 @@ const getReportByLngLat = async (req, res) => {
   report1.forEach((report) => {
     report.dataValues.type = 1;
   });
-  console.log(lng)
-  console.log(lat)
+  console.log(lng);
+  console.log(lat);
   const report2 = await LocationReport.findAll({
     where: {
       long: lng,
@@ -518,9 +523,9 @@ const getReportByLngLat = async (req, res) => {
   report2.forEach((report) => {
     report.dataValues.type = 2;
   });
-  console.log(report2)
+  console.log(report2);
   const combined = report1.concat(report2);
-  console.log(combined)
+  console.log(combined);
   return res.status(200).json(JSON.stringify(combined));
 };
 module.exports = {
