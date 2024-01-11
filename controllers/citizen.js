@@ -151,6 +151,25 @@ const getReport = async (req, res, next) => {
           },
         ],
       },
+      {
+        model: ReportType,
+        required: true,
+      },
+    ],
+  });
+
+  const reportedTable2 = await LocationReport.findAll({
+    where: {
+      status: {
+        [Sequelize.Op.not]: "Đã xử lý",
+      },
+    },
+    include: [
+      { model: Area, required: true },
+      {
+        model: ReportType,
+        required: true,
+      },
     ],
   });
 
@@ -165,18 +184,41 @@ const getReport = async (req, res, next) => {
       const feature = {
         type: "Feature",
         properties: {
-          id: data.AdsPlacement.id,
           area: {
             ward: data.AdsPlacement.Area.ward,
             district: data.AdsPlacement.Area.district,
           },
-          locationType: data.AdsPlacement.LocationType.locationType,
-          adsType: data.AdsPlacement.AdsType.type,
+          reportType: data.ReportType.type,
           address: data.AdsPlacement.address,
-          status: "Bị báo cáo",
+          lng: data.AdsPlacement.long,
+          lat: data.AdsPlacement.lat,
         },
         geometry: {
           coordinates: [data.AdsPlacement.long, data.AdsPlacement.lat],
+          type: "Point",
+        },
+      };
+      reportedGeoJSON.features.push(feature);
+    }
+  });
+  const placement2 = [];
+  reportedTable2.forEach((data) => {
+    if (placement2.indexOf([data.long, data.lat]) == -1) {
+      placement2.push([data.long, data.lat]);
+      const feature = {
+        type: "Feature",
+        properties: {
+          area: {
+            ward: data.Area.ward,
+            district: data.Area.district,
+          },
+          reportType: data.ReportType.type,
+          address: data.address,
+          lng: data.long,
+          lat: data.lat,
+        },
+        geometry: {
+          coordinates: [data.long, data.lat],
           type: "Point",
         },
       };
@@ -348,7 +390,7 @@ const postSelfReport = async (req, res) => {
       },
     ],
   });
-  const combined=reports.concat(reports2)
+  const combined = reports.concat(reports2);
   res.json(JSON.stringify(combined));
 };
 
@@ -417,8 +459,8 @@ const postReportRandomLocation = async (req, res) => {
     image: imageUrl,
     status: "Chờ xử lý",
     address: address,
-    long: lng,
-    lat: lat,
+    long: parseFloat(lng).toFixed(6),
+    lat: parseFloat(lat).toFixed(6),
     AreaId: areaId,
     ReportTypeId: typeId,
   });
@@ -426,7 +468,7 @@ const postReportRandomLocation = async (req, res) => {
   return res.status(200).json({ newReport });
 };
 
-const getReportByLngLat = async (req, res) => {
+const getSelfReportByLngLat = async (req, res) => {
   const lng = parseFloat(req.query.lng);
   const lat = parseFloat(req.query.lat);
   const type = req.query.type;
@@ -445,16 +487,43 @@ const getReportByLngLat = async (req, res) => {
         },
       ],
     });
-    console.log(reports);
+
     return res.json(JSON.stringify(reports));
   } else if (type == 2) {
     const reports = await LocationReport.findAll({
       where: { id: { [Sequelize.Op.in]: reportIds }, long: lng, lat: lat },
       include: [{ model: ReportType, required: true }],
     });
-    console.log(reports);
+
     return res.json(JSON.stringify(reports));
   }
+};
+
+const getReportByLngLat = async (req, res) => {
+  const lng = parseFloat(req.query.lng);
+  const lat = parseFloat(req.query.lat);
+  const report1 = await Report.findAll({
+    include: [
+      { model: AdsPlacement, where: { long: lng, lat: lat } },
+      { model: ReportType, required: true },
+    ],
+  });
+  report1.forEach((report) => {
+    report.dataValues.type = 1;
+  });
+
+  const report2 = await LocationReport.findAll({
+    where: {
+      long: lng,
+      lat: lat,
+    },
+    include: [{ model: ReportType, required: true }],
+  });
+  report2.forEach((report) => {
+    report.dataValues.type = 2;
+  });
+  const combined = report1.concat(report2);
+  return res.status(200).json(JSON.stringify(combined));
 };
 module.exports = {
   getSipulated,
@@ -465,5 +534,6 @@ module.exports = {
   getReportData,
   postSelfReport,
   postReportRandomLocation,
+  getSelfReportByLngLat,
   getReportByLngLat,
 };
