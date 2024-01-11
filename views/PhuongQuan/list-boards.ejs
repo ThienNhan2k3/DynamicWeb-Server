@@ -70,7 +70,9 @@
                 <td><%= board.BoardType.type %></td>
                 <td><%= board.PermitRequest.status %></td>
                 <td>
-                  <a href=""><i class="fa-solid fa-file"></i></a>
+                  <a href="" data-bs-toggle="modal" data-bs-target="#viewPermitRequestModal" onclick="showPermitRequestDetails(this)" data-permit-request-id="<%= board.PermitRequest.id %>" data-board-id="<%= board.id %>" data-company-name="<%= board.PermitRequest.Company.name %>" data-phone="<%= board.PermitRequest.Company.phone %>" data-address="<%= board.PermitRequest.Company.address %>" data-email="<%= board.PermitRequest.Company.email %>" data-start-date="<%= board.PermitRequest.start.toISOString().substring(0, 10) %>" data-end-date="<%= board.PermitRequest.end.toISOString().substring(0, 10) %>" data-img="/<%= board.PermitRequest.image %>" data-content="<%= board.PermitRequest.content %>">
+                    <i class="fa-solid fa-file"></i>
+                  </a>
                   <a href="" data-bs-toggle="modal" data-bs-target="#boardChange" onclick="showEditBoardModal(this)" data-id="<%= board.id %>" data-size="<%= board.size %>" data-quantity="<%= board.quantity %>" data-type="<%= board.BoardTypeId %>">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </a>
@@ -126,6 +128,7 @@
   <!-- Modals -->
   <%- include("./subPartials/form-change-board-details.ejs") %>
   <%- include("./subPartials/form-add-permit-request.ejs") %>
+  <%- include("./subPartials/view-permit-request.ejs") %>
   <% if (message) { %> <%- include("./subPartials/message-modal.ejs") %> <% }; %>
   </body>
 

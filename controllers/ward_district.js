@@ -232,6 +232,7 @@ controller.showListBoards = async (req, res) => {
       {
         model: models.PermitRequest,
         required: true,
+        include: [{model: models.Company}]
       },
       { model: models.BoardType },
     ],
@@ -272,7 +273,9 @@ controller.showListBoards = async (req, res) => {
       {
         model: models.PermitRequest,
         required: false,
-        where: { boardId: null },
+        where: { 
+          boardId: null,
+        },
       },
       { model: models.BoardType },
     ],
@@ -281,7 +284,7 @@ controller.showListBoards = async (req, res) => {
         {
           id: {
             [Op.notIn]: Sequelize.literal(
-              "(SELECT boardId FROM permitRequests WHERE boardId IS NOT NULL)"
+              "(SELECT boardId FROM permitRequests WHERE boardId IS NOT NULL AND end >= CURRENT_DATE)"
             ),
           },
         },
