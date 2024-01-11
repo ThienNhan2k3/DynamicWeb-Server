@@ -565,8 +565,10 @@ controller.viewReports = async (req, res) => {
   let district = req.query.district || "";
   let ward = req.query.ward || "";
   let type = req.query.type || "";
-  
-  let wards = [], currentDistrict = "", currentWard = "";
+
+  let wards = [],
+    currentDistrict = "",
+    currentWard = "";
   let whereCondition = {};
   if (district.trim() !== "") {
     wards = await Area.findAll({
@@ -611,8 +613,8 @@ controller.viewReports = async (req, res) => {
         ReportType,
         {
           model: Area,
-              where: whereCondition,
-              required: true,
+          where: whereCondition,
+          required: true,
         },
       ],
       required: true,
@@ -641,8 +643,8 @@ controller.viewReports = async (req, res) => {
         ReportType,
         {
           model: Area,
-              where: whereCondition,
-              required: true,
+          where: whereCondition,
+          required: true,
         },
       ],
       required: true,
@@ -656,18 +658,27 @@ controller.viewReports = async (req, res) => {
     res,
     reports,
     reportsPerPage,
-    page,
+    page
   );
   const createWardDistrictPageTypeQueryString = (key, value) => {
-    let newType = key === 'type=' ? {key: value === "" ? value : key , value} : {key: type === "" ? "" : "type=", value: type}; 
-    let newWard = key === "ward=" ? { key, value } : {key: ward === "" ? "" : "ward=", value: ward};
+    let newType =
+      key === "type="
+        ? { key: value === "" ? value : key, value }
+        : { key: type === "" ? "" : "type=", value: type };
+    let newWard =
+      key === "ward="
+        ? { key, value }
+        : { key: ward === "" ? "" : "ward=", value: ward };
     let newPage = key === "page=" ? { key, value } : { key: "", value: "" };
     let newDistrict;
     if (key === "district=") {
       newDistrict = { key, value };
       newWard = { key: "", value: "" };
     } else {
-      newDistrict = { key: district === "" ? "": "district=", value: district };
+      newDistrict = {
+        key: district === "" ? "" : "district=",
+        value: district,
+      };
     }
     let newUrl = req.originalUrl;
     let index = newUrl.indexOf("?");
@@ -680,16 +691,26 @@ controller.viewReports = async (req, res) => {
     console.log(">>> index: ", index);
 
     let temp = newUrl.length;
-    newUrl = newUrl + newPage.key + newPage.value +
-      (newWard.key !== "" ? "&" : "") + newWard.key + newWard.value +
-      (newDistrict.key !== "" ? "&" : "") + newDistrict.key + newDistrict.value + 
-      (newType.key !== "" ? "&" : "") + newType.key + newType.value;
+    newUrl =
+      newUrl +
+      newPage.key +
+      newPage.value +
+      (newWard.key !== "" ? "&" : "") +
+      newWard.key +
+      newWard.value +
+      (newDistrict.key !== "" ? "&" : "") +
+      newDistrict.key +
+      newDistrict.value +
+      (newType.key !== "" ? "&" : "") +
+      newType.key +
+      newType.value;
     if (newUrl.charAt(temp) === "&") {
       newUrl = newUrl.slice(0, temp) + newUrl.slice(temp + 1);
     }
     return newUrl;
   };
-  res.locals.createWardDistrictPageTypeQueryString = createWardDistrictPageTypeQueryString;
+  res.locals.createWardDistrictPageTypeQueryString =
+    createWardDistrictPageTypeQueryString;
   // console.log(pagination.rows);
   const currentUrl = req.url.slice(1);
   return res.render("So/viewReports.ejs", {
@@ -706,7 +727,7 @@ controller.viewReports = async (req, res) => {
     wards,
     currentDistrict,
     currentWard,
-    currentType: type
+    currentType: type,
   });
 };
 
@@ -748,13 +769,12 @@ controller.detailReport = async (req, res) => {
         id,
       },
     });
-  
   }
-  
+
   report.image = report.image.split(", ");
   return res.render("So/detailReport.ejs", {
     report,
-    type
+    type,
   });
 };
 
@@ -786,7 +806,7 @@ controller.statisticReport = async (req, res) => {
       },
     });
     reports = reports.concat(locationReports);
-  
+
     let labels = [],
       numberOfReportsList = [],
       waiting = 0,
@@ -1183,7 +1203,7 @@ controller.createAdplace = async (req, res) => {
 
   console.log(req.body);
   let createFailed = false;
-  const { district, ward } = checkInput.extractDistrictAndWard(
+  const { district, ward } = await checkInput.extractDistrictAndWard(
     await checkInput.getAddressFromLatLong(
       latCreateModal,
       lngCreateModal,
@@ -1251,13 +1271,12 @@ controller.createAdplace = async (req, res) => {
     adTypeSelectCreateModal
   );
 
-  console.log("Bắt đầu khởi tạo AdsPlacement");
   try {
     const newAdsPlacement = await AdsPlacement.create({
       address: addressCreateModal,
       status: "Chưa quy hoạch",
-      long: lngCreateModal,
-      lat: latCreateModal,
+      long: parseFloat(lngCreateModal).toFixed(6),
+      lat: parseFloat(latCreateModal).toFixed(6),
       AreaId: areaId,
       LocationTypeId: locationTypeId,
       AdsTypeId: adTypeId,
@@ -1289,7 +1308,7 @@ controller.createAdplace = async (req, res) => {
 
 controller.editAdplace = async (req, res) => {
   let editFailed = false;
-  const {
+  let {
     idEditModal,
     districtSelectEditModal,
     wardSelectEditModal,
@@ -1330,8 +1349,8 @@ controller.editAdplace = async (req, res) => {
         LocationTypeId: locationTypeId,
         AdsTypeId: adTypeId,
         status: statusEditModal,
-        long: lngEditModal,
-        lat: latEditModal,
+        long: parseFloat(lngEditModal).toFixed(6),
+        lat: parseFloat(latEditModal).toFixed(6),
       },
       {
         where: {
