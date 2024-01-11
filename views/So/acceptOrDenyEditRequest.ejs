@@ -326,7 +326,9 @@
             console.log(requestStatus);
 
             if (requestStatus === 'Bị từ chối' || requestStatus === 'Đã được duyệt') {
-              console.log(requestStatus);
+              document.getElementById("accept-btn").disabled = true;
+              document.getElementById("deny-btn").disabled = true;
+            } else {
               document.getElementById("accept-btn").disabled = true;
               document.getElementById("deny-btn").disabled = true;
             }

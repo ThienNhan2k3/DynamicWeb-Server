@@ -355,6 +355,9 @@
                         if (btn.dataset.requeststatus != "Chờ phê duyệt") {
                             document.getElementById("accept-btn").disabled = true;
                             document.getElementById("deny-btn").disabled = true;
+                        } else {
+                            document.getElementById("accept-btn").disabled = false;
+                            document.getElementById("deny-btn").disabled = false;
                         }
                     }
                     document.addEventListener('DOMContentLoaded', function () {
