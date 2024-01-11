@@ -34,7 +34,7 @@ controller.home = async (req, res) => {
   const wardArr = wards.map((area) => {
     return area.dataValues.ward;
   });
-  // console.log(wardArr)
+
   return res.render("PhuongQuan/home.ejs", {
     tab: "Trang chủ",
     area: account.Area,
