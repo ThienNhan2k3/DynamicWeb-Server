@@ -316,9 +316,9 @@ function extractDistrictAndWard(input) {
   for (let i = 0; i < components.length; i++) {
     const component = components[i];
     if (
-      component.includes("District") ||
+      (component.includes("District") ||
       component.includes("Huyện") ||
-      component.includes("Quận")
+      component.includes("Quận")) && districtIndex == null
     ) {
       district = component.replace("District ", ""); // Extract only digits
       district = component.replace("Huyện ", ""); // Extract only digits
