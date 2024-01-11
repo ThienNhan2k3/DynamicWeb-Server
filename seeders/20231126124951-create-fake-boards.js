@@ -12,8 +12,8 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await queryInterface.sequelize.query("SELECT * FROM boardtypes");
-    await queryInterface.sequelize.query("SELECT * FROM adsplacements");
+    await queryInterface.sequelize.query("SELECT * FROM boardTypes");
+    await queryInterface.sequelize.query("SELECT * FROM adsPlacements");
 
     const {boards} = require("../data/boardsData.js");
     await queryInterface.bulkInsert(

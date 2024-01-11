@@ -13,7 +13,7 @@ module.exports = {
      * }], {});
     */
     await queryInterface.sequelize.query('SELECT * FROM areas');
-    await queryInterface.sequelize.query('SELECT * FROM reporttypes');
+    await queryInterface.sequelize.query('SELECT * FROM reportTypes');
     await queryInterface.sequelize.query('SELECT * FROM accounts');
     
     const {locationReports} = require("../data/locationReportsData");

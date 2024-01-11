@@ -14,7 +14,7 @@ module.exports = {
      */
     await queryInterface.sequelize.query("SELECT * FROM companies");
     await queryInterface.sequelize.query("SELECT * FROM boards");
-    await queryInterface.sequelize.query("SELECT * FROM reporttypes");
+    await queryInterface.sequelize.query("SELECT * FROM reportTypes");
     await queryInterface.sequelize.query("SELECT * FROM accounts");
 
     const {permitRequests} = require("../data/permitRequestsData.js");

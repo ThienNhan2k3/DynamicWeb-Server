@@ -13,8 +13,8 @@ module.exports = {
      * }], {});
      */
     await queryInterface.sequelize.query("SELECT * FROM areas");
-    await queryInterface.sequelize.query("SELECT * FROM locationtypes");
-    await queryInterface.sequelize.query("SELECT * FROM adstypes");
+    await queryInterface.sequelize.query("SELECT * FROM locationTypes");
+    await queryInterface.sequelize.query("SELECT * FROM adsTypes");
 
     const {adsPlacementsData} = require("../data/adsPlacementsData.js");
     await queryInterface.bulkInsert(

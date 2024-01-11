@@ -13,10 +13,10 @@ module.exports = {
      * }], {});
      */
     await queryInterface.sequelize.query('SELECT * FROM boards');
-    await queryInterface.sequelize.query('SELECT * FROM adsplacements');
-    await queryInterface.sequelize.query('SELECT * FROM reporttypes');
+    await queryInterface.sequelize.query('SELECT * FROM adsPlacements');
+    await queryInterface.sequelize.query('SELECT * FROM reportTypes');
     await queryInterface.sequelize.query('SELECT * FROM accounts');
-    await queryInterface.sequelize.query('SELECT * FROM reporttypes');
+    await queryInterface.sequelize.query('SELECT * FROM reportTypes');
     
     const {reports} = require("../data/reportsData");
     await queryInterface.bulkInsert(
