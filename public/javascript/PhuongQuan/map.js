@@ -1100,10 +1100,6 @@ map.on("click", async (e) => {
     const HTMLlocationAddr = document.querySelector("#location-address");
     HTMLlocationName.innerHTML = name;
     HTMLlocationAddr.innerHTML = address;
-    // Change in report random location form
-    document.querySelector("#form-address-random-location").value = fullAddr;
-    document.querySelector("#form-lng-random-location").value = lng;
-    document.querySelector("#form-lat-random-location").value = lat;
   } catch (err) {
     console.log(err);
   }
@@ -1202,49 +1198,6 @@ createPermissionButtonHalf.addEventListener("click", (e) => {
   selectedBoard = adsData[page - 1];
 });
 
-//Update map when select specified ward
-const filterSelect = document.querySelector("#filterSelect");
-filterSelect.addEventListener("change", (e) => {
-  // e.preventDefault();
-  const selectedWardsHTML = filterSelect.selectedOptions;
-  let selectedWard = [];
-  for (let i = 0; i < selectedWardsHTML.length; i++) {
-    selectedWard.push(selectedWardsHTML[i].label);
-  }
-
-  //Refilter
-  filterSipulated.features = sipulated.features
-    .filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        selectedWard.includes(p.properties.area.ward)
-      );
-    })
-    .slice();
-
-  filterNonSipulated.features = nonSipulated.features
-    .filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        selectedWard.includes(p.properties.area.ward)
-      );
-    })
-    .slice();
-
-  filterReported.features = reported.features
-    .filter((p) => {
-      return (
-        p.properties.area.district == accountDistrict &&
-        selectedWard.includes(p.properties.area.ward)
-      );
-    })
-    .slice();
-
-  //Change data and rerender map
-  map.getSource("sipulated").setData(filterSipulated);
-  map.getSource("nonSipulated").setData(filterNonSipulated);
-  map.getSource("reported").setData(filterReported);
-});
 
 // view report detail button
 const handleViewReportButton = async (e) => {
@@ -1252,10 +1205,15 @@ const handleViewReportButton = async (e) => {
     document.querySelector(".page-item.active .page-link").innerText
   );
   const selectedReport = rpData[selectedPage - 1];
-
+  let path
+  if(accountType=="Quan") {
+    path="district"
+  } else {
+    path="ward"
+  }
   if (selectedReport.type == 1) {
-    window.location.href = `${serverPath}/district/list-reports/${selectedReport.id}`;
+    window.location.href = `${serverPath}/${path}/list-reports/${selectedReport.id}`;
   } else if (selectedReport.type == 2) {
-    window.location.href = `${serverPath}/district/list-reports/location-report/${selectedReport.id}`;
+    window.location.href = `${serverPath}/${path}/list-reports/location-report/${selectedReport.id}`;
   }
 };
