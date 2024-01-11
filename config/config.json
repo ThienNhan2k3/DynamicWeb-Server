@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "ntk123",
-    "database": "ptudw_ntk_test",
+    "password": "boonreal",
+    "database": "ptudw",
     "host": "34.84.1.65",
     "dialect": "mysql",
     "logging": false,
