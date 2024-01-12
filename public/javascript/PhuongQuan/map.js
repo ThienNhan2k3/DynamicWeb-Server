@@ -332,9 +332,6 @@ const getInfoOnclickUnclustered = async (e) => {
     <a class="page-link" href="#" aria-label="Previous">
       <span aria-hidden="true">&laquo;</span></a></li>`;
   for (let i = 0; i < adsData.length; i++) {
-    if (i == 3) {
-      break;
-    }
     if (i == 0) {
       paginationData += `<li class="page-item active" aria-current="page"><a class="page-link" href="#">${
         i + 1
